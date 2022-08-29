@@ -1,0 +1,5 @@
+target/**
+**/output*.txt
+.idea/**
+rlo_06.iml
+/.flattened-pom.xml
