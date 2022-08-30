@@ -9,6 +9,7 @@
   <name>rlo_06</name>
   <description>Java RFC5424 parser library rlo_06</description>
   <groupId>com.teragrep</groupId>
+  <url>https://teragrep.com</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
