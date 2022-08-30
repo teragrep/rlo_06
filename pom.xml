@@ -247,7 +247,7 @@
         <repository>
           <id>github</id>
           <name>GitHub Packages</name>
-          <url>https://maven.pkg.github.com/teragrep/rlp_03</url>
+          <url>https://maven.pkg.github.com/teragrep/rlo_06</url>
         </repository>
       </distributionManagement>
     </profile>
