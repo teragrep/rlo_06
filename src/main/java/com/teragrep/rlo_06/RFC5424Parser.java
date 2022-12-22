@@ -51,13 +51,20 @@ import java.nio.ByteBuffer;
 
 public final class RFC5424Parser {
     private InputStream inputStream;
+    private final boolean LFT;
     private Boolean EOF = false;
-    private final byte[] buffer = new byte[256*1024];
+    private final byte[] buffer = new byte[256 * 1024];
     private int pointer = -1;
     private int read = -1;
 
     public RFC5424Parser(InputStream inputStream) {
         this.inputStream = inputStream;
+        this.LFT = true;
+    }
+
+    public RFC5424Parser(InputStream inputStream, boolean LFT) {
+        this.inputStream = inputStream;
+        this.LFT = LFT;
     }
 
     public void setInputStream(InputStream inputStream) {
@@ -97,7 +104,7 @@ public final class RFC5424Parser {
 
         b = this.readBuffer();
         if (b >= 48 && b <= 57) { // first is always a number between 0..9
-            if(resultset.PRIORITY!= null)
+            if (resultset.PRIORITY != null)
                 resultset.PRIORITY.put(b);
         } else {
             throw new ParseException("PRIORITY number incorrect");
@@ -105,12 +112,12 @@ public final class RFC5424Parser {
 
         b = this.readBuffer();
         if (b >= 48 && b <= 57) { // second may be a number between 0..9
-            if(resultset.PRIORITY!= null)
+            if (resultset.PRIORITY != null)
                 resultset.PRIORITY.put(b);
 
             b = this.readBuffer();
             if (b >= 48 && b <= 57) { // third may be a number
-                if(resultset.PRIORITY!= null)
+                if (resultset.PRIORITY != null)
                     resultset.PRIORITY.put(b);
 
                 b = this.readBuffer();
@@ -167,7 +174,7 @@ public final class RFC5424Parser {
             return b;
         }
 
-        while(b == 91) { // '[' sd exists
+        while (b == 91) { // '[' sd exists
             // structured data, oh wow the performance hit
 
             // parse the sdId
@@ -178,7 +185,7 @@ public final class RFC5424Parser {
                     Payload:'[ID_A@1]'
                     */
             b = this.readBuffer();
-            while(sdId_max_left > 0 && b != 32 && b != 93) { // ' ' nor ']'
+            while (sdId_max_left > 0 && b != 32 && b != 93) { // ' ' nor ']'
                 resultset.sdIdIterator.put(b);
                 sdId_max_left--;
                 b = this.readBuffer();
@@ -187,16 +194,14 @@ public final class RFC5424Parser {
 
             if (b != 32 && b != 93) { // ' ' nor ']'
                 throw new ParseException("SP missing after SD_ID or SD_ID too long");
-            }
-            else if (b == 93) { // ']', sdId only here: Payload:'[ID_A@1]' or Payload:'[ID_A@1][ID_B@1]'
+            } else if (b == 93) { // ']', sdId only here: Payload:'[ID_A@1]' or Payload:'[ID_A@1][ID_B@1]'
                 // clean up sdIterator for the next one
                 resultset.sdIdIterator.flip();
                 resultset.sdIdIterator.clear();
 
                 // MSG may not exist, no \n either, Parsing may be complete. readBuffer sets this.returnAfter to false
                 // Total payload: '<14>1 2015-06-20T09:14:07.12345+00:00 host02 serverd DEA MSG-01 [ID_A@1]'
-            }
-            else { // ' ', sdElement must exist
+            } else { // ' ', sdElement must exist
                 // check if we are interested in this sdId at all or skip to next sdId block
 
                 if (resultset.sdSubscription.containsKey(resultset.sdIdIterator)) {
@@ -220,14 +225,14 @@ public final class RFC5424Parser {
                         }
 
                         // check if this is for us
-                        if(resultset.sdSubscription.get(resultset.sdIdIterator).containsKey(resultset.sdElementIterator)) {
-                            ByteBuffer elementValue =  resultset.sdSubscription.get(resultset.sdIdIterator).get(resultset.sdElementIterator);
-                            short sdElemVal_max_left = 8*1024;
+                        if (resultset.sdSubscription.get(resultset.sdIdIterator).containsKey(resultset.sdElementIterator)) {
+                            ByteBuffer elementValue = resultset.sdSubscription.get(resultset.sdIdIterator).get(resultset.sdElementIterator);
+                            short sdElemVal_max_left = 8 * 1024;
                             b = this.readBuffer();
 
                             while (sdElemVal_max_left > 0 && b != 34) { // '"'
                                 // escaped are special: \" \\ \] ...
-                                if(b == 92) { // \
+                                if (b == 92) { // \
                                     // insert
                                     elementValue.put(b);
                                     sdElemVal_max_left--;
@@ -235,7 +240,7 @@ public final class RFC5424Parser {
                                     b = this.readBuffer();
 
                                     // if it is a '"' then it must be taken care of, loop can do the rest
-                                    if(b == 34) {
+                                    if (b == 34) {
                                         if (sdElemVal_max_left > 0) {
                                             elementValue.put(b);
                                             sdElemVal_max_left--;
@@ -325,19 +330,33 @@ public final class RFC5424Parser {
 
         // first of anything is ' '
         // first
-        if (
-                b != 32 // space is skipped as "-xyz" or "- xyz" or "]xyz" or "] xyz" may exist
-        ) {
+        if (b != 32) { // space is skipped as "-xyz" or "- xyz" or "]xyz" or "] xyz" may exist
             resultset.MSG.put(b);
             msg_current_left--;
+        } else { // read next byte because this one is a space
+            b = this.readBuffer();
         }
 
-        // this little while here is the steam roller of this parser
-        while ( (b = this.readBuffer()) != 10 && this.EOF == false) {
-            if (msg_current_left > 0) {
-                if(resultset.MSG != null)
-                    resultset.MSG.put(b);
-                msg_current_left--;
+        // this little while here is the steamroller of this parser
+        if (this.LFT) { // Line-feed termination active
+            while (b != 10 && !this.EOF) {
+                if (msg_current_left > 0) {
+                    if (resultset.MSG != null) {
+                        resultset.MSG.put(b);
+                    }
+                    msg_current_left--;
+                }
+                b = this.readBuffer();
+            }
+        } else { // Line-feed termination inactive, reading until EOF
+            while (!this.EOF) {
+                if (msg_current_left > 0) {
+                    if (resultset.MSG != null) {
+                        resultset.MSG.put(b);
+                    }
+                    msg_current_left--;
+                }
+                b = this.readBuffer();
             }
         }
         return b;
@@ -347,15 +366,14 @@ public final class RFC5424Parser {
         byte b;
         b = this.readBuffer();
         if (b == 49) {
-            if(resultset.VERSION != null)
-               resultset.VERSION.put(b);
+            if (resultset.VERSION != null)
+                resultset.VERSION.put(b);
 
             b = this.readBuffer();
             if (b != 32) { // omit ' '
                 throw new ParseException("SP missing after VERSION");
             }
-        }
-        else {
+        } else {
             throw new ParseException("VERSION not 1");
         }
     }
@@ -365,7 +383,7 @@ public final class RFC5424Parser {
         short ts_max_left = 32;
         b = this.readBuffer();
         while (ts_max_left > 0 && b != 32) {
-            if(resultset.TIMESTAMP != null)
+            if (resultset.TIMESTAMP != null)
                 resultset.TIMESTAMP.put(b);
             ts_max_left--;
             b = this.readBuffer();
@@ -381,8 +399,8 @@ public final class RFC5424Parser {
         short hostname_max_left = 255;
         b = this.readBuffer();
         while (hostname_max_left > 0 && b != 32) {
-            if(resultset.HOSTNAME != null)
-               resultset.HOSTNAME.put(b);
+            if (resultset.HOSTNAME != null)
+                resultset.HOSTNAME.put(b);
             hostname_max_left--;
             b = this.readBuffer();
         }
@@ -397,7 +415,7 @@ public final class RFC5424Parser {
         short appname_max_left = 48;
         b = this.readBuffer();
         while (appname_max_left > 0 && b != 32) {
-            if(resultset.APPNAME != null)
+            if (resultset.APPNAME != null)
                 resultset.APPNAME.put(b);
             appname_max_left--;
             b = this.readBuffer();
@@ -413,7 +431,7 @@ public final class RFC5424Parser {
         short procid_max_left = 128;
         b = this.readBuffer();
         while (procid_max_left > 0 && b != 32) {
-            if(resultset.PROCID != null)
+            if (resultset.PROCID != null)
                 resultset.PROCID.put(b);
             procid_max_left--;
             b = this.readBuffer();
@@ -429,7 +447,7 @@ public final class RFC5424Parser {
         short msgid_max_left = 32;
         b = this.readBuffer();
         while (msgid_max_left > 0 && b != 32) {
-            if(resultset.MSGID!= null)
+            if (resultset.MSGID != null)
                 resultset.MSGID.put(b);
             msgid_max_left--;
             b = this.readBuffer();
@@ -572,8 +590,8 @@ public final class RFC5424Parser {
         // fall through
 
         if (b != 10) {
-                throw new ParseException("NL missing after MSG or MSG too long");
-            }
+            throw new ParseException("NL missing after MSG or MSG too long");
+        }
         return true; // there was data, returning true
     } // public void parseStream(InputStream inputStream) throws IOException {
 }

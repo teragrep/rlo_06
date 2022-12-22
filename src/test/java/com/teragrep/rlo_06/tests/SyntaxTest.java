@@ -532,4 +532,53 @@ public class SyntaxTest {
         Assertions.assertEquals("", strings1.getMsgid());
         Assertions.assertEquals("", strings1.getMsg());
     }
+    @Test
+    void multipleNewlinesInMsg() throws Exception {
+        String SYSLOG_MESSAGE = "<14>1 2022-12-13T14:41:29.715Z test-stream 9627df7a-testi - - - Testing text.\ntest\ning.\n";
+
+        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
+        subscription.subscribeAll();
+
+        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
+        sdSubscription.subscribeElement("event_id@48577","hostname");
+
+        ParserResultset res = new ParserResultset(subscription, sdSubscription);
+
+        RFC5424Parser parser = new RFC5424Parser(null, false);
+
+        int count = 2;
+        for (int i = 0; i < count; i++) {
+            parser.setInputStream(new ByteArrayInputStream( (SYSLOG_MESSAGE).getBytes()));
+
+            assertTrue(parser.next(res));
+            ResultsetAsString strings1 = new ResultsetAsString(res);
+
+            // Message 1
+            Assertions.assertEquals("14", strings1.getPriority());
+            Assertions.assertEquals("1", strings1.getVersion());
+            Assertions.assertEquals("2022-12-13T14:41:29.715Z", strings1.getTimestamp());
+            Assertions.assertEquals("test-stream", strings1.getHostname());
+            Assertions.assertEquals("9627df7a-testi", strings1.getAppname());
+            Assertions.assertEquals("-", strings1.getProcid());
+            Assertions.assertEquals("-", strings1.getMsgid());
+            Assertions.assertEquals("Testing text.\ntest\ning.\n", strings1.getMsg());
+
+            res.clear();
+        }
+
+        // finally empty
+        assertFalse(parser.next(res));
+        ResultsetAsString strings1 = new ResultsetAsString(res);
+        strings1.setResultset(res);
+
+        // Message Finished
+        Assertions.assertEquals("", strings1.getPriority());
+        Assertions.assertEquals("", strings1.getVersion());
+        Assertions.assertEquals("", strings1.getTimestamp());
+        Assertions.assertEquals("", strings1.getHostname());
+        Assertions.assertEquals("", strings1.getAppname());
+        Assertions.assertEquals("", strings1.getProcid());
+        Assertions.assertEquals("", strings1.getMsgid());
+        Assertions.assertEquals("", strings1.getMsg());
+    }
 }
