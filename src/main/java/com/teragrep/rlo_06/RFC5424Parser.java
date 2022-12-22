@@ -51,7 +51,7 @@ import java.nio.ByteBuffer;
 
 public final class RFC5424Parser {
     private InputStream inputStream;
-    private final boolean LFT;
+    private final boolean lineFeedTermination;
     private Boolean EOF = false;
     private final byte[] buffer = new byte[256 * 1024];
     private int pointer = -1;
@@ -59,12 +59,12 @@ public final class RFC5424Parser {
 
     public RFC5424Parser(InputStream inputStream) {
         this.inputStream = inputStream;
-        this.LFT = true;
+        this.lineFeedTermination = true;
     }
 
-    public RFC5424Parser(InputStream inputStream, boolean LFT) {
+    public RFC5424Parser(InputStream inputStream, boolean lineFeedTermination) {
         this.inputStream = inputStream;
-        this.LFT = LFT;
+        this.lineFeedTermination = lineFeedTermination;
     }
 
     public void setInputStream(InputStream inputStream) {
@@ -338,7 +338,7 @@ public final class RFC5424Parser {
         }
 
         // this little while here is the steamroller of this parser
-        if (this.LFT) { // Line-feed termination active
+        if (this.lineFeedTermination) { // Line-feed termination active
             while (b != 10 && !this.EOF) {
                 if (msg_current_left > 0) {
                     if (resultset.MSG != null) {
