@@ -55,8 +55,8 @@ import java.util.HashMap;
 
 public class ParserResultset {
     // subscriptions
-    protected RFC5424ParserSubscription subscription = null;
-    protected RFC5424ParserSDSubscription sdSubscription = null;
+    protected RFC5424ParserSubscription subscription;
+    protected RFC5424ParserSDSubscription sdSubscription;
 
     // results
     protected ByteBuffer PRIORITY = null;
@@ -69,8 +69,8 @@ public class ParserResultset {
     protected ByteBuffer MSG = null;
 
     // sdId and sdElement iterators, used by the parser but kept here for the consistency
-    protected ByteBuffer sdIdIterator = null;
-    protected ByteBuffer sdElementIterator = null;
+    protected ByteBuffer sdIdIterator;
+    protected ByteBuffer sdElementIterator;
 
 
 

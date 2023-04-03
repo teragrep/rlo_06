@@ -47,6 +47,7 @@ package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 public class ResultsetAsString {
 
@@ -113,20 +114,42 @@ public class ResultsetAsString {
         sdIdByteBuffer.put(sdIdBytes, 0, sdIdBytes.length);
         sdIdByteBuffer.flip();
 
-        if (this.resultset.sdSubscription.containsKey(sdIdByteBuffer)) {
+        if (this.resultset.sdSubscription.isSubscribedSDId(sdIdByteBuffer)) {
             byte[] sdElemBytes = sdElement.getBytes(StandardCharsets.US_ASCII);
             ByteBuffer sdElemByteBuffer = ByteBuffer.allocateDirect(sdElemBytes.length);
             sdElemByteBuffer.put(sdElemBytes, 0, sdElemBytes.length);
             sdElemByteBuffer.flip();
 
-            if (this.resultset.sdSubscription.get(sdIdByteBuffer).containsKey(sdElemByteBuffer)) {
-                ByteBuffer outBuffer = this.resultset.sdSubscription.get(sdIdByteBuffer).get(sdElemByteBuffer);
+            if (this.resultset.sdSubscription.isSubscribedSDElement(sdIdByteBuffer, sdElemByteBuffer)) {
+                ByteBuffer outBuffer = this.resultset.sdSubscription.getSubscribedSDElementBuffer(sdIdByteBuffer, sdElemByteBuffer);
                 outBuffer.flip();
-                String output = StandardCharsets.UTF_8.decode(outBuffer).toString();
-                return output;
+                return StandardCharsets.UTF_8.decode(outBuffer).toString();
             }
         }
         return null;
     }
 
+    public HashMap<String, HashMap<String, String>> getAsMap() {
+        // there might be much more optimal way of translating the map
+        HashMap<String, HashMap<String, String>> sdSubscriptionStringMap = new HashMap<>();
+
+        HashMap<ByteBuffer, HashMap<ByteBuffer, ByteBuffer>> sdSubscriptionMap = this.resultset.sdSubscription.getMap();
+
+        for (ByteBuffer sdIdBB : sdSubscriptionMap.keySet()) {
+            String sdIdString = StandardCharsets.US_ASCII.decode(sdIdBB).toString();
+            sdIdBB.flip();
+            HashMap<String, String> sdElemHashMap = new HashMap<>();
+            sdSubscriptionStringMap.put(sdIdString, sdElemHashMap);
+
+            for (ByteBuffer sdElemBB : sdSubscriptionMap.get(sdIdBB).keySet()) {
+                String sdElemKeyString = StandardCharsets.US_ASCII.decode(sdElemBB).toString();
+                sdElemBB.flip();
+                ByteBuffer sdValBB = sdSubscriptionMap.get(sdIdBB).get(sdElemBB).flip();
+                String sdElemValString = StandardCharsets.UTF_8.decode(sdValBB).toString();
+                sdElemHashMap.put(sdElemKeyString, sdElemValString);
+            }
+        }
+
+        return sdSubscriptionStringMap;
+    }
 }

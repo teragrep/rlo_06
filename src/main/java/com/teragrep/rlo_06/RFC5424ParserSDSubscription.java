@@ -55,11 +55,22 @@ import java.util.HashMap;
  */
 
 public class RFC5424ParserSDSubscription {
+
+    private final boolean subscribeAll;
     private final HashMap<ByteBuffer, HashMap<ByteBuffer, ByteBuffer>> mapHashMap = new HashMap<>();
     public RFC5424ParserSDSubscription() {
+        this.subscribeAll = false;
 
     }
+
+    public RFC5424ParserSDSubscription(boolean subscribeAll) {
+        this.subscribeAll = subscribeAll;
+    }
+
     public void subscribeElement(String sdId, String sdElement) {
+        if (subscribeAll) {
+            throw new IllegalArgumentException("subscribeElement can not be used together with subscribeAll");
+        }
         // sdId
         byte[] sdIdBytes = sdId.getBytes(StandardCharsets.US_ASCII);
         ByteBuffer sdIdByteBuffer = ByteBuffer.allocateDirect(sdIdBytes.length);
@@ -80,18 +91,57 @@ public class RFC5424ParserSDSubscription {
     }
 
     public void clear() {
-        for (HashMap<ByteBuffer,ByteBuffer> sdElem : mapHashMap.values()){
-            for (ByteBuffer value : sdElem.values()) {
-                value.clear();
+        if (subscribeAll) {
+            mapHashMap.clear();
+        }
+        else {
+            for (HashMap<ByteBuffer, ByteBuffer> sdElem : mapHashMap.values()) {
+                for (ByteBuffer value : sdElem.values()) {
+                    value.clear();
+                }
             }
         }
     }
 
-    public boolean containsKey(ByteBuffer sdIdByteBuffer) {
-        return mapHashMap.containsKey(sdIdByteBuffer);
+    public boolean isSubscribedSDId(ByteBuffer sdIdIterator) {
+        boolean containsKey = mapHashMap.containsKey(sdIdIterator);
+
+        if (subscribeAll && !containsKey) {
+            mapHashMap.put(cloneByteBuffer(sdIdIterator), new HashMap<>());
+            containsKey = true;
+        }
+
+        return containsKey;
+
     }
 
-    public HashMap<ByteBuffer, ByteBuffer> get(ByteBuffer sdIdByteBuffer) {
-        return mapHashMap.get(sdIdByteBuffer);
+    public boolean isSubscribedSDElement(ByteBuffer sdIdIterator, ByteBuffer sdElementIterator) {
+        boolean containsKey = mapHashMap.get(sdIdIterator).containsKey(sdElementIterator);
+
+        if (subscribeAll && !containsKey) {
+            HashMap<ByteBuffer, ByteBuffer> hashMap = mapHashMap.get(sdIdIterator);
+            hashMap.put(cloneByteBuffer(sdElementIterator), ByteBuffer.allocateDirect(8 * 1024));
+            containsKey = true;
+
+        }
+
+        return containsKey;
+    }
+
+    public ByteBuffer getSubscribedSDElementBuffer(ByteBuffer sdIdIterator, ByteBuffer sdElementIterator) {
+        return mapHashMap.get(sdIdIterator).get(sdElementIterator);
+    }
+
+    private static ByteBuffer cloneByteBuffer(ByteBuffer source) {
+        ByteBuffer clone = ByteBuffer.allocateDirect(source.capacity());
+        source.rewind();
+        clone.put(source);
+        source.rewind();
+        clone.flip();
+        return clone;
+    }
+
+    HashMap<ByteBuffer, HashMap<ByteBuffer, ByteBuffer>> getMap() {
+        return mapHashMap;
     }
 }
