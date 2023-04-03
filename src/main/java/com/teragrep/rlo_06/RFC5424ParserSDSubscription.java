@@ -54,7 +54,11 @@ import java.util.HashMap;
  * NOTE: creating empty one will capture all.
  */
 
-public class RFC5424ParserSDSubscription extends HashMap<ByteBuffer, HashMap<ByteBuffer, ByteBuffer>> {
+public class RFC5424ParserSDSubscription {
+    private final HashMap<ByteBuffer, HashMap<ByteBuffer, ByteBuffer>> mapHashMap = new HashMap<>();
+    public RFC5424ParserSDSubscription() {
+
+    }
     public void subscribeElement(String sdId, String sdElement) {
         // sdId
         byte[] sdIdBytes = sdId.getBytes(StandardCharsets.US_ASCII);
@@ -62,8 +66,8 @@ public class RFC5424ParserSDSubscription extends HashMap<ByteBuffer, HashMap<Byt
         sdIdByteBuffer.put(sdIdBytes, 0 ,sdIdBytes.length);
         sdIdByteBuffer.flip();
 
-        if (!this.containsKey(sdIdByteBuffer)) {
-            this.put(sdIdByteBuffer, new HashMap<ByteBuffer, ByteBuffer>());
+        if (!mapHashMap.containsKey(sdIdByteBuffer)) {
+            mapHashMap.put(sdIdByteBuffer, new HashMap<>());
         }
 
         // sdElement
@@ -72,6 +76,22 @@ public class RFC5424ParserSDSubscription extends HashMap<ByteBuffer, HashMap<Byt
         sdElemByteBuffer.put(sdElemBytes, 0 , sdElemBytes.length);
         sdElemByteBuffer.flip();
 
-        this.get(sdIdByteBuffer).put(sdElemByteBuffer, null);
+        mapHashMap.get(sdIdByteBuffer).put(sdElemByteBuffer, ByteBuffer.allocateDirect(8*1024));
+    }
+
+    public void clear() {
+        for (HashMap<ByteBuffer,ByteBuffer> sdElem : mapHashMap.values()){
+            for (ByteBuffer value : sdElem.values()) {
+                value.clear();
+            }
+        }
+    }
+
+    public boolean containsKey(ByteBuffer sdIdByteBuffer) {
+        return mapHashMap.containsKey(sdIdByteBuffer);
+    }
+
+    public HashMap<ByteBuffer, ByteBuffer> get(ByteBuffer sdIdByteBuffer) {
+        return mapHashMap.get(sdIdByteBuffer);
     }
 }
