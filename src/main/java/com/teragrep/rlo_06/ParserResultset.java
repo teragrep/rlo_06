@@ -121,11 +121,6 @@ public class ParserResultset {
             }
         }
 
-        // sdSubscription allocation
-        for (HashMap<ByteBuffer,ByteBuffer> sdElem : this.sdSubscription.values()){
-            sdElem.replaceAll((k,v) -> v = ByteBuffer.allocateDirect(8*1024));
-        }
-
         // sdIterator allocations
         this.sdIdIterator = ByteBuffer.allocateDirect(32);
         this.sdElementIterator = ByteBuffer.allocateDirect(32);
@@ -149,11 +144,7 @@ public class ParserResultset {
         if(this.MSG != null)
             this.MSG.clear();
 
-        for (HashMap<ByteBuffer,ByteBuffer> sdElem : this.sdSubscription.values()){
-            for (ByteBuffer value : sdElem.values()) {
-                value.clear();
-            }
-        }
+        this.sdSubscription.clear();
 
         this.sdIdIterator.clear();
         this.sdElementIterator.clear();
