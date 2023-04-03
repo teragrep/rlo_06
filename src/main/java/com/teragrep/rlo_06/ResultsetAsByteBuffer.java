@@ -46,6 +46,7 @@
 package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 
 public class ResultsetAsByteBuffer {
     ParserResultset resultset;
@@ -92,11 +93,15 @@ public class ResultsetAsByteBuffer {
 
     public ByteBuffer getSdValue(ByteBuffer sdIdByteBuffer, ByteBuffer sdElemByteBuffer) {
         // NOTE sdIdByteBuffer and sdElemByteBuffer needs to be flipped to read when calling this
-        if (this.resultset.sdSubscription.containsKey(sdIdByteBuffer)) {
-            if (this.resultset.sdSubscription.get(sdIdByteBuffer).containsKey(sdElemByteBuffer)) {
-                return (ByteBuffer) this.resultset.sdSubscription.get(sdIdByteBuffer).get(sdElemByteBuffer).flip();
+        if (this.resultset.sdSubscription.isSubscribedSDId(sdIdByteBuffer)) {
+            if (this.resultset.sdSubscription.isSubscribedSDElement(sdIdByteBuffer, sdElemByteBuffer)) {
+                return this.resultset.sdSubscription.getSubscribedSDElementBuffer(sdIdByteBuffer, sdElemByteBuffer).flip();
             }
         }
         return null;
+    }
+
+    public HashMap<ByteBuffer, HashMap<ByteBuffer, ByteBuffer>> getAsMap() {
+        return this.resultset.sdSubscription.getMap();
     }
 }

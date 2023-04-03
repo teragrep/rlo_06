@@ -204,7 +204,7 @@ public final class RFC5424Parser {
             } else { // ' ', sdElement must exist
                 // check if we are interested in this sdId at all or skip to next sdId block
 
-                if (resultset.sdSubscription.containsKey(resultset.sdIdIterator)) {
+                if (resultset.sdSubscription.isSubscribedSDId(resultset.sdIdIterator)) {
                     while (b == 32) { // multiple ' ' separated sdKey="sdValue" pairs may exist
                         short sdElemKey_max_left = 32;
                         b = this.readBuffer();
@@ -225,8 +225,8 @@ public final class RFC5424Parser {
                         }
 
                         // check if this is for us
-                        if (resultset.sdSubscription.get(resultset.sdIdIterator).containsKey(resultset.sdElementIterator)) {
-                            ByteBuffer elementValue = resultset.sdSubscription.get(resultset.sdIdIterator).get(resultset.sdElementIterator);
+                        if (resultset.sdSubscription.isSubscribedSDElement(resultset.sdIdIterator, resultset.sdElementIterator)) {
+                            ByteBuffer elementValue = resultset.sdSubscription.getSubscribedSDElementBuffer(resultset.sdIdIterator, resultset.sdElementIterator);
                             short sdElemVal_max_left = 8 * 1024;
                             b = this.readBuffer();
 
