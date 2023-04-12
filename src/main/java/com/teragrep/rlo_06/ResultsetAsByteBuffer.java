@@ -95,7 +95,7 @@ public class ResultsetAsByteBuffer {
         // NOTE sdIdByteBuffer and sdElemByteBuffer needs to be flipped to read when calling this
         if (this.resultset.sdSubscription.isSubscribedSDId(sdIdByteBuffer)) {
             if (this.resultset.sdSubscription.isSubscribedSDElement(sdIdByteBuffer, sdElemByteBuffer)) {
-                return this.resultset.sdSubscription.getSubscribedSDElementBuffer(sdIdByteBuffer, sdElemByteBuffer).flip();
+                return (ByteBuffer) this.resultset.sdSubscription.getSubscribedSDElementBuffer(sdIdByteBuffer, sdElemByteBuffer).flip();
             }
         }
         return null;

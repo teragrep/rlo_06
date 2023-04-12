@@ -144,7 +144,7 @@ public class ResultsetAsString {
             for (ByteBuffer sdElemBB : sdSubscriptionMap.get(sdIdBB).keySet()) {
                 String sdElemKeyString = StandardCharsets.US_ASCII.decode(sdElemBB).toString();
                 sdElemBB.flip();
-                ByteBuffer sdValBB = sdSubscriptionMap.get(sdIdBB).get(sdElemBB).flip();
+                ByteBuffer sdValBB = (ByteBuffer) sdSubscriptionMap.get(sdIdBB).get(sdElemBB).flip();
                 String sdElemValString = StandardCharsets.UTF_8.decode(sdValBB).toString();
                 sdElemHashMap.put(sdElemKeyString, sdElemValString);
             }
