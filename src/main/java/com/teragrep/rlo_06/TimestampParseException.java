@@ -45,16 +45,16 @@
  */
 package com.teragrep.rlo_06;
 
-class ParseException extends RuntimeException {
-    public ParseException(String message, Throwable cause) {
+class TimestampParseException extends ParseException {
+    public TimestampParseException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public ParseException(String message) {
+    public TimestampParseException(String message) {
         super(message);
     }
 
-    public ParseException(Throwable cause) {
+    public TimestampParseException(Throwable cause) {
         super(cause);
     }
 }

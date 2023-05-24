@@ -99,7 +99,7 @@ public final class RFC5424Parser {
             return;
 
         if (b != 60) { // '<'
-            throw new ParseException("PRIORITY < missing" + " read: " + read + " pointer: " + pointer);
+            throw new PriorityParseException("PRIORITY < missing" + " read: " + read + " pointer: " + pointer);
         }
 
         b = this.readBuffer();
@@ -107,7 +107,7 @@ public final class RFC5424Parser {
             if (resultset.PRIORITY != null)
                 resultset.PRIORITY.put(b);
         } else {
-            throw new ParseException("PRIORITY number incorrect");
+            throw new PriorityParseException("PRIORITY number incorrect");
         }
 
         b = this.readBuffer();
@@ -122,17 +122,17 @@ public final class RFC5424Parser {
 
                 b = this.readBuffer();
                 if (b != 62) { // '>' must be after three numbers, omit
-                    throw new ParseException("PRIORITY > missing");
+                    throw new PriorityParseException("PRIORITY > missing");
                 }
             } else if (b == 62) { // third may be a '>'
                 // omit '>'
             } else {
-                throw new ParseException("PRIORITY number incorrect");
+                throw new PriorityParseException("PRIORITY number incorrect");
             }
         } else if (b == 62) { // second may be a '>'
             // omit '>'
         } else {
-            throw new ParseException("PRIORITY number incorrect");
+            throw new PriorityParseException("PRIORITY number incorrect");
         }
     }
 
@@ -160,7 +160,7 @@ public final class RFC5424Parser {
         b = this.readBuffer();
 
         if (b != 45 && b != 91) { // '-' nor '['
-            throw new ParseException("SD does not contain '-' or '['");
+            throw new StructuredDataParseException("SD does not contain '-' or '['");
         }
 
                 /*
@@ -193,7 +193,7 @@ public final class RFC5424Parser {
             resultset.sdIdIterator.flip(); // flip to READ so the compare works
 
             if (b != 32 && b != 93) { // ' ' nor ']'
-                throw new ParseException("SP missing after SD_ID or SD_ID too long");
+                throw new StructuredDataParseException("SP missing after SD_ID or SD_ID too long");
             } else if (b == 93) { // ']', sdId only here: Payload:'[ID_A@1]' or Payload:'[ID_A@1][ID_B@1]'
                 // clean up sdIterator for the next one
                 resultset.sdIdIterator.flip();
@@ -216,12 +216,12 @@ public final class RFC5424Parser {
                         resultset.sdElementIterator.flip(); // flip to READ so the compare works
 
                         if (b != 61) { // '='
-                            throw new ParseException("EQ missing after SD_KEY or SD_KEY too long");
+                            throw new StructuredDataParseException("EQ missing after SD_KEY or SD_KEY too long");
                         }
 
                         b = this.readBuffer();
                         if (b != 34) { // '"'
-                            throw new ParseException("\" missing after SD_KEY EQ");
+                            throw new StructuredDataParseException("\" missing after SD_KEY EQ");
                         }
 
                         // check if this is for us
@@ -371,10 +371,10 @@ public final class RFC5424Parser {
 
             b = this.readBuffer();
             if (b != 32) { // omit ' '
-                throw new ParseException("SP missing after VERSION");
+                throw new VersionParseException("SP missing after VERSION");
             }
         } else {
-            throw new ParseException("VERSION not 1");
+            throw new VersionParseException("VERSION not 1");
         }
     }
 
@@ -390,7 +390,7 @@ public final class RFC5424Parser {
         }
 
         if (b != 32) {
-            throw new ParseException("SP missing after TIMESTAMP or TIMESTAMP too long");
+            throw new TimestampParseException("SP missing after TIMESTAMP or TIMESTAMP too long");
         }
     }
 
@@ -406,7 +406,7 @@ public final class RFC5424Parser {
         }
 
         if (b != 32) {
-            throw new ParseException("SP missing after HOSTNAME or HOSTNAME too long");
+            throw new HostnameParseException("SP missing after HOSTNAME or HOSTNAME too long");
         }
     }
 
@@ -422,7 +422,7 @@ public final class RFC5424Parser {
         }
 
         if (b != 32) {
-            throw new ParseException("SP missing after APPNAME or APPNAME too long");
+            throw new AppNameParseException("SP missing after APPNAME or APPNAME too long");
         }
     }
 
@@ -438,7 +438,7 @@ public final class RFC5424Parser {
         }
 
         if (b != 32) {
-            throw new ParseException("SP missing after PROCID or PROCID too long");
+            throw new ProcIdParseException("SP missing after PROCID or PROCID too long");
         }
     }
 
@@ -454,7 +454,7 @@ public final class RFC5424Parser {
         }
 
         if (b != 32) {
-            throw new ParseException("SP missing after MSGID or MSGID too long");
+            throw new MsgIdParseException("SP missing after MSGID or MSGID too long");
         }
     }
 
@@ -590,7 +590,7 @@ public final class RFC5424Parser {
         // fall through
 
         if (b != 10) {
-            throw new ParseException("NL missing after MSG or MSG too long");
+            throw new MsgParseException("NL missing after MSG or MSG too long");
         }
         return true; // there was data, returning true
     } // public void parseStream(InputStream inputStream) throws IOException {
