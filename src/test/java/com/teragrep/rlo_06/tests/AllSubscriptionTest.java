@@ -20,17 +20,13 @@ public class AllSubscriptionTest {
 
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription(true);
 
-        ParserResultset currentResultSet = new ParserResultset(subscription, sdSubscription);
-
         InputStream inputStream = new ByteArrayInputStream( (SYSLOG_MESSAGE).getBytes());
 
-        RFC5424Parser parser = new RFC5424Parser(inputStream);
+        RFC5424Parser parser = new RFC5424Parser(inputStream,  subscription, sdSubscription);
 
-        parser.next(currentResultSet);
+        Assertions.assertTrue(parser.next());
 
-        ResultsetAsString resultsetAsString = new ResultsetAsString(null);
-
-        resultsetAsString.setResultset(currentResultSet);
+        ResultSetAsString resultsetAsString = new ResultSetAsString(parser.get());
 
         Assertions.assertEquals("0FD92E51B37748EB90CD894CCEE63907", resultsetAsString.getSdValue("event_id@48577", "uuid"));
     }
@@ -45,17 +41,14 @@ public class AllSubscriptionTest {
 
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription(true);
 
-        ParserResultset currentResultSet = new ParserResultset(subscription, sdSubscription);
 
         InputStream inputStream = new ByteArrayInputStream( (SYSLOG_MESSAGE).getBytes());
 
-        RFC5424Parser parser = new RFC5424Parser(inputStream);
+        RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription);
 
-        parser.next(currentResultSet);
+        Assertions.assertTrue(parser.next());
 
-        ResultsetAsString resultsetAsString = new ResultsetAsString(null);
-
-        resultsetAsString.setResultset(currentResultSet);
+        ResultSetAsString resultsetAsString = new ResultSetAsString(parser.get());
 
         HashMap<String, HashMap<String, String>> resultsetMap = resultsetAsString.getAsMap();
 

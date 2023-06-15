@@ -45,15 +45,10 @@
  */
 package com.teragrep.rlo_06.tests;
 
-import com.teragrep.rlo_06.ParserResultset;
-import com.teragrep.rlo_06.RFC5424Parser;
-import com.teragrep.rlo_06.RFC5424ParserSDSubscription;
 import com.teragrep.rlo_06.RFC5424ParserSubscription;
-import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channel;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.time.Instant;

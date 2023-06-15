@@ -49,63 +49,51 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
-public class ResultsetAsString {
+public class ResultSetAsString {
 
-    ParserResultset resultset;
+    private final ParserResultSet resultset;
 
-    public ResultsetAsString(ParserResultset resultset) {
-        this.resultset = resultset;
-    }
-
-    public void setResultset(ParserResultset resultset) {
+    public ResultSetAsString(ParserResultSet resultset) {
         this.resultset = resultset;
     }
 
     public String getPriority() {
         this.resultset.PRIORITY.flip();
-        String priority = StandardCharsets.US_ASCII.decode(this.resultset.PRIORITY).toString();
-        return priority;
+        return StandardCharsets.US_ASCII.decode(this.resultset.PRIORITY).toString();
     }
 
     public String getVersion() {
         this.resultset.VERSION.flip();
-        String version = StandardCharsets.US_ASCII.decode(this.resultset.VERSION).toString();
-        return version;
+        return StandardCharsets.US_ASCII.decode(this.resultset.VERSION).toString();
     }
 
     public String getTimestamp() {
         this.resultset.TIMESTAMP.flip();
-        String ts = StandardCharsets.US_ASCII.decode(this.resultset.TIMESTAMP).toString();
-        return ts;
+        return StandardCharsets.US_ASCII.decode(this.resultset.TIMESTAMP).toString();
     }
 
     public String getHostname() {
         this.resultset.HOSTNAME.flip();
-        String hostname = StandardCharsets.US_ASCII.decode(this.resultset.HOSTNAME).toString();
-        return hostname;
+        return StandardCharsets.US_ASCII.decode(this.resultset.HOSTNAME).toString();
     }
 
     public String getAppname() {
         this.resultset.APPNAME.flip();
-        String appname = StandardCharsets.US_ASCII.decode(this.resultset.APPNAME).toString();
-        return appname;
+        return StandardCharsets.US_ASCII.decode(this.resultset.APPNAME).toString();
     }
 
     public String getProcid() {
         this.resultset.PROCID.flip();
-        String procid = StandardCharsets.US_ASCII.decode(this.resultset.PROCID).toString();
-        return procid;
+        return StandardCharsets.US_ASCII.decode(this.resultset.PROCID).toString();
     }
     public String getMsgid() {
         this.resultset.MSGID.flip();
-        String msgid = StandardCharsets.US_ASCII.decode(this.resultset.MSGID).toString();
-        return msgid;
+        return StandardCharsets.US_ASCII.decode(this.resultset.MSGID).toString();
     }
 
     public String getMsg() {
         this.resultset.MSG.flip();
-        String msg = StandardCharsets.UTF_8.decode(this.resultset.MSG).toString();
-        return msg;
+        return StandardCharsets.UTF_8.decode(this.resultset.MSG).toString();
     }
 
     public String getSdValue(String sdId, String sdElement) {

@@ -45,10 +45,11 @@
  */
 package com.teragrep.rlo_06.tests;
 
-import com.teragrep.rlo_06.ParserResultset;
+import com.teragrep.rlo_06.ParserResultSet;
 import com.teragrep.rlo_06.RFC5424Parser;
 import com.teragrep.rlo_06.RFC5424ParserSDSubscription;
 import com.teragrep.rlo_06.RFC5424ParserSubscription;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -68,25 +69,22 @@ public class PerformanceTest {
 
         sdSubscription.subscribeElement("ID_A@1","u");
 
-        ParserResultset res = new ParserResultset(subscription, sdSubscription);
-
         InputStream inputStream = new ByteArrayInputStream( SYSLOG_MESSAGE.getBytes());
-        RFC5424Parser parser = new RFC5424Parser(inputStream);
+        RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription);
 
 
 
         Instant instant1 = Instant.now();
         long count = 50000;
         for (long i = 0; i < count; i++) {
-            res.clear();
-            parser.next(res);
+            Assertions.assertTrue(parser.next());
             inputStream.reset();
         }
         Instant instant2 = Instant.now();
         long msgsize = (count * SYSLOG_MESSAGE.length())/1024/1024;
         long spent = instant2.toEpochMilli()-instant1.toEpochMilli();
         System.out.println("testLongPayloadPerformance: time taken " + spent + " for " + count +
-                           ", total EPS: " + (float) count/ ((float) spent/1000) +
+                           ", total RPS: " + (float) count/ ((float) spent/1000) +
                            ", " + (float) msgsize + " megabytes (" + (float) (msgsize/((float)spent/1000)) + " MB/s)");
     }
 
@@ -101,17 +99,14 @@ public class PerformanceTest {
 
         sdSubscription.subscribeElement("ID_A@1","u");
 
-        ParserResultset res = new ParserResultset(subscription, sdSubscription);
-
         InputStream inputStream = new ByteArrayInputStream( SYSLOG_MESSAGE.getBytes());
-        RFC5424Parser parser = new RFC5424Parser(inputStream);
+        RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription);
 
 
         Instant instant1 = Instant.now();
         long count = 10000000;
         for (long i = 0; i < count; i++) {
-            res.clear();
-            parser.next(res);
+            Assertions.assertTrue(parser.next());
             inputStream.reset();
         }
         Instant instant2 = Instant.now();
@@ -119,7 +114,7 @@ public class PerformanceTest {
         long msgsize = (count * SYSLOG_MESSAGE.length())/1024/1024;
         long spent = instant2.toEpochMilli()-instant1.toEpochMilli();
         System.out.println("testShortPayloadPerformance: time taken " + spent + " for " + count +
-                           ", total EPS: " + (float) count/ ((float) spent/1000) +
+                           ", total RPS: " + (float) count/ ((float) spent/1000) +
                            ", " + (float) msgsize + " megabytes (" + (float) (msgsize/((float)spent/1000)) + " MB/s)");
 
     }
