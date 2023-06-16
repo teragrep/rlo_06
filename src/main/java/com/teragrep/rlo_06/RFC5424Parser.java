@@ -110,7 +110,7 @@ public final class RFC5424Parser {
 
         resultset.clear();
 
-        // everything starts here
+        // everything starts here, loads the '<' if it exists
         if (!stream.next()) {
             return false;
         }

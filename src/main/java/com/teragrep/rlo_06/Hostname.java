@@ -21,13 +21,12 @@ final class Hostname implements Consumer<Stream> {
 
     @Override
     public void accept(Stream stream) {
-        byte b;
         short hostname_max_left = 255;
 
         if (!stream.next()) {
             throw new ParseException("TOO SHORT");
         }
-        b = stream.get();
+        byte b = stream.get();
         while (hostname_max_left > 0 && b != 32) {
             if (HOSTNAME != null)
                 HOSTNAME.put(b);
