@@ -50,22 +50,44 @@ import java.io.InputStream;
 import java.util.function.Consumer;
 
 public final class RFC5424Parser {
-    private final boolean lineFeedTermination;
-
     private Stream stream;
     private final ParserResultSet resultset;
-
+    private final Consumer<Stream> streamConsumer;
 
     public RFC5424Parser(InputStream inputStream, RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription) {
-        this.stream = new Stream(inputStream);
-        this.resultset = new ParserResultSet(subscription, sdSubscription);
-        this.lineFeedTermination = true;
+        this(inputStream, subscription, sdSubscription, true);
     }
 
     public RFC5424Parser(InputStream inputStream, RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription, boolean lineFeedTermination) {
         this.stream = new Stream(inputStream);
         this.resultset = new ParserResultSet(subscription, sdSubscription);
-        this.lineFeedTermination = lineFeedTermination;
+
+        Priority priority = new Priority(this.resultset.PRIORITY);
+        Version version = new Version(this.resultset.VERSION);
+        Timestamp timestamp = new Timestamp(this.resultset.TIMESTAMP);
+        Hostname hostname = new Hostname(this.resultset.HOSTNAME);
+        AppName appName = new AppName(this.resultset.APPNAME);
+        ProcId procId = new ProcId(this.resultset.PROCID);
+        MsgId msgId = new MsgId(this.resultset.MSGID);
+        StructuredData structuredData = new StructuredData(this.resultset);
+        Msg msg = new Msg(this.resultset.MSG, lineFeedTermination);
+
+        this.streamConsumer = priority
+                .andThen(version
+                        .andThen(timestamp
+                                .andThen(hostname
+                                        .andThen(appName
+                                                .andThen(procId
+                                                        .andThen(msgId
+                                                                .andThen(structuredData
+                                                                        .andThen(msg)
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                );
     }
 
 
@@ -93,32 +115,6 @@ public final class RFC5424Parser {
             return false;
         }
 
-        Priority priority = new Priority(resultset.PRIORITY);
-        Version version = new Version(resultset.VERSION);
-        Timestamp timestamp = new Timestamp(resultset.TIMESTAMP);
-        Hostname hostname = new Hostname(resultset.HOSTNAME);
-        AppName appName = new AppName(resultset.APPNAME);
-        ProcId procId = new ProcId(resultset.PROCID);
-        MsgId msgId = new MsgId(resultset.MSGID);
-        StructuredData structuredData = new StructuredData(resultset);
-        Msg msg = new Msg(resultset.MSG, lineFeedTermination);
-
-        Consumer<Stream> streamConsumer = priority
-                .andThen(version
-                        .andThen(timestamp
-                                .andThen(hostname
-                                        .andThen(appName
-                                                .andThen(procId
-                                                        .andThen(msgId
-                                                                .andThen(structuredData
-                                                                        .andThen(msg)
-                                                                )
-                                                        )
-                                                )
-                                        )
-                                )
-                        )
-                );
         streamConsumer.accept(stream);
 
         return true;
