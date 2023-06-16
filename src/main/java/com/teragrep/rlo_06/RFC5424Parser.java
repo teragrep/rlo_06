@@ -47,10 +47,11 @@ package com.teragrep.rlo_06;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.function.Consumer;
 
 public final class RFC5424Parser {
     private final boolean lineFeedTermination;
-    
+
     private Stream stream;
     private final ParserResultSet resultset;
 
@@ -93,31 +94,32 @@ public final class RFC5424Parser {
         }
 
         Priority priority = new Priority(resultset.PRIORITY);
-        priority.accept(stream);
-
         Version version = new Version(resultset.VERSION);
-        version.accept(stream);
-
         Timestamp timestamp = new Timestamp(resultset.TIMESTAMP);
-        timestamp.accept(stream);
-
         Hostname hostname = new Hostname(resultset.HOSTNAME);
-        hostname.accept(stream);
-
-        AppName appName = new AppName( resultset.APPNAME);
-        appName.accept(stream);
-
+        AppName appName = new AppName(resultset.APPNAME);
         ProcId procId = new ProcId(resultset.PROCID);
-        procId.accept(stream);
-
         MsgId msgId = new MsgId(resultset.MSGID);
-        msgId.accept(stream);
-
         StructuredData structuredData = new StructuredData(resultset);
-        structuredData.accept(stream);
-
         Msg msg = new Msg(resultset.MSG, lineFeedTermination);
-        msg.accept(stream);
+
+        Consumer<Stream> streamConsumer = priority
+                .andThen(version
+                        .andThen(timestamp
+                                .andThen(hostname
+                                        .andThen(appName
+                                                .andThen(procId
+                                                        .andThen(msgId
+                                                                .andThen(structuredData
+                                                                        .andThen(msg)
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                );
+        streamConsumer.accept(stream);
 
         return true;
     }
