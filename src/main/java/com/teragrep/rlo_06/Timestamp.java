@@ -1,9 +1,9 @@
 package com.teragrep.rlo_06;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.function.Consumer;
 
-final class Timestamp {
+final class Timestamp implements Consumer<Stream> {
     /*
                           ||||||||||||||||||||||||||||||||
                           vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -13,15 +13,13 @@ final class Timestamp {
                     Payload:'2014-06-20T09:14:07.12345+00:00 '
                     States : ...............................T
                     */
-    private final Stream stream;
     private final ByteBuffer TIMESTAMP;
 
-    Timestamp(Stream stream, ByteBuffer TIMESTAMP) {
-        this.stream = stream;
+    Timestamp(ByteBuffer TIMESTAMP) {
         this.TIMESTAMP = TIMESTAMP;
     }
 
-    void parseTimestamp() throws IOException {
+    public void accept(Stream stream) {
         byte b;
         short ts_max_left = 32;
 

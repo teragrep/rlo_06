@@ -1,9 +1,9 @@
 package com.teragrep.rlo_06;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.function.Consumer;
 
-final class Hostname {
+final class Hostname implements Consumer<Stream> {
     /*
                                                       |||||||
                                                       vvvvvvv
@@ -13,15 +13,14 @@ final class Hostname {
                 Payload:'host01 '
                 States : ......T
                 */
-    private final Stream stream;
     private final ByteBuffer HOSTNAME;
 
-    Hostname(Stream stream, ByteBuffer HOSTNAME) {
-        this.stream = stream;
+    Hostname(ByteBuffer HOSTNAME) {
         this.HOSTNAME = HOSTNAME;
     }
 
-    void parseHostname() throws IOException {
+    @Override
+    public void accept(Stream stream) {
         byte b;
         short hostname_max_left = 255;
 

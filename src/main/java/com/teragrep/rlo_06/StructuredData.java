@@ -1,9 +1,9 @@
 package com.teragrep.rlo_06;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.function.Consumer;
 
-final class StructuredData {
+final class StructuredData implements Consumer<Stream> {
 /*
                                                                                 |||||||||||||||||||||||||||||||||||
                                                                                 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvR
@@ -22,14 +22,13 @@ final class StructuredData {
     Payload:'[ID_A@1 u="3" e="t"][ID_B@2 n="9"] ' // sd exists
     Payload:'- ' // no sd
      */
-    private final Stream stream;
     private final ParserResultSet resultset;
-    StructuredData(Stream stream, ParserResultSet resultset) {
-        this.stream = stream;
+    StructuredData(ParserResultSet resultset) {
         this.resultset = resultset;
     }
 
-    void parseStructuredData() throws IOException {
+    @Override
+    public void accept(Stream stream) {
         byte b;
 
 

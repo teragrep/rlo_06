@@ -1,9 +1,9 @@
 package com.teragrep.rlo_06;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.function.Consumer;
 
-final class Priority {
+final class Priority implements Consumer<Stream> {
     /*
     |||
     vvv
@@ -13,16 +13,15 @@ final class Priority {
     Payload:'<14>'
     States : |..T
     */
-
-    private final Stream stream;
     private final ByteBuffer PRIORITY;
 
-    Priority(Stream stream, ByteBuffer PRIORITY) {
-        this.stream = stream;
+    Priority(ByteBuffer PRIORITY) {
         this.PRIORITY = PRIORITY;
     }
 
-    void parsePriority() throws IOException {
+
+    @Override
+    public void accept(Stream stream) {
         if (stream.get() != '<') {
             throw new PriorityParseException("PRIORITY < missing");
         }

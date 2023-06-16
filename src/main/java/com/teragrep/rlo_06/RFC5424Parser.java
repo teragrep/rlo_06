@@ -92,32 +92,32 @@ public final class RFC5424Parser {
             return false;
         }
 
-        Priority priority = new Priority(stream, resultset.PRIORITY);
-        priority.parsePriority();
+        Priority priority = new Priority(resultset.PRIORITY);
+        priority.accept(stream);
 
-        Version version = new Version(stream, resultset.VERSION);
-        version.parseVersion();
+        Version version = new Version(resultset.VERSION);
+        version.accept(stream);
 
-        Timestamp timestamp = new Timestamp(stream, resultset.TIMESTAMP);
-        timestamp.parseTimestamp();
+        Timestamp timestamp = new Timestamp(resultset.TIMESTAMP);
+        timestamp.accept(stream);
 
-        Hostname hostname = new Hostname(stream, resultset.HOSTNAME);
-        hostname.parseHostname();
+        Hostname hostname = new Hostname(resultset.HOSTNAME);
+        hostname.accept(stream);
 
-        AppName appName = new AppName( stream, resultset.APPNAME);
-        appName.parseAppName();
+        AppName appName = new AppName( resultset.APPNAME);
+        appName.accept(stream);
 
-        ProcId procId = new ProcId(stream, resultset.PROCID);
-        procId.praseProcId();
+        ProcId procId = new ProcId(resultset.PROCID);
+        procId.accept(stream);
 
-        MsgId msgId = new MsgId(stream, resultset.MSGID);
-        msgId.parseMsgId();
+        MsgId msgId = new MsgId(resultset.MSGID);
+        msgId.accept(stream);
 
-        StructuredData structuredData = new StructuredData(stream, resultset);
-        structuredData.parseStructuredData();
+        StructuredData structuredData = new StructuredData(resultset);
+        structuredData.accept(stream);
 
-        Msg msg = new Msg(stream, resultset.MSG, lineFeedTermination);
-        msg.parseMsg();
+        Msg msg = new Msg(resultset.MSG, lineFeedTermination);
+        msg.accept(stream);
 
         return true;
     }

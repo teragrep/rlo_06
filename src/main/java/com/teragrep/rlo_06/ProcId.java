@@ -1,9 +1,9 @@
 package com.teragrep.rlo_06;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.function.Consumer;
 
-final class ProcId {
+final class ProcId implements Consumer<Stream> {
     /*
                                                              ||||
                                                              vvvv
@@ -14,14 +14,12 @@ final class ProcId {
         States : ...T
         */
 
-    private final Stream stream;
     private final ByteBuffer PROCID;
-    ProcId(Stream stream, ByteBuffer PROCID) {
-        this.stream = stream;
+    ProcId(ByteBuffer PROCID) {
         this.PROCID = PROCID;
     }
 
-    void praseProcId() throws IOException {
+    public void accept(Stream stream) {
         byte b;
         short procid_max_left = 128;
 

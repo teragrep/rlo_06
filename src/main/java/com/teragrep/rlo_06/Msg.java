@@ -1,9 +1,9 @@
 package com.teragrep.rlo_06;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.function.Consumer;
 
-final class Msg {
+final class Msg implements Consumer<Stream> {
     /*
                                                                                                vvvvvvvvvv
             <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
@@ -16,17 +16,15 @@ final class Msg {
 
             */
 
-    private final Stream stream;
     private final ByteBuffer MSG;
 
     private final boolean lineFeedTermination;
-    Msg(Stream stream, ByteBuffer MSG, boolean lineFeedTermination) {
-        this.stream = stream;
+    Msg(ByteBuffer MSG, boolean lineFeedTermination) {
         this.MSG = MSG;
         this.lineFeedTermination = lineFeedTermination;
     }
 
-    void parseMsg() throws IOException {
+    public void accept(Stream stream) {
         int msg_current_left = 256 * 1024;
 
         byte oldByte = stream.get();

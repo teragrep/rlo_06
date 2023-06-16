@@ -1,9 +1,9 @@
 package com.teragrep.rlo_06;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.function.Consumer;
 
-final class MsgId {
+final class MsgId implements Consumer<Stream> {
     /*
                                                                              |||||||
                                                                              vvvvvvv
@@ -13,14 +13,13 @@ final class MsgId {
                     Payload:'MSG-01 '
                     States : ......T
                     */
-    private final Stream stream;
     private final ByteBuffer MSGID;
-    MsgId(Stream stream, ByteBuffer MSGID) {
-        this.stream = stream;
+    MsgId(ByteBuffer MSGID) {
         this.MSGID = MSGID;
     }
 
-    void parseMsgId() throws IOException {
+    @Override
+    public void accept(Stream stream) {
         byte b;
         short msgid_max_left = 32;
 

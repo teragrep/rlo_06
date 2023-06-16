@@ -1,9 +1,9 @@
 package com.teragrep.rlo_06;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.function.Consumer;
 
-final class Version {
+final class Version implements Consumer<Stream> {
     /*
         ||
         vv
@@ -13,15 +13,14 @@ final class Version {
     Payload:'1 '
     States : .T
     */
-    private final Stream stream;
     private final ByteBuffer VERSION;
 
-    Version(Stream stream, ByteBuffer VERSION) {
-        this.stream = stream;
+    Version(ByteBuffer VERSION) {
         this.VERSION = VERSION;
     }
 
-    void parseVersion() throws IOException {
+    @Override
+    public void accept(Stream stream) {
         byte b;
 
         if (!stream.next()) {

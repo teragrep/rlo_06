@@ -1,9 +1,9 @@
 package com.teragrep.rlo_06;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.function.Consumer;
 
-final class AppName {
+final class AppName implements Consumer<Stream> {
     /*
                                                      ||||||||
                                                      vvvvvvvv
@@ -13,14 +13,13 @@ final class AppName {
         Payload:'systemd '
         States : .......T
         */
-    private final Stream stream;
     private final ByteBuffer APPNAME;
-    AppName(Stream stream, ByteBuffer APPNAME) {
-        this.stream = stream;
+    AppName(ByteBuffer APPNAME) {
         this.APPNAME = APPNAME;
     }
 
-    void parseAppName() throws IOException {
+    @Override
+    public void accept(Stream stream) {
         byte b;
         short appname_max_left = 48;
 
