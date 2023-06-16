@@ -2,9 +2,10 @@ package com.teragrep.rlo_06;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.UncheckedIOException;
+import java.util.function.Supplier;
 
-final class Stream {
+final class Stream implements Supplier<Byte> {
 
     private final InputStream inputStream;
 
@@ -17,14 +18,19 @@ final class Stream {
         this.inputStream = inputStream;
     }
 
-    byte get() {
+    public Byte get() {
         // System.out.println("GETS B <"+ new String(new byte[]{b}, StandardCharsets.UTF_8)+">");
         return b;
     }
 
-    boolean next() throws IOException {
+    boolean next() {
         if (pointer == bytesInBuffer) {
-            int read = inputStream.read(buffer, 0, buffer.length);
+            int read;
+            try {
+                read = inputStream.read(buffer, 0, buffer.length);
+            } catch (IOException ioException) {
+                throw new UncheckedIOException(ioException);
+            }
             if (read <= 0) { // EOF
                 pointer = bytesInBuffer;
                 // System.out.println("NEXT RV <false> pointer <"+pointer+"> bytesInBuffer <"+ bytesInBuffer +"> b <"+new String(new byte[]{b}, StandardCharsets.UTF_8)+">");
