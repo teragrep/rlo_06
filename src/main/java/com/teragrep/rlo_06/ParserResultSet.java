@@ -47,13 +47,12 @@ package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
 import java.util.Iterator;
-import java.util.HashMap;
 
 /**
  * NOTE: Each ByteBuffer here is always kept in 'put' mode.
  */
 
-public class ParserResultset {
+public class ParserResultSet {
     // subscriptions
     protected RFC5424ParserSubscription subscription;
     protected RFC5424ParserSDSubscription sdSubscription;
@@ -74,7 +73,7 @@ public class ParserResultset {
 
 
 
-    public ParserResultset(RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription) {
+    ParserResultSet(RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription) {
         this.subscription = subscription;
         this.sdSubscription = sdSubscription;
         // subscription allocation

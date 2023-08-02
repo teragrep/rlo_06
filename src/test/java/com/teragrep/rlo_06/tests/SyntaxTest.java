@@ -66,19 +66,16 @@ public class SyntaxTest {
 
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
 
-        sdSubscription.subscribeElement("ID_A@1","u");
+        sdSubscription.subscribeElement("ID_A@1", "u");
 
-        ParserResultset res = new ParserResultset(subscription, sdSubscription);
 
-        InputStream inputStream = new ByteArrayInputStream( (SYSLOG_MESSAGE+SYSLOG_MESSAGE2).getBytes());
-        RFC5424Parser parser = new RFC5424Parser(inputStream);
+        InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE + SYSLOG_MESSAGE2).getBytes());
+        RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription);
 
         int count = 1;
         for (int i = 0; i < count; i++) {
-            res.clear();
-            assertTrue(parser.next(res));
-
-            ResultsetAsString strings1 = new ResultsetAsString(res);
+            Assertions.assertTrue(parser.next());
+            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
 
             Assertions.assertEquals("14", strings1.getPriority());
             Assertions.assertEquals("1", strings1.getVersion());
@@ -91,11 +88,10 @@ public class SyntaxTest {
 
 
             // Structured Data 1
-            Assertions.assertEquals("\\\"3", strings1.getSdValue("ID_A@1","u"));
+            Assertions.assertEquals("\\\"3", strings1.getSdValue("ID_A@1", "u"));
 
-            res.clear();
-            assertTrue(parser.next(res));
-            strings1.setResultset(res);
+            Assertions.assertTrue(parser.next());
+           strings1 = new ResultSetAsString(parser.get());
 
             // Message 2
             Assertions.assertEquals("31", strings1.getPriority());
@@ -112,11 +108,10 @@ public class SyntaxTest {
 
 
             // Structured Data 2
-            Assertions.assertEquals("\\\"3", strings1.getSdValue("ID_A@1","u"));
+            Assertions.assertEquals("\\\"3", strings1.getSdValue("ID_A@1", "u"));
 
-            res.clear();
-            assertFalse(parser.next(res));
-            strings1.setResultset(res);
+            assertFalse(parser.next());
+           strings1 = new ResultSetAsString(parser.get());
 
             // Finished
             Assertions.assertEquals("", strings1.getPriority());
@@ -129,7 +124,7 @@ public class SyntaxTest {
             Assertions.assertEquals("", strings1.getMsg());
 
             // Structured Data Finished
-            Assertions.assertEquals("", strings1.getSdValue("ID_A@1","u"));
+            Assertions.assertEquals("", strings1.getSdValue("ID_A@1", "u"));
 
             inputStream.reset();
         }
@@ -144,18 +139,15 @@ public class SyntaxTest {
 
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
 
-        sdSubscription.subscribeElement("ID_A@1","u");
+        sdSubscription.subscribeElement("ID_A@1", "u");
 
-        ParserResultset res = new ParserResultset(subscription, sdSubscription);
-
-        InputStream inputStream = new ByteArrayInputStream( (SYSLOG_MESSAGE).getBytes());
-        RFC5424Parser parser = new RFC5424Parser(inputStream);
+        InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes());
+        RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription);
 
         int count = 1;
         for (int i = 0; i < count; i++) {
-            res.clear();
-            assertTrue(parser.next(res));
-            ResultsetAsString strings1 = new ResultsetAsString(res);
+            Assertions.assertTrue(parser.next());
+            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
 
             // Message 1
             Assertions.assertEquals("14", strings1.getPriority());
@@ -168,11 +160,10 @@ public class SyntaxTest {
             Assertions.assertEquals("sigsegv", strings1.getMsg());
 
             // Structured Data 1
-            Assertions.assertEquals("\\\"3", strings1.getSdValue("ID_A@1","u"));
+            Assertions.assertEquals("\\\"3", strings1.getSdValue("ID_A@1", "u"));
 
-            res.clear();
-            assertFalse(parser.next(res));
-            strings1.setResultset(res);
+            assertFalse(parser.next());
+           strings1 = new ResultSetAsString(parser.get());
 
             // Message Finished
             Assertions.assertEquals("", strings1.getPriority());
@@ -185,7 +176,7 @@ public class SyntaxTest {
             Assertions.assertEquals("", strings1.getMsg());
 
             // Structured Data Finished
-            Assertions.assertEquals("", strings1.getSdValue("ID_A@1","u"));
+            Assertions.assertEquals("", strings1.getSdValue("ID_A@1", "u"));
 
             inputStream.reset();
         }
@@ -193,7 +184,7 @@ public class SyntaxTest {
 
     @Test
     void testTeragrepStructuredElement() throws Exception {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();                   
+        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
         subscription.add(ParserEnum.TIMESTAMP);
         subscription.add(ParserEnum.HOSTNAME);
         subscription.add(ParserEnum.PROCID);
@@ -202,27 +193,24 @@ public class SyntaxTest {
 
         // Structured
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-        sdSubscription.subscribeElement("event_node_source@48577","source");
-        sdSubscription.subscribeElement("event_node_source@48577","source_module");
-        sdSubscription.subscribeElement("event_node_source@48577","hostname");
-        sdSubscription.subscribeElement("event_node_relay@48577","source");
-        sdSubscription.subscribeElement("event_node_relay@48577","source_module");
-        sdSubscription.subscribeElement("event_node_relay@48577","hostname");
+        sdSubscription.subscribeElement("event_node_source@48577", "source");
+        sdSubscription.subscribeElement("event_node_source@48577", "source_module");
+        sdSubscription.subscribeElement("event_node_source@48577", "hostname");
+        sdSubscription.subscribeElement("event_node_relay@48577", "source");
+        sdSubscription.subscribeElement("event_node_relay@48577", "source_module");
+        sdSubscription.subscribeElement("event_node_relay@48577", "hostname");
         // [teragrep@48577 streamname="log:f17:0" directory="com_teragrep_audit" unixtime="1584572400.0"]
-        sdSubscription.subscribeElement("teragrep@48577","streamname");
-        sdSubscription.subscribeElement("teragrep@48577","directory");
-        sdSubscription.subscribeElement("teragrep@48577","unixtime");
-
-        ParserResultset res = new ParserResultset(subscription, sdSubscription);
+        sdSubscription.subscribeElement("teragrep@48577", "streamname");
+        sdSubscription.subscribeElement("teragrep@48577", "directory");
+        sdSubscription.subscribeElement("teragrep@48577", "unixtime");
 
         final File logFile = new File("src/test/resources/event.log");
-        final InputStream inputStream = new BufferedInputStream(new FileInputStream(logFile),32*1024*1024);
-        final InputStream inputStream2 = new BufferedInputStream(new FileInputStream(logFile),32*1024*1024);
-        RFC5424Parser parser = new RFC5424Parser(inputStream);
+        final InputStream inputStream = new BufferedInputStream(new FileInputStream(logFile), 32 * 1024 * 1024);
+        final InputStream inputStream2 = new BufferedInputStream(new FileInputStream(logFile), 32 * 1024 * 1024);
+        RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription);
 
-        res.clear();
-        parser.next(res);
-        ResultsetAsString strings1 = new ResultsetAsString(res);
+        Assertions.assertTrue(parser.next());
+        ResultSetAsString strings1 = new ResultSetAsString(parser.get());
 
         // Teragrep structured
         Assertions.assertEquals("2020-03-19T01:00:00+00:00", strings1.getTimestamp());
@@ -232,18 +220,18 @@ public class SyntaxTest {
         Assertions.assertEquals("{\"rainfall_rate\": 0.0, \"wind_speed\": 8.0, \"atmosphere_water_vapor_content\": 4.800000190734863, \"atmosphere_cloud_liquid_water_content\": 0.029999997466802597, \"latitude\": -89.875, \"longitude\": 0.125}", strings1.getMsg());
 
         // event_node_source@48577
-        Assertions.assertEquals("f17_ssmis_20200319v7.nc", strings1.getSdValue("event_node_source@48577","source"));
-        Assertions.assertEquals("imfile", strings1.getSdValue("event_node_source@48577","source_module"));
-        Assertions.assertEquals("sc-99-99-14-25", strings1.getSdValue("event_node_source@48577","hostname"));
+        Assertions.assertEquals("f17_ssmis_20200319v7.nc", strings1.getSdValue("event_node_source@48577", "source"));
+        Assertions.assertEquals("imfile", strings1.getSdValue("event_node_source@48577", "source_module"));
+        Assertions.assertEquals("sc-99-99-14-25", strings1.getSdValue("event_node_source@48577", "hostname"));
 
         // event_node_relay@48577
-        Assertions.assertEquals("sc-99-99-14-25", strings1.getSdValue("event_node_relay@48577","source"));
-        Assertions.assertEquals("imrelp", strings1.getSdValue("event_node_relay@48577","source_module"));
-        Assertions.assertEquals("localhost", strings1.getSdValue("event_node_relay@48577","hostname"));
+        Assertions.assertEquals("sc-99-99-14-25", strings1.getSdValue("event_node_relay@48577", "source"));
+        Assertions.assertEquals("imrelp", strings1.getSdValue("event_node_relay@48577", "source_module"));
+        Assertions.assertEquals("localhost", strings1.getSdValue("event_node_relay@48577", "hostname"));
         // teragrep@48577
-        Assertions.assertEquals("log:f17:0", strings1.getSdValue("teragrep@48577","streamname"));
-        Assertions.assertEquals("com_teragrep_audit", strings1.getSdValue("teragrep@48577","directory"));
-        Assertions.assertEquals("1584572400.0", strings1.getSdValue("teragrep@48577","unixtime"));
+        Assertions.assertEquals("log:f17:0", strings1.getSdValue("teragrep@48577", "streamname"));
+        Assertions.assertEquals("com_teragrep_audit", strings1.getSdValue("teragrep@48577", "directory"));
+        Assertions.assertEquals("1584572400.0", strings1.getSdValue("teragrep@48577", "unixtime"));
         // Message Finished
     }
 
@@ -256,18 +244,17 @@ public class SyntaxTest {
 
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
 
-        sdSubscription.subscribeElement("event_id@48577","hostname");
+        sdSubscription.subscribeElement("event_id@48577", "hostname");
 
-        ParserResultset res = new ParserResultset(subscription, sdSubscription);
 
-        RFC5424Parser parser = new RFC5424Parser(null);
+        RFC5424Parser parser = new RFC5424Parser(null, subscription, sdSubscription);
 
         int count = 2;
         for (int i = 0; i < count; i++) {
-            parser.setInputStream(new ByteArrayInputStream( (SYSLOG_MESSAGE).getBytes()));
+            parser.setInputStream(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
 
-            assertTrue(parser.next(res));
-            ResultsetAsString strings1 = new ResultsetAsString(res);
+            Assertions.assertTrue(parser.next());
+            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
 
             // Message 1
             Assertions.assertEquals("46", strings1.getPriority());
@@ -280,15 +267,12 @@ public class SyntaxTest {
             Assertions.assertEquals("{\"@timestamp\":\"2021-03-18T12:29:36.842898+02:00\",\"host\":\"logsource.example.com\",\"source-module\":\"impstats\", \"name\": \"tags-out\", \"origin\": \"dynstats.bucket\", \"values\": { } }", strings1.getMsg());
 
             // Structured Data 1
-            Assertions.assertEquals("logsource.example.com", strings1.getSdValue("event_id@48577","hostname"));
-
-            res.clear();
+            Assertions.assertEquals("logsource.example.com", strings1.getSdValue("event_id@48577", "hostname"));
         }
 
         // finally empty
-        assertFalse(parser.next(res));
-        ResultsetAsString strings1 = new ResultsetAsString(res);
-        strings1.setResultset(res);
+        assertFalse(parser.next());
+        ResultSetAsString strings1 = new ResultSetAsString(parser.get());
 
         // Message Finished
         Assertions.assertEquals("", strings1.getPriority());
@@ -301,7 +285,7 @@ public class SyntaxTest {
         Assertions.assertEquals("", strings1.getMsg());
 
         // Structured Data Finished
-        Assertions.assertEquals("", strings1.getSdValue("event_id@48577","hostname"));
+        Assertions.assertEquals("", strings1.getSdValue("event_id@48577", "hostname"));
 
     }
 
@@ -314,18 +298,16 @@ public class SyntaxTest {
 
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
 
-        sdSubscription.subscribeElement("event_id@48577","hostname");
+        sdSubscription.subscribeElement("event_id@48577", "hostname");
 
-        ParserResultset res = new ParserResultset(subscription, sdSubscription);
-
-        RFC5424Parser parser = new RFC5424Parser(null);
+        RFC5424Parser parser = new RFC5424Parser(null, subscription, sdSubscription);
 
         int count = 2;
         for (int i = 0; i < count; i++) {
-            parser.setInputStream(new ByteArrayInputStream( (SYSLOG_MESSAGE).getBytes()));
+            parser.setInputStream(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
 
-            assertTrue(parser.next(res));
-            ResultsetAsString strings1 = new ResultsetAsString(res);
+            Assertions.assertTrue(parser.next());
+            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
 
             // Message 1
             Assertions.assertEquals("46", strings1.getPriority());
@@ -338,15 +320,12 @@ public class SyntaxTest {
             Assertions.assertEquals("{\"@timestamp\":\"2021-03-25T15:14:09.449777+02:00\",\"host\":\"logsource.example.com\",\"source-module\":\"impstats\", \"name\": \"resource-usage\", \"origin\": \"impstats\", \"utime\": 693053726, \"stime\": 133593735, \"maxrss\": 4690828, \"minflt\": 46694808, \"majflt\": 0, \"inblock\": 122077416, \"oublock\": 123878288, \"nvcsw\": 7199, \"nivcsw\": 9287, \"openfiles\": 20 }", strings1.getMsg());
 
             // Structured Data 1
-            Assertions.assertEquals("logsource.example.com", strings1.getSdValue("event_id@48577","hostname"));
-
-            res.clear();
+            Assertions.assertEquals("logsource.example.com", strings1.getSdValue("event_id@48577", "hostname"));
         }
 
         // finally empty
-        assertFalse(parser.next(res));
-        ResultsetAsString strings1 = new ResultsetAsString(res);
-        strings1.setResultset(res);
+        assertFalse(parser.next());
+        ResultSetAsString strings1 = new ResultSetAsString(parser.get());
 
         // Message Finished
         Assertions.assertEquals("", strings1.getPriority());
@@ -360,7 +339,7 @@ public class SyntaxTest {
 
 
         // Structured Data Finished
-        Assertions.assertEquals("", strings1.getSdValue("event_id@48577","hostname"));
+        Assertions.assertEquals("", strings1.getSdValue("event_id@48577", "hostname"));
 
     }
 
@@ -375,16 +354,13 @@ public class SyntaxTest {
 
         //sdSubscription.subscribeElement("ID_A@1","u");
 
-        ParserResultset res = new ParserResultset(subscription, sdSubscription);
-
-        InputStream inputStream = new ByteArrayInputStream( (SYSLOG_MESSAGE).getBytes());
-        RFC5424Parser parser = new RFC5424Parser(inputStream);
+        InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes());
+        RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription);
 
         int count = 1;
         for (int i = 0; i < count; i++) {
-            res.clear();
-            assertTrue(parser.next(res));
-            ResultsetAsString strings1 = new ResultsetAsString(res);
+            Assertions.assertTrue(parser.next());
+            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
 
             Assertions.assertEquals("134", strings1.getPriority());
             Assertions.assertEquals("1", strings1.getVersion());
@@ -395,9 +371,7 @@ public class SyntaxTest {
             Assertions.assertEquals("-", strings1.getMsgid());
             Assertions.assertEquals(" 1.2.3.4 - - [08/Mar/2019:14:00:00 +0200] \"POST /idt/device/", strings1.getMsg());
 
-            res.clear();
-            assertFalse(parser.next(res));
-            strings1.setResultset(res);
+            assertFalse(parser.next());
 
             inputStream.reset();
         }
@@ -415,18 +389,16 @@ public class SyntaxTest {
          there is an illegal field in syslogtag containing brackets
          it is fixed by subscribing to it.
          */
-        sdSubscription.subscribeElement("rfc3164@48577","syslogtag");
+        sdSubscription.subscribeElement("rfc3164@48577", "syslogtag");
 
-        ParserResultset res = new ParserResultset(subscription, sdSubscription);
 
-        InputStream inputStream = new ByteArrayInputStream( (SYSLOG_MESSAGE).getBytes());
-        RFC5424Parser parser = new RFC5424Parser(inputStream);
+        InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes());
+        RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription, false);
 
         int count = 1;
         for (int i = 0; i < count; i++) {
-            res.clear();
-            assertTrue(parser.next(res));
-            ResultsetAsString strings1 = new ResultsetAsString(res);
+            Assertions.assertTrue(parser.next());
+            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
 
             Assertions.assertEquals("15", strings1.getPriority());
             Assertions.assertEquals("1", strings1.getVersion());
@@ -437,9 +409,8 @@ public class SyntaxTest {
             Assertions.assertEquals("-", strings1.getMsgid());
             Assertions.assertEquals(" source-http <snip>", strings1.getMsg());
 
-            res.clear();
-            assertFalse(parser.next(res));
-            strings1.setResultset(res);
+            assertFalse(parser.next());
+            
 
             inputStream.reset();
         }
@@ -454,16 +425,14 @@ public class SyntaxTest {
 
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
 
-        ParserResultset res = new ParserResultset(subscription, sdSubscription);
 
-        InputStream inputStream = new ByteArrayInputStream( (SYSLOG_MESSAGE).getBytes());
-        RFC5424Parser parser = new RFC5424Parser(inputStream);
+        InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes());
+        RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription);
 
         int count = 1;
         for (int i = 0; i < count; i++) {
-            res.clear();
-            assertTrue(parser.next(res));
-            ResultsetAsString strings1 = new ResultsetAsString(res);
+            Assertions.assertTrue(parser.next());
+            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
 
             Assertions.assertEquals("15", strings1.getPriority());
             Assertions.assertEquals("1", strings1.getVersion());
@@ -474,9 +443,7 @@ public class SyntaxTest {
             Assertions.assertEquals("-", strings1.getMsgid());
             Assertions.assertEquals(" http(Worker1", strings1.getMsg());
 
-            res.clear();
-            assertFalse(parser.next(res));
-            strings1.setResultset(res);
+            assertFalse(parser.next());
 
             inputStream.reset();
         }
@@ -491,18 +458,16 @@ public class SyntaxTest {
 
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
 
-        sdSubscription.subscribeElement("event_id@48577","hostname");
+        sdSubscription.subscribeElement("event_id@48577", "hostname");
 
-        ParserResultset res = new ParserResultset(subscription, sdSubscription);
-
-        RFC5424Parser parser = new RFC5424Parser(null);
+        RFC5424Parser parser = new RFC5424Parser(null, subscription, sdSubscription);
 
         int count = 2;
         for (int i = 0; i < count; i++) {
-            parser.setInputStream(new ByteArrayInputStream( (SYSLOG_MESSAGE).getBytes()));
+            parser.setInputStream(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
 
-            assertTrue(parser.next(res));
-            ResultsetAsString strings1 = new ResultsetAsString(res);
+            Assertions.assertTrue(parser.next());
+            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
 
             // Message 1
             Assertions.assertEquals("15", strings1.getPriority());
@@ -513,14 +478,11 @@ public class SyntaxTest {
             Assertions.assertEquals("PRODA", strings1.getProcid());
             Assertions.assertEquals("-", strings1.getMsgid());
             Assertions.assertEquals(" http(Worker1", strings1.getMsg());
-
-            res.clear();
         }
 
         // finally empty
-        assertFalse(parser.next(res));
-        ResultsetAsString strings1 = new ResultsetAsString(res);
-        strings1.setResultset(res);
+        assertFalse(parser.next());
+        ResultSetAsString strings1 = new ResultSetAsString(parser.get());
 
         // Message Finished
         Assertions.assertEquals("", strings1.getPriority());
@@ -532,6 +494,7 @@ public class SyntaxTest {
         Assertions.assertEquals("", strings1.getMsgid());
         Assertions.assertEquals("", strings1.getMsg());
     }
+
     @Test
     void multipleNewlinesInMsg() throws Exception {
         String SYSLOG_MESSAGE = "<14>1 2022-12-13T14:41:29.715Z test-stream 9627df7a-testi - - - Testing text.\ntest\ning.\n";
@@ -540,18 +503,16 @@ public class SyntaxTest {
         subscription.subscribeAll();
 
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-        sdSubscription.subscribeElement("event_id@48577","hostname");
+        sdSubscription.subscribeElement("event_id@48577", "hostname");
 
-        ParserResultset res = new ParserResultset(subscription, sdSubscription);
+        RFC5424Parser parser = new RFC5424Parser(null, subscription, sdSubscription, false);
 
-        RFC5424Parser parser = new RFC5424Parser(null, false);
-
-        int count = 2;
+        int count = 1;
         for (int i = 0; i < count; i++) {
-            parser.setInputStream(new ByteArrayInputStream( (SYSLOG_MESSAGE).getBytes()));
+            parser.setInputStream(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
 
-            assertTrue(parser.next(res));
-            ResultsetAsString strings1 = new ResultsetAsString(res);
+            Assertions.assertTrue(parser.next());
+            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
 
             // Message 1
             Assertions.assertEquals("14", strings1.getPriority());
@@ -562,14 +523,11 @@ public class SyntaxTest {
             Assertions.assertEquals("-", strings1.getProcid());
             Assertions.assertEquals("-", strings1.getMsgid());
             Assertions.assertEquals("Testing text.\ntest\ning.\n", strings1.getMsg());
-
-            res.clear();
         }
 
         // finally empty
-        assertFalse(parser.next(res));
-        ResultsetAsString strings1 = new ResultsetAsString(res);
-        strings1.setResultset(res);
+        assertFalse(parser.next());
+        ResultSetAsString strings1 = new ResultSetAsString(parser.get());
 
         // Message Finished
         Assertions.assertEquals("", strings1.getPriority());

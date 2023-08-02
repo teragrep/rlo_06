@@ -45,12 +45,12 @@
  */
 package com.teragrep.rlo_06.tests;
 
-import com.teragrep.rlo_06.ParserResultset;
+import com.teragrep.rlo_06.ParserResultSet;
 import com.teragrep.rlo_06.RFC5424Parser;
 import com.teragrep.rlo_06.RFC5424ParserSDSubscription;
 import com.teragrep.rlo_06.RFC5424ParserSubscription;
 import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -86,19 +86,16 @@ public class TestFileTest {
 
         sdSubscription.subscribeElement("ID_A@1","u");
 
-        ParserResultset res = new ParserResultset(subscription, sdSubscription);
-
         final File initialFile = new File("output.txt");
         final InputStream inputStream = new BufferedInputStream(new FileInputStream(initialFile),32*1024*1024);
-        RFC5424Parser parser = new RFC5424Parser(inputStream);
+        RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription);
 
 
 
         Instant instant1 = Instant.now();
         int count = 1000;
         for (int i = 0; i < count; i++) {
-            res.clear();
-            parser.next(res);
+            Assertions.assertTrue(parser.next());
         }
         Instant instant2 = Instant.now();
 

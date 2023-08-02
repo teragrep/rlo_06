@@ -48,60 +48,56 @@ package com.teragrep.rlo_06;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 
-public class ResultsetAsByteBuffer {
-    ParserResultset resultset;
+public class ResultSetAsByteBuffer {
+    private final ParserResultSet resultSet;
 
-    public ResultsetAsByteBuffer(ParserResultset resultset) {
-        this.resultset = resultset;
-    }
-
-    public void setResultset(ParserResultset resultset) {
-        this.resultset = resultset;
+    public ResultSetAsByteBuffer(ParserResultSet resultSet) {
+        this.resultSet = resultSet;
     }
 
     public ByteBuffer getPRIORITY() {
-        return (ByteBuffer) this.resultset.PRIORITY.flip();
+        return (ByteBuffer) this.resultSet.PRIORITY.flip();
     }
 
     public ByteBuffer getVERSION() {
-        return (ByteBuffer) this.resultset.VERSION.flip();
+        return (ByteBuffer) this.resultSet.VERSION.flip();
     }
 
     public ByteBuffer getTIMESTAMP() {
-        return (ByteBuffer) this.resultset.TIMESTAMP.flip();
+        return (ByteBuffer) this.resultSet.TIMESTAMP.flip();
     }
 
     public ByteBuffer getHOSTNAME() {
-        return (ByteBuffer) this.resultset.HOSTNAME.flip();
+        return (ByteBuffer) this.resultSet.HOSTNAME.flip();
     }
 
     public ByteBuffer getAPPNAME() {
-        return (ByteBuffer) this.resultset.APPNAME.flip();
+        return (ByteBuffer) this.resultSet.APPNAME.flip();
     }
 
     public ByteBuffer getPROCID() {
-        return (ByteBuffer) this.resultset.PROCID.flip();
+        return (ByteBuffer) this.resultSet.PROCID.flip();
     }
 
     public ByteBuffer getMSGID() {
-        return (ByteBuffer) this.resultset.MSGID.flip();
+        return (ByteBuffer) this.resultSet.MSGID.flip();
     }
 
     public ByteBuffer getMSG() {
-        return (ByteBuffer) this.resultset.MSG.flip();
+        return (ByteBuffer) this.resultSet.MSG.flip();
     }
 
     public ByteBuffer getSdValue(ByteBuffer sdIdByteBuffer, ByteBuffer sdElemByteBuffer) {
         // NOTE sdIdByteBuffer and sdElemByteBuffer needs to be flipped to read when calling this
-        if (this.resultset.sdSubscription.isSubscribedSDId(sdIdByteBuffer)) {
-            if (this.resultset.sdSubscription.isSubscribedSDElement(sdIdByteBuffer, sdElemByteBuffer)) {
-                return (ByteBuffer) this.resultset.sdSubscription.getSubscribedSDElementBuffer(sdIdByteBuffer, sdElemByteBuffer).flip();
+        if (this.resultSet.sdSubscription.isSubscribedSDId(sdIdByteBuffer)) {
+            if (this.resultSet.sdSubscription.isSubscribedSDElement(sdIdByteBuffer, sdElemByteBuffer)) {
+                return (ByteBuffer) this.resultSet.sdSubscription.getSubscribedSDElementBuffer(sdIdByteBuffer, sdElemByteBuffer).flip();
             }
         }
         return null;
     }
 
     public HashMap<ByteBuffer, HashMap<ByteBuffer, ByteBuffer>> getAsMap() {
-        return this.resultset.sdSubscription.getMap();
+        return this.resultSet.sdSubscription.getMap();
     }
 }
