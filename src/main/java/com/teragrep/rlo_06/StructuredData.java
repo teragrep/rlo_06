@@ -33,7 +33,7 @@ final class StructuredData implements Consumer<Stream> {
 
 
         if (!stream.next()) {
-            throw new ParseException("TOO SHORT");
+            throw new ParseException("Expected SD, received nothing");
         }
         b = stream.get();
 
@@ -50,7 +50,7 @@ final class StructuredData implements Consumer<Stream> {
             // if '-' then R(ead) and pass to next state
 
             if (!stream.next()) {
-                throw new ParseException("TOO SHORT");
+                throw new ParseException("SD is too short, can't continue");
             }
             return;
         }
@@ -67,7 +67,7 @@ final class StructuredData implements Consumer<Stream> {
                     */
 
             if (!stream.next()) {
-                throw new ParseException("TOO SHORT");
+                throw new ParseException("SD is too short, can't continue");
             }
             b = stream.get();
             while (sdId_max_left > 0 && b != 32 && b != 93) { // ' ' nor ']'
@@ -75,7 +75,7 @@ final class StructuredData implements Consumer<Stream> {
                 sdId_max_left--;
 
                 if (!stream.next()) {
-                    throw new ParseException("TOO SHORT");
+                    throw new ParseException("SD is too short, can't continue");
                 }
                 b = stream.get();
             }
@@ -98,7 +98,7 @@ final class StructuredData implements Consumer<Stream> {
                         short sdElemKey_max_left = 32;
 
                         if (!stream.next()) {
-                            throw new ParseException("TOO SHORT");
+                            throw new ParseException("SD is too short, can't continue");
                         }
                         b = stream.get();
                         while (sdElemKey_max_left > 0 && b != 61) { // '='
@@ -106,7 +106,7 @@ final class StructuredData implements Consumer<Stream> {
                             sdElemKey_max_left--;
 
                             if (!stream.next()) {
-                                throw new ParseException("TOO SHORT");
+                                throw new ParseException("SD is too short, can't continue");
                             }
                             b = stream.get();
                         }
@@ -117,7 +117,7 @@ final class StructuredData implements Consumer<Stream> {
                         }
 
                         if (!stream.next()) {
-                            throw new ParseException("TOO SHORT");
+                            throw new ParseException("SD is too short, can't continue");
                         }
                         b = stream.get();
                         if (b != 34) { // '"'
@@ -130,7 +130,7 @@ final class StructuredData implements Consumer<Stream> {
                             short sdElemVal_max_left = 8 * 1024;
 
                             if (!stream.next()) {
-                                throw new ParseException("TOO SHORT");
+                                throw new ParseException("SD is too short, can't continue");
                             }
                             b = stream.get();
 
@@ -143,7 +143,7 @@ final class StructuredData implements Consumer<Stream> {
                                     // read next
 
                                     if (!stream.next()) {
-                                        throw new ParseException("TOO SHORT");
+                                        throw new ParseException("SD is too short, can't continue");
                                     }
                                     b = stream.get();
 
@@ -154,7 +154,7 @@ final class StructuredData implements Consumer<Stream> {
                                             sdElemVal_max_left--;
 
                                             if (!stream.next()) {
-                                                throw new ParseException("TOO SHORT");
+                                                throw new ParseException("SD is too short, can't continue");
                                             }
                                             b = stream.get();
                                         }
@@ -164,7 +164,7 @@ final class StructuredData implements Consumer<Stream> {
                                     sdElemVal_max_left--;
 
                                     if (!stream.next()) {
-                                        throw new ParseException("TOO SHORT");
+                                        throw new ParseException("SD is too short, can't continue");
                                     }
                                     b = stream.get();
                                 }
@@ -173,7 +173,7 @@ final class StructuredData implements Consumer<Stream> {
                             // skip through, no subscription for this sdElem
 
                             if (!stream.next()) {
-                                throw new ParseException("TOO SHORT");
+                                throw new ParseException("SD is too short, can't continue");
                             }
                             b = stream.get();
                             while (b != 34) { // '"'
@@ -182,21 +182,21 @@ final class StructuredData implements Consumer<Stream> {
                                     // read next
 
                                     if (!stream.next()) {
-                                        throw new ParseException("TOO SHORT");
+                                        throw new ParseException("SD is too short, can't continue");
                                     }
                                     b = stream.get();
                                     // if it is a '"' then it must be taken care of, loop can do the rest
                                     if (b == 34) {
 
                                         if (!stream.next()) {
-                                            throw new ParseException("TOO SHORT");
+                                            throw new ParseException("SD is too short, can't continue");
                                         }
                                         b = stream.get();
                                     }
                                 } else {
 
                                     if (!stream.next()) {
-                                        throw new ParseException("TOO SHORT");
+                                        throw new ParseException("SD is too short, can't continue");
                                     }
                                     b = stream.get();
                                 }
@@ -210,16 +210,16 @@ final class StructuredData implements Consumer<Stream> {
                         // take next one for the while to check if ' ' or if to break it
 
                         if (!stream.next()) {
-                            throw new ParseException("TOO SHORT");
+                            throw new ParseException("SD is too short, can't continue");
                         }
                         b = stream.get();
-                    } // while (b == 32) { // multiple ' ' separated sdKey="sdValue" pairs may exist
-                } // if (this.resultset.sdSubscription.containsKey(this.resultset.sdIdIterator))
+                    }
+                }
                 else {
                     // TODO skip through to next block
 
                     if (!stream.next()) {
-                        throw new ParseException("TOO SHORT");
+                        throw new ParseException("SD is too short, can't continue");
                     }
                     b = stream.get();
                     while (b != 93) { // ']'
@@ -228,21 +228,21 @@ final class StructuredData implements Consumer<Stream> {
                             // read next
 
                             if (!stream.next()) {
-                                throw new ParseException("TOO SHORT");
+                                throw new ParseException("SD is too short, can't continue");
                             }
                             b = stream.get();
                             // if it is a ']' then it must be taken care of, loop can do the rest
                             if (b == 93) {
 
                                 if (!stream.next()) {
-                                    throw new ParseException("TOO SHORT");
+                                    throw new ParseException("SD is too short, can't continue");
                                 }
                                 b = stream.get();
                             }
                         } else {
 
                             if (!stream.next()) {
-                                throw new ParseException("TOO SHORT");
+                                throw new ParseException("SD is too short, can't continue");
                             }
                             b = stream.get();
                         }
@@ -259,10 +259,10 @@ final class StructuredData implements Consumer<Stream> {
                         */
 
             if (!stream.next()) {
-                throw new ParseException("TOO SHORT");
+                throw new ParseException("SD is too short, can't continue");
             }
             b = stream.get(); // will it be '[' or the MSG who knows.
             // let's find out, note if not '[' then R(ead) and pass to next state
-        } // while(b == 91) { // '[' sd exists
+        }
     }
 }

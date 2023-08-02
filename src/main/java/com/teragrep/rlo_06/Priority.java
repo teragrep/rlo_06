@@ -27,36 +27,39 @@ final class Priority implements Consumer<Stream> {
         }
 
         if (!stream.next()) {
-            throw new ParseException("TOO SHORT");
+            throw new ParseException("Expected PRIORITY, received nothing");
         }
 
         if (stream.get() >= 48 && stream.get() <= 57) { // first is always a number between 0..9
-            if (PRIORITY != null)
+            if (PRIORITY != null) {
                 PRIORITY.put(stream.get());
+            }
         } else {
             throw new PriorityParseException("PRIORITY number incorrect");
         }
 
         if (!stream.next()) {
-            throw new ParseException("TOO SHORT");
+            throw new ParseException("PRIORITY is too short, can't continue");
         }
         if (stream.get() >= 48 &&stream.get() <= 57) { // second may be a number between 0..9
-            if (PRIORITY != null)
+            if (PRIORITY != null) {
                 PRIORITY.put(stream.get());
+            }
 
             if (!stream.next()) {
-                throw new ParseException("TOO SHORT");
+                throw new ParseException("PRIORITY is too short, can't continue");
             }
 
             if (stream.get() >= 48 && stream.get() <= 57) { // third may be a number
-                if (PRIORITY != null)
+                if (PRIORITY != null) {
                     PRIORITY.put(stream.get());
-
-                if (!stream.next()) {
-                    throw new ParseException("TOO SHORT");
                 }
 
-                if (stream.get() != '>') { // omit
+                if (!stream.next()) {
+                    throw new ParseException("PRIORITY is too short, can't continue");
+                }
+
+                if (stream.get() != 62) { // omit
                     throw new PriorityParseException("PRIORITY > missing");
                 }
             } else if (stream.get() == 62) { // third may be a '>'

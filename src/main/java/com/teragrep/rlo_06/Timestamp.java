@@ -24,16 +24,17 @@ final class Timestamp implements Consumer<Stream> {
         short ts_max_left = 32;
 
         if (!stream.next()) {
-            throw new ParseException("TOO SHORT");
+            throw new ParseException("Expected TIMESTAMP, received nothing");
         }
         b = stream.get();
         while (ts_max_left > 0 && b != 32) {
-            if (TIMESTAMP != null)
+            if (TIMESTAMP != null) {
                 TIMESTAMP.put(b);
+            }
             ts_max_left--;
 
             if (!stream.next()) {
-                throw new ParseException("TOO SHORT");
+                throw new ParseException("TIMESTAMP is too short, can't continue");
             }
             b = stream.get();
         }

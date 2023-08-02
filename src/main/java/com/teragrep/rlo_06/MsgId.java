@@ -24,16 +24,17 @@ final class MsgId implements Consumer<Stream> {
         short msgid_max_left = 32;
 
         if (!stream.next()) {
-            throw new ParseException("TOO SHORT");
+            throw new ParseException("Expected MSGID, received nothing");
         }
         b = stream.get();
         while (msgid_max_left > 0 && b != 32) {
-            if (MSGID != null)
+            if (MSGID != null) {
                 MSGID.put(b);
+            }
             msgid_max_left--;
 
             if (!stream.next()) {
-                throw new ParseException("TOO SHORT");
+                throw new ParseException("MSGID is too short, can't continue");
             }
             b = stream.get();
         }

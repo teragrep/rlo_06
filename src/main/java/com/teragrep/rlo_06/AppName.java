@@ -24,16 +24,17 @@ final class AppName implements Consumer<Stream> {
         short appname_max_left = 48;
 
         if (!stream.next()) {
-            throw new ParseException("TOO SHORT");
+            throw new ParseException("Expected APPNAME, received nothing");
         }
         b = stream.get();
         while (appname_max_left > 0 && b != 32) {
-            if (APPNAME != null)
+            if (APPNAME != null) {
                 APPNAME.put(b);
+            }
             appname_max_left--;
 
             if (!stream.next()) {
-                throw new ParseException("TOO SHORT");
+                throw new ParseException("APPNAME is too short, can't continue");
             }
             b = stream.get();
         }

@@ -24,16 +24,17 @@ final class Hostname implements Consumer<Stream> {
         short hostname_max_left = 255;
 
         if (!stream.next()) {
-            throw new ParseException("TOO SHORT");
+            throw new ParseException("Expected HOSTNAME, received nothing");
         }
         byte b = stream.get();
         while (hostname_max_left > 0 && b != 32) {
-            if (HOSTNAME != null)
+            if (HOSTNAME != null) {
                 HOSTNAME.put(b);
+            }
             hostname_max_left--;
 
             if (!stream.next()) {
-                throw new ParseException("TOO SHORT");
+                throw new ParseException("HOSTNAME is too short, can't continue");
             }
             b = stream.get();
         }
