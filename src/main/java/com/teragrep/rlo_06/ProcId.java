@@ -24,16 +24,17 @@ final class ProcId implements Consumer<Stream> {
         short procid_max_left = 128;
 
         if (!stream.next()) {
-            throw new ParseException("TOO SHORT");
+            throw new ParseException("Expected PROCID, received nothing");
         }
         b = stream.get();
         while (procid_max_left > 0 && b != 32) {
-            if (PROCID != null)
+            if (PROCID != null) {
                 PROCID.put(b);
+            }
             procid_max_left--;
 
             if (!stream.next()) {
-                throw new ParseException("TOO SHORT");
+                throw new ParseException("PROCID is too short, can't continue");
             }
             b = stream.get();
         }

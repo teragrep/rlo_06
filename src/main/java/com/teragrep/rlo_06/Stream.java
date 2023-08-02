@@ -19,7 +19,6 @@ final class Stream implements Supplier<Byte> {
     }
 
     public Byte get() {
-        // System.out.println("GETS B <"+ new String(new byte[]{b}, StandardCharsets.UTF_8)+">");
         return b;
     }
 
@@ -33,7 +32,6 @@ final class Stream implements Supplier<Byte> {
             }
             if (read <= 0) { // EOF
                 pointer = bytesInBuffer;
-                // System.out.println("NEXT RV <false> pointer <"+pointer+"> bytesInBuffer <"+ bytesInBuffer +"> b <"+new String(new byte[]{b}, StandardCharsets.UTF_8)+">");
                 return false;
             }
 
@@ -41,7 +39,6 @@ final class Stream implements Supplier<Byte> {
             pointer = 0;
         }
         b = buffer[pointer++];
-        // System.out.println("NEXT RV <true> pointer <"+pointer+"> bytesInBuffer <"+ bytesInBuffer +">  b <"+new String(new byte[]{b}, StandardCharsets.UTF_8)+">");
         return true;
     }
 }

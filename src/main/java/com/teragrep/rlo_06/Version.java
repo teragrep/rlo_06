@@ -24,15 +24,16 @@ final class Version implements Consumer<Stream> {
         byte b;
 
         if (!stream.next()) {
-            throw new ParseException("TOO SHORT");
+            throw new ParseException("Expected VERSION, received nothing");
         }
         b = stream.get();
         if (b == 49) {
-            if (VERSION != null)
+            if (VERSION != null) {
                 VERSION.put(b);
+            }
 
             if (!stream.next()) {
-                throw new ParseException("TOO SHORT");
+                throw new ParseException("VERSION is too short, can't continue");
             }
             b = stream.get();
             if (b != 32) { // omit ' '

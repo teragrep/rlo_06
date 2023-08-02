@@ -150,4 +150,33 @@ public class MsgTest {
         ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
         Assertions.assertEquals("there is nothing after newline", resultSetAsString.getMsg());
     }
+
+    @Test
+    public void emptyMessageTest() {
+        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
+        subscription.add(ParserEnum.MSG);
+        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
+
+        ParserResultSet parserResultSet = new ParserResultSet(
+                subscription,
+                sdSubscription
+        );
+
+        // lf termination off
+        Msg msg = new Msg(parserResultSet.MSG, true);
+
+        String input = " ";
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(
+                input.getBytes(StandardCharsets.US_ASCII)
+        );
+
+        Stream stream = new Stream(bais);
+
+        Assertions.assertTrue(stream.next()); // msg requires stream called with next
+        msg.accept(stream);
+
+        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
+        Assertions.assertEquals("", resultSetAsString.getMsg());
+    }
 }
