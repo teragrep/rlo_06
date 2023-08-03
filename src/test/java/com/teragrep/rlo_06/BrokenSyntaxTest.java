@@ -13,11 +13,9 @@ public class BrokenSyntaxTest {
         RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
         subscription.subscribeAll();
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-        ParserResultSet res = new ParserResultSet(subscription, sdSubscription);
         RFC5424Parser parser = new RFC5424Parser(null, subscription, sdSubscription);
         parser.setInputStream(new ByteArrayInputStream( (SYSLOG_MESSAGE).getBytes()));
         Assertions.assertThrows(ParseException.class, parser::next);
-        res.clear();
     }
 
     @Test
@@ -26,7 +24,6 @@ public class BrokenSyntaxTest {
         RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
         subscription.subscribeAll();
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription(true);
-        ParserResultSet res = new ParserResultSet(subscription, sdSubscription);
         RFC5424Parser parser = new RFC5424Parser(null,  subscription, sdSubscription);
         ResultSetAsString resultsetAsString = new ResultSetAsString(parser.get());
         parser.setInputStream(new ByteArrayInputStream( (input).getBytes()));
@@ -39,7 +36,6 @@ public class BrokenSyntaxTest {
         Assertions.assertEquals("DEA", resultsetAsString.getProcid(), "Procid");
         Assertions.assertEquals("MSG-01", resultsetAsString.getMsgid(), "msgid");
         Assertions.assertEquals("sigsegv", resultsetAsString.getMsg(), "msg");
-        res.clear();
     }
 
     @Test
@@ -48,11 +44,9 @@ public class BrokenSyntaxTest {
         RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
         subscription.subscribeAll();
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-        ParserResultSet res = new ParserResultSet(subscription, sdSubscription);
         RFC5424Parser parser = new RFC5424Parser(null, subscription, sdSubscription);
         parser.setInputStream(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
         Assertions.assertThrows(ParseException.class, parser::next);
-        res.clear();
     }
 
 
