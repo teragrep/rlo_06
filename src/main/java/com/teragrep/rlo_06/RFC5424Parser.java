@@ -54,6 +54,22 @@ public final class RFC5424Parser {
     private final ParserResultSet resultset;
     private final Consumer<Stream> streamConsumer;
 
+    public RFC5424Parser() {
+        this(new InputStream() {
+            @Override
+            public int read() {
+                return -1;
+            }
+        });
+    }
+
+    public RFC5424Parser(InputStream inputStream) {
+        this(inputStream, new RFC5424ParserSubscription());
+    }
+    public RFC5424Parser(InputStream inputStream, RFC5424ParserSubscription subscription) {
+        this(inputStream, subscription, new RFC5424ParserSDSubscription());
+    }
+
     public RFC5424Parser(InputStream inputStream, RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription) {
         this(inputStream, subscription, sdSubscription, true);
     }
