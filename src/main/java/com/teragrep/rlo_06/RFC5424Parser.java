@@ -54,11 +54,37 @@ public final class RFC5424Parser {
     private final ParserResultSet resultset;
     private final Consumer<Stream> streamConsumer;
 
+    public RFC5424Parser() {
+        this(null);
+    }
+
+    public RFC5424Parser(InputStream inputStream) {
+        this(inputStream, null);
+    }
+    public RFC5424Parser(InputStream inputStream, RFC5424ParserSubscription subscription) {
+        this(inputStream, subscription, null);
+    }
+
     public RFC5424Parser(InputStream inputStream, RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription) {
         this(inputStream, subscription, sdSubscription, true);
     }
 
     public RFC5424Parser(InputStream inputStream, RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription, boolean lineFeedTermination) {
+        if(inputStream == null) {
+            inputStream = new InputStream() {
+                @Override
+                public int read() {
+                    return -1;
+                }
+            };
+        }
+        if(subscription == null) {
+            subscription = new RFC5424ParserSubscription();
+            subscription.subscribeAll();
+        }
+        if(sdSubscription == null) {
+            sdSubscription = new RFC5424ParserSDSubscription();
+        }
         this.stream = new Stream(inputStream);
         this.resultset = new ParserResultSet(subscription, sdSubscription);
 
