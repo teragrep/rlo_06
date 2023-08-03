@@ -1,8 +1,11 @@
 = teragrep RFC5424 parser
+
 Features
+
 * Fast
 
 Non-features
+
 * Excellent strictness
 
 
