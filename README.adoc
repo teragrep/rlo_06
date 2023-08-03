@@ -54,19 +54,3 @@ if (parser.next()) {
   String sdValue = results.getSdValue("event_key@12345","paramKey");
 }
 ----
-
-== Todo
-
-=== RFC5424Parser.java
-* Take maximum allocation sizes from ParserResultset for string length checking
-* Throw if maximum size is exceeded
-* Throw if quotation exceed maximum line. THIS STALLS AT THE MOMENT.
-* Honour the subscription map
-* Extract rest of the switch case states from the next() to private methods
-* Try extracting sdParsing to a dedicated class
-* Try extracting buffer handling to a dedicated class
-
-=== Tests
-
-* More test cases, see palindromicity code
-
