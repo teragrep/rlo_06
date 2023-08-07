@@ -88,7 +88,7 @@ public class TestFileTest {
 
         final File initialFile = new File("output.txt");
         final InputStream inputStream = new BufferedInputStream(new FileInputStream(initialFile),32*1024*1024);
-        RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription);
+        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
 
 
 
