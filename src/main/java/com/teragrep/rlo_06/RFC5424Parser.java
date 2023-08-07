@@ -54,49 +54,21 @@ public final class RFC5424Parser {
     private final ParserResultSet resultset;
     private final Consumer<Stream> streamConsumer;
 
-    public RFC5424Parser() {
-        this(new InputStream() {
-            @Override
-            public int read() {
-                return -1;
-            }
-        });
+    public RFC5424Parser(RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription) {
+        this(subscription, sdSubscription, true);
     }
 
-    public RFC5424Parser(InputStream inputStream) {
-        this(inputStream, new RFC5424ParserSubscription());
-    }
-    public RFC5424Parser(InputStream inputStream, RFC5424ParserSubscription subscription) {
-        this(inputStream, subscription, new RFC5424ParserSDSubscription());
-    }
-
-    public RFC5424Parser(InputStream inputStream, RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription) {
-        this(inputStream, subscription, sdSubscription, true);
-    }
-
-    public RFC5424Parser(InputStream inputStream, RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription, boolean lineFeedTermination) {
-        this.stream = new Stream(inputStream);
+    public RFC5424Parser(RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription, boolean lineFeedTermination) {
         this.resultset = new ParserResultSet(subscription, sdSubscription);
-
-        Priority priority = new Priority(this.resultset.PRIORITY);
-        Version version = new Version(this.resultset.VERSION);
-        Timestamp timestamp = new Timestamp(this.resultset.TIMESTAMP);
-        Hostname hostname = new Hostname(this.resultset.HOSTNAME);
-        AppName appName = new AppName(this.resultset.APPNAME);
-        ProcId procId = new ProcId(this.resultset.PROCID);
-        MsgId msgId = new MsgId(this.resultset.MSGID);
-        StructuredData structuredData = new StructuredData(this.resultset);
-        Msg msg = new Msg(this.resultset.MSG, lineFeedTermination);
-
-        this.streamConsumer = priority
-                .andThen(version
-                        .andThen(timestamp
-                                .andThen(hostname
-                                        .andThen(appName
-                                                .andThen(procId
-                                                        .andThen(msgId
-                                                                .andThen(structuredData
-                                                                        .andThen(msg)
+        this.streamConsumer = new Priority(this.resultset.PRIORITY)
+                .andThen(new Version(this.resultset.VERSION)
+                        .andThen(new Timestamp(this.resultset.TIMESTAMP)
+                                .andThen(new Hostname(this.resultset.HOSTNAME)
+                                        .andThen(new AppName(this.resultset.APPNAME)
+                                                .andThen(new ProcId(this.resultset.PROCID)
+                                                        .andThen(new MsgId(this.resultset.MSGID)
+                                                                .andThen(new StructuredData(this.resultset)
+                                                                        .andThen(new Msg(this.resultset.MSG, lineFeedTermination))
                                                                 )
                                                         )
                                                 )
@@ -106,6 +78,30 @@ public final class RFC5424Parser {
                 );
     }
 
+    public RFC5424Parser(RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription, InputStream inputStream) {
+        this(subscription, sdSubscription, inputStream, true);
+    }
+
+    public RFC5424Parser(RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription, InputStream inputStream, boolean lineFeedTermination) {
+        this.stream = new Stream(inputStream);
+        this.resultset = new ParserResultSet(subscription, sdSubscription);
+        this.streamConsumer = new Priority(this.resultset.PRIORITY)
+                .andThen(new Version(this.resultset.VERSION)
+                        .andThen(new Timestamp(this.resultset.TIMESTAMP)
+                                .andThen(new Hostname(this.resultset.HOSTNAME)
+                                        .andThen(new AppName(this.resultset.APPNAME)
+                                                .andThen(new ProcId(this.resultset.PROCID)
+                                                        .andThen(new MsgId(this.resultset.MSGID)
+                                                                .andThen(new StructuredData(this.resultset)
+                                                                        .andThen(new Msg(this.resultset.MSG, lineFeedTermination))
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                );
+    }
 
     public void setInputStream(InputStream inputStream) {
         stream = new Stream(inputStream);

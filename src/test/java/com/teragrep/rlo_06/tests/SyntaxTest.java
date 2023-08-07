@@ -70,7 +70,7 @@ public class SyntaxTest {
 
 
         InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE + SYSLOG_MESSAGE2).getBytes());
-        RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription);
+        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
 
         int count = 1;
         for (int i = 0; i < count; i++) {
@@ -142,7 +142,7 @@ public class SyntaxTest {
         sdSubscription.subscribeElement("ID_A@1", "u");
 
         InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes());
-        RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription);
+        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
 
         int count = 1;
         for (int i = 0; i < count; i++) {
@@ -207,7 +207,7 @@ public class SyntaxTest {
         final File logFile = new File("src/test/resources/event.log");
         final InputStream inputStream = new BufferedInputStream(new FileInputStream(logFile), 32 * 1024 * 1024);
         final InputStream inputStream2 = new BufferedInputStream(new FileInputStream(logFile), 32 * 1024 * 1024);
-        RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription);
+        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
 
         Assertions.assertTrue(parser.next());
         ResultSetAsString strings1 = new ResultSetAsString(parser.get());
@@ -247,7 +247,7 @@ public class SyntaxTest {
         sdSubscription.subscribeElement("event_id@48577", "hostname");
 
 
-        RFC5424Parser parser = new RFC5424Parser(null, subscription, sdSubscription);
+        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription);
 
         int count = 2;
         for (int i = 0; i < count; i++) {
@@ -300,7 +300,7 @@ public class SyntaxTest {
 
         sdSubscription.subscribeElement("event_id@48577", "hostname");
 
-        RFC5424Parser parser = new RFC5424Parser(null, subscription, sdSubscription);
+        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription);
 
         int count = 2;
         for (int i = 0; i < count; i++) {
@@ -355,7 +355,7 @@ public class SyntaxTest {
         //sdSubscription.subscribeElement("ID_A@1","u");
 
         InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes());
-        RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription);
+        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
 
         int count = 1;
         for (int i = 0; i < count; i++) {
@@ -393,7 +393,7 @@ public class SyntaxTest {
 
 
         InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes());
-        RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription, false);
+        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream, false);
 
         int count = 1;
         for (int i = 0; i < count; i++) {
@@ -427,7 +427,7 @@ public class SyntaxTest {
 
 
         InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes());
-        RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription);
+        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
 
         int count = 1;
         for (int i = 0; i < count; i++) {
@@ -460,7 +460,7 @@ public class SyntaxTest {
 
         sdSubscription.subscribeElement("event_id@48577", "hostname");
 
-        RFC5424Parser parser = new RFC5424Parser(null, subscription, sdSubscription);
+        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription);
 
         int count = 2;
         for (int i = 0; i < count; i++) {
@@ -505,7 +505,7 @@ public class SyntaxTest {
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
         sdSubscription.subscribeElement("event_id@48577", "hostname");
 
-        RFC5424Parser parser = new RFC5424Parser(null, subscription, sdSubscription, false);
+        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, false);
 
         int count = 1;
         for (int i = 0; i < count; i++) {
