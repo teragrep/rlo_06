@@ -37,11 +37,19 @@ RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
 sdSubscription.subscribeElement("event_key@12345","paramKey");
 ----
 
-Create a parser with the desired InputStream
+Create a parser and set inputStream manually
 
 [source,java]
 ----
-RFC5424Parser parser = new RFC5424Parser(inputStream, subscription, sdSubscription);
+RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription);
+parser.setInputStream(inputStream);
+----
+
+Or pass the inputStream from constructor
+
+[source,java]
+----
+RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
 ----
 
 Next event can be extracted as follows
