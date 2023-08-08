@@ -182,7 +182,7 @@ public class PerformanceTest {
         InputStream inputStream = new ByteArrayInputStream( SYSLOG_MESSAGE.getBytes());
         RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
         subscription.subscribeAll();
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
+        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription(true);
         RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
 
         Instant instant1 = Instant.now();
