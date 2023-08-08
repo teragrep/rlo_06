@@ -54,70 +54,83 @@ import java.util.Iterator;
 
 public class ParserResultSet {
     // subscriptions
-    protected RFC5424ParserSubscription subscription;
-    protected RFC5424ParserSDSubscription sdSubscription;
+    final RFC5424ParserSubscription subscription;
+    final RFC5424ParserSDSubscription sdSubscription;
 
     // results
-    protected ByteBuffer PRIORITY = null;
-    protected ByteBuffer VERSION = null;
-    protected ByteBuffer TIMESTAMP = null;
-    protected ByteBuffer HOSTNAME = null;
-    protected ByteBuffer APPNAME = null;
-    protected ByteBuffer PROCID = null;
-    protected ByteBuffer MSGID = null;
-    protected ByteBuffer MSG = null;
+    final ByteBuffer PRIORITY;
+    final ByteBuffer VERSION;
+    final ByteBuffer TIMESTAMP;
+    final ByteBuffer HOSTNAME;
+    final ByteBuffer APPNAME;
+    final ByteBuffer PROCID;
+    final ByteBuffer MSGID;
+    final ByteBuffer MSG;
 
     // sdId and sdElement iterators, used by the parser but kept here for the consistency
-    protected ByteBuffer sdIdIterator;
-    protected ByteBuffer sdElementIterator;
+    final ByteBuffer sdIdIterator;
+    final ByteBuffer sdElementIterator;
 
 
 
     ParserResultSet(RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription) {
         this.subscription = subscription;
         this.sdSubscription = sdSubscription;
-        // subscription allocation
-        Iterator<ParserEnum> subsIter = this.subscription.subscription.iterator();
-        while (subsIter.hasNext()) {
-            ParserEnum sub = subsIter.next();
-            switch (sub) {
-                case PRIORITY:
-                    // 123
-                    this.PRIORITY = ByteBuffer.allocateDirect(3);
-                    break;
-                case VERSION:
-                    // 1
-                    this.VERSION = ByteBuffer.allocateDirect(1);
-                    break;
-                case TIMESTAMP:
-                    // '2021-03-19T10:42:21.20518+02:00'
-                    // '2020-10-14T08:27:34.317349+00:00'
-                    this.TIMESTAMP = ByteBuffer.allocateDirect(32);
-                    break;
-                case HOSTNAME:
-                    this.HOSTNAME = ByteBuffer.allocateDirect(255);
-                    break;
-                case APPNAME:
-                    this.APPNAME = ByteBuffer.allocateDirect(48);
-                    break;
-                case PROCID:
-                    this.PROCID = ByteBuffer.allocateDirect(128);
-                    break;
-                case MSGID:
-                    this.MSGID = ByteBuffer.allocateDirect(32);
-                    break;
-                case SD_PARSE:
-                    // allocated differently
-                    break;
-                case MSG:
-                    this.MSG = ByteBuffer.allocateDirect(256*1024);
-                    break;
-                case NL:
-                    // not captured
-                    break;
-                default:
-                    throw new RuntimeException("unknown subscription " + sub);
-            }
+
+        if (this.subscription.subscription.contains(ParserEnum.PRIORITY)) {
+            this.PRIORITY = ByteBuffer.allocateDirect(3);
+        }
+        else {
+            this.PRIORITY = null;
+        }
+
+        if (this.subscription.subscription.contains(ParserEnum.VERSION)) {
+            this.VERSION = ByteBuffer.allocateDirect(1);
+        }
+        else {
+            this.VERSION = null;
+        }
+
+        if (this.subscription.subscription.contains(ParserEnum.TIMESTAMP)) {
+            this.TIMESTAMP = ByteBuffer.allocateDirect(32);
+        }
+        else {
+            this.TIMESTAMP = null;
+        }
+
+        if (this.subscription.subscription.contains(ParserEnum.HOSTNAME)) {
+            this.HOSTNAME = ByteBuffer.allocateDirect(255);
+        }
+        else {
+            this.HOSTNAME = null;
+        }
+
+        if (this.subscription.subscription.contains(ParserEnum.APPNAME)) {
+            this.APPNAME = ByteBuffer.allocateDirect(48);
+        }
+        else {
+            this.APPNAME = null;
+        }
+
+        if (this.subscription.subscription.contains(ParserEnum.PROCID)) {
+            this.PROCID = ByteBuffer.allocateDirect(128);
+        }
+        else {
+            this.PROCID = null;
+        }
+
+        if (this.subscription.subscription.contains(ParserEnum.MSGID)) {
+            this.MSGID = ByteBuffer.allocateDirect(32);
+        }
+        else {
+            this.MSGID = null;
+        }
+
+        if (this.subscription.subscription.contains(ParserEnum.MSG)) {
+            this.MSG = ByteBuffer.allocateDirect(256 * 1024);
+        }
+        else {
+            this.MSG = null;
         }
 
         // sdIterator allocations
