@@ -5,14 +5,14 @@ import java.util.function.Consumer;
 final class SDElement implements Consumer<Stream> {
 
     private final ParserResultSet resultset;
-    private final SDId sdId;
-    private final SDKeyValuePair sdKeyValuePair;
+    private final SDElementId sdElementId;
+    private final SDParam sdParam;
     private final SDSkip sdSkip;
 
     SDElement(ParserResultSet resultset) {
         this.resultset = resultset;
-        this.sdId = new SDId(resultset);
-        this.sdKeyValuePair = new SDKeyValuePair(resultset);
+        this.sdElementId = new SDElementId(resultset);
+        this.sdParam = new SDParam(resultset);
         this.sdSkip = new SDSkip();
     }
 
@@ -22,12 +22,12 @@ final class SDElement implements Consumer<Stream> {
         byte b;
 
         // parse the sdId
-        sdId.accept(stream);
+        sdElementId.accept(stream);
         b = stream.get();
 
         if (b == 32) { // ' ', sdElement must exist
             if (resultset.sdSubscription.isSubscribedSDId(resultset.sdIdIterator)) {
-                sdKeyValuePair.accept(stream);
+                sdParam.accept(stream);
             }
             else {
                 sdSkip.accept(stream);

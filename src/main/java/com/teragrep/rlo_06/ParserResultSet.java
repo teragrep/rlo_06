@@ -46,7 +46,6 @@
 package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
-import java.util.Iterator;
 
 /**
  * NOTE: Each ByteBuffer here is always kept in 'put' mode.

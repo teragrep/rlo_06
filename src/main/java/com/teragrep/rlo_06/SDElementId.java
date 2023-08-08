@@ -2,11 +2,11 @@ package com.teragrep.rlo_06;
 
 import java.util.function.Consumer;
 
-final class SDId implements Consumer<Stream> {
+final class SDElementId implements Consumer<Stream> {
 
     private final ParserResultSet resultset;
 
-    SDId(ParserResultSet resultset) {
+    SDElementId(ParserResultSet resultset) {
         this.resultset = resultset;
     }
 

@@ -3,10 +3,10 @@ package com.teragrep.rlo_06;
 import java.nio.ByteBuffer;
 import java.util.function.Consumer;
 
-final class SDValue implements Consumer<Stream> {
+final class SDParamValue implements Consumer<Stream> {
     private final ParserResultSet resultset;
 
-    SDValue(ParserResultSet resultset) {
+    SDParamValue(ParserResultSet resultset) {
         this.resultset = resultset;
     }
 

@@ -2,17 +2,17 @@ package com.teragrep.rlo_06;
 
 import java.util.function.Consumer;
 
-final class SDKeyValuePair implements Consumer<Stream> {
+final class SDParam implements Consumer<Stream> {
     private final ParserResultSet resultset;
     private final SDValueSkip sdValueSkip;
-    private final SDKey sdKey;
-    private final SDValue sdValue;
+    private final SDParamKey sdParamKey;
+    private final SDParamValue sdParamValue;
 
-    SDKeyValuePair(ParserResultSet resultset) {
+    SDParam(ParserResultSet resultset) {
         this.resultset = resultset;
         this.sdValueSkip = new SDValueSkip();
-        this.sdKey = new SDKey(resultset);
-        this.sdValue = new SDValue(resultset);
+        this.sdParamKey = new SDParamKey(resultset);
+        this.sdParamValue = new SDParamValue(resultset);
     }
 
     @Override
@@ -22,7 +22,7 @@ final class SDKeyValuePair implements Consumer<Stream> {
         b = stream.get();
 
         while (b == 32) { // multiple ' ' separated sdKey="sdValue" pairs may exist
-            sdKey.accept(stream);
+            sdParamKey.accept(stream);
 
             b = stream.get();
             if (b != 61) { // '='
@@ -31,7 +31,7 @@ final class SDKeyValuePair implements Consumer<Stream> {
 
             // check if this is for us
             if (resultset.sdSubscription.isSubscribedSDElement(resultset.sdIdIterator, resultset.sdElementIterator)) {
-                sdValue.accept(stream);
+                sdParamValue.accept(stream);
             } else {
                 sdValueSkip.accept(stream);
             }

@@ -1,12 +1,11 @@
 package com.teragrep.rlo_06;
 
-import java.nio.ByteBuffer;
 import java.util.function.Consumer;
 
-final class SDKey implements Consumer<Stream> {
+final class SDParamKey implements Consumer<Stream> {
     private final ParserResultSet resultset;
 
-    SDKey(ParserResultSet resultset) {
+    SDParamKey(ParserResultSet resultset) {
         this.resultset = resultset;
     }
 
