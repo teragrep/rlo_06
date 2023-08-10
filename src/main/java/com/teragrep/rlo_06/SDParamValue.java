@@ -1,13 +1,14 @@
 package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-final class SDParamValue implements Consumer<Stream> {
-    private final ParserResultSet resultset;
+public final class SDParamValue implements Consumer<Stream>, Clearable {
+    private final ByteBuffer value;
 
-    SDParamValue(ParserResultSet resultset) {
-        this.resultset = resultset;
+    SDParamValue() {
+        this.value = ByteBuffer.allocateDirect(8 * 1024);
     }
 
     @Override
@@ -22,7 +23,6 @@ final class SDParamValue implements Consumer<Stream> {
             throw new StructuredDataParseException("\" missing after SD_KEY EQ");
         }
 
-        ByteBuffer elementValue = resultset.sdSubscription.getSubscribedSDElementBuffer(resultset.sdIdIterator, resultset.sdElementIterator);
         short sdElemVal_max_left = 8 * 1024;
 
         if (!stream.next()) {
@@ -34,7 +34,7 @@ final class SDParamValue implements Consumer<Stream> {
             // escaped are special: \" \\ \] ...
             if (b == 92) { // \
                 // insert
-                elementValue.put(b);
+                value.put(b);
                 sdElemVal_max_left--;
                 // read next
 
@@ -46,7 +46,7 @@ final class SDParamValue implements Consumer<Stream> {
                 // if it is a '"' then it must be taken care of, loop can do the rest
                 if (b == 34) {
                     if (sdElemVal_max_left > 0) {
-                        elementValue.put(b);
+                        value.put(b);
                         sdElemVal_max_left--;
 
                         if (!stream.next()) {
@@ -56,7 +56,7 @@ final class SDParamValue implements Consumer<Stream> {
                     }
                 }
             } else {
-                elementValue.put(b);
+                value.put(b);
                 sdElemVal_max_left--;
 
                 if (!stream.next()) {
@@ -65,5 +65,16 @@ final class SDParamValue implements Consumer<Stream> {
                 b = stream.get();
             }
         }
+    }
+
+    @Override
+    public void clear() {
+        value.clear();
+    }
+
+    @Override
+    public String toString() {
+        value.flip();
+        return StandardCharsets.UTF_8.decode(value).toString();
     }
 }

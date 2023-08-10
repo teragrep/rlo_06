@@ -69,7 +69,7 @@ public class PerformanceTest {
         sdSubscription.subscribeElement("ID_A@1","u");
 
         InputStream inputStream = new ByteArrayInputStream( SYSLOG_MESSAGE.getBytes());
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
+        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription, inputStream);
 
 
 
@@ -100,7 +100,7 @@ public class PerformanceTest {
         sdSubscription.subscribeElement("ID_A@1","u");
 
         InputStream inputStream = new ByteArrayInputStream( SYSLOG_MESSAGE.getBytes());
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
+        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription, inputStream);
 
 
         Instant instant1 = Instant.now();
@@ -129,7 +129,7 @@ public class PerformanceTest {
         subscription.add(ParserEnum.MSG);
 
         InputStream inputStream = new ByteArrayInputStream( SYSLOG_MESSAGE.getBytes());
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
+        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription, inputStream);
 
 
         Instant instant1 = Instant.now();
@@ -156,7 +156,7 @@ public class PerformanceTest {
         RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
         InputStream inputStream = new ByteArrayInputStream(SYSLOG_MESSAGE.getBytes());
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
+        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription, inputStream);
 
         Instant instant1 = Instant.now();
         long count = 10000000;
@@ -183,7 +183,7 @@ public class PerformanceTest {
         RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
         subscription.subscribeAll();
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription(true);
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
+        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription, inputStream);
 
         Instant instant1 = Instant.now();
         long count = 100000000;
@@ -209,7 +209,7 @@ public class PerformanceTest {
         RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
         InputStream inputStream = new ByteArrayInputStream( SYSLOG_MESSAGE.getBytes());
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
+        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription, inputStream);
 
         Instant instant1 = Instant.now();
         long count = 100000000;

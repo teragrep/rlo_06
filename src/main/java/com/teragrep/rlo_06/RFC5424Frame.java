@@ -45,30 +45,49 @@
  */
 package com.teragrep.rlo_06;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Consumer;
 
-public final class RFC5424Parser {
+public final class RFC5424Frame {
     private Stream stream;
-    private final ParserResultSet resultset;
     private final Consumer<Stream> streamConsumer;
 
-    public RFC5424Parser(RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription) {
-        this(subscription, sdSubscription, true);
+    public final Priority priority;
+    public final Version version;
+    public final Timestamp timestamp;
+    public final Hostname hostname;
+    public final AppName appName;
+    public final ProcId procId;
+    public final MsgId msgId;
+    public final StructuredData structuredData; // todo as array
+    public final Msg msg;
+
+    public RFC5424Frame() {
+        this(true);
     }
 
-    public RFC5424Parser(RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription, boolean lineFeedTermination) {
-        this.resultset = new ParserResultSet(subscription, sdSubscription);
-        this.streamConsumer = new Priority(this.resultset.PRIORITY)
-                .andThen(new Version(this.resultset.VERSION)
-                        .andThen(new Timestamp(this.resultset.TIMESTAMP)
-                                .andThen(new Hostname(this.resultset.HOSTNAME)
-                                        .andThen(new AppName(this.resultset.APPNAME)
-                                                .andThen(new ProcId(this.resultset.PROCID)
-                                                        .andThen(new MsgId(this.resultset.MSGID)
-                                                                .andThen(new StructuredData(this.resultset)
-                                                                        .andThen(new Msg(this.resultset.MSG, lineFeedTermination))
+    public RFC5424Frame(boolean lineFeedTermination) {
+        this.priority = new Priority();
+        this.version = new Version();
+        this.timestamp = new Timestamp();
+        this.hostname = new Hostname();
+        this.appName = new AppName();
+        this.procId = new ProcId();
+        this.msgId = new MsgId();
+        this.structuredData = new StructuredData(); // todo as array
+        this.msg = new Msg(lineFeedTermination);
+
+        this.streamConsumer = priority
+                .andThen(version
+                        .andThen(timestamp
+                                .andThen(hostname
+                                        .andThen(appName
+                                                .andThen(procId
+                                                        .andThen(msgId
+                                                                .andThen(structuredData
+                                                                        .andThen(msg)
                                                                 )
                                                         )
                                                 )
@@ -76,36 +95,10 @@ public final class RFC5424Parser {
                                 )
                         )
                 );
+
+        load(new ByteArrayInputStream(new byte[0]));
     }
 
-    public RFC5424Parser(RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription, InputStream inputStream) {
-        this(subscription, sdSubscription, inputStream, true);
-    }
-
-    public RFC5424Parser(RFC5424ParserSubscription subscription, RFC5424ParserSDSubscription sdSubscription, InputStream inputStream, boolean lineFeedTermination) {
-        this.stream = new Stream(inputStream);
-        this.resultset = new ParserResultSet(subscription, sdSubscription);
-        this.streamConsumer = new Priority(this.resultset.PRIORITY)
-                .andThen(new Version(this.resultset.VERSION)
-                        .andThen(new Timestamp(this.resultset.TIMESTAMP)
-                                .andThen(new Hostname(this.resultset.HOSTNAME)
-                                        .andThen(new AppName(this.resultset.APPNAME)
-                                                .andThen(new ProcId(this.resultset.PROCID)
-                                                        .andThen(new MsgId(this.resultset.MSGID)
-                                                                .andThen(new StructuredData(this.resultset)
-                                                                        .andThen(new Msg(this.resultset.MSG, lineFeedTermination))
-                                                                )
-                                                        )
-                                                )
-                                        )
-                                )
-                        )
-                );
-    }
-
-    public void setInputStream(InputStream inputStream) {
-        stream = new Stream(inputStream);
-    }
 
     public boolean next() throws IOException {
         /*
@@ -120,7 +113,7 @@ public final class RFC5424Parser {
         |=State indicator, .= Token, T=State termination, %=State internal change
          */
 
-        resultset.clear();
+        clear();
 
         // everything starts here, loads the '<' if it exists
         if (!stream.next()) {
@@ -132,7 +125,26 @@ public final class RFC5424Parser {
         return true;
     }
 
-    public ParserResultSet get() throws IOException {
-        return resultset;
+    private void clear() {
+        priority.clear();
+        version.clear();
+        timestamp.clear();
+        hostname.clear();
+        appName.clear();
+        procId.clear();
+        msgId.clear();
+        structuredData.clear();
+        msg.clear();
     }
+
+    public void load(InputStream inputStream) {
+        stream = new Stream(inputStream);
+    }
+
+    /* todo create sdMatcher and such
+    public void getSDValue(SDMatcher sdMatcher) {
+        // new SDMatcher(sdId, sdKey); -> all bytebuffers ready
+    }
+
+     */
 }

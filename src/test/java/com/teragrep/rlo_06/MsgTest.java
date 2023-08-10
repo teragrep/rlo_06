@@ -19,7 +19,7 @@ public class MsgTest {
         );
 
         // lf termination off
-        Msg msg = new Msg(parserResultSet.MSG, false);
+        Msg msg = new Msg(false);
 
         String input = " msg with preceding space and no newline";
 
@@ -48,7 +48,7 @@ public class MsgTest {
         );
 
         // lf termination off
-        Msg msg = new Msg(parserResultSet.MSG, false);
+        Msg msg = new Msg(false);
 
         String input = "msg without preceding space and no newline";
 
@@ -77,7 +77,7 @@ public class MsgTest {
         );
 
         // lf termination off
-        Msg msg = new Msg(parserResultSet.MSG, false);
+        Msg msg = new Msg(false);
 
         String input = " yes\nnewline";
 
@@ -105,7 +105,7 @@ public class MsgTest {
         );
 
         // lf termination off
-        Msg msg = new Msg(parserResultSet.MSG, true);
+        Msg msg = new Msg(true);
 
         String input = " there is something after newline\nanother";
 
@@ -134,7 +134,7 @@ public class MsgTest {
         );
 
         // lf termination off
-        Msg msg = new Msg(parserResultSet.MSG, true);
+        Msg msg = new Msg(true);
 
         String input = " there is nothing after newline\n";
 
@@ -163,7 +163,7 @@ public class MsgTest {
         );
 
         // lf termination off
-        Msg msg = new Msg(parserResultSet.MSG, true);
+        Msg msg = new Msg(true);
 
         String input = " ";
 

@@ -1,9 +1,13 @@
 package com.teragrep.rlo_06;
 
-import java.nio.ByteBuffer;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
-final class StructuredData implements Consumer<Stream> {
+public final class StructuredData implements Consumer<Stream>, Clearable {
     /*
                                                                     |||||||||||||||||||||||||||||||||||
                                                                     vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvR
@@ -22,11 +26,13 @@ final class StructuredData implements Consumer<Stream> {
     Payload:'[ID_A@1 u="3" e="t"][ID_B@2 n="9"] ' // sd exists
     Payload:'- ' // no sd
      */
-    private final ParserResultSet resultset;
-    private final SDElement sdElement;
-    StructuredData(ParserResultSet resultset) {
-        this.resultset = resultset;
-        this.sdElement = new SDElement(this.resultset);
+    public final List<SDElement> sdElements;
+    private final SDElementCache sdElementCache;
+
+    StructuredData() {
+        int numElements = 16;
+        this.sdElementCache = new SDElementCache(numElements);
+        this.sdElements = new ArrayList<>(numElements);
     }
 
     @Override
@@ -58,7 +64,9 @@ final class StructuredData implements Consumer<Stream> {
         }
 
         while (b == 91) { // '[' sd exists
+            SDElement sdElement = sdElementCache.take();
             sdElement.accept(stream);
+            sdElements.add(sdElement);
              /*
                                         vv            vv
             Payload:'[ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n'
@@ -71,5 +79,29 @@ final class StructuredData implements Consumer<Stream> {
             b = stream.get(); // will it be '[' or the MSG who knows.
             // let's find out, note if not '[' then R(ead) and pass to next state
         }
+    }
+
+
+    @Override
+    public void clear() {
+        for (SDElement sdElement : sdElements) {
+            // cache clears and deallocates
+            sdElementCache.put(sdElement);
+        }
+    }
+
+    public SDParamValue getSDParamValue(SDVector sdVector) {
+        // reverse search as last value is only that matters
+        ListIterator<SDElement> listIterator = sdElements.listIterator(sdElements.size());
+        while(listIterator.hasPrevious()) {
+            SDElement sdElement = listIterator.previous();
+            try {
+                return sdElement.getSDParamValue(sdVector);
+            }
+            catch (NoSuchElementException nsee) {
+                continue;
+            }
+        }
+        throw new NoSuchElementException(sdVector.toString());
     }
 }

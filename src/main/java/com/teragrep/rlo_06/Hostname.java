@@ -1,9 +1,10 @@
 package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-final class Hostname implements Consumer<Stream> {
+public final class Hostname implements Consumer<Stream>, Clearable {
     /*
                                                       |||||||
                                                       vvvvvvv
@@ -15,8 +16,8 @@ final class Hostname implements Consumer<Stream> {
                 */
     private final ByteBuffer HOSTNAME;
 
-    Hostname(ByteBuffer HOSTNAME) {
-        this.HOSTNAME = HOSTNAME;
+    Hostname() {
+        this.HOSTNAME = ByteBuffer.allocateDirect(255);
     }
 
     @Override
@@ -42,5 +43,16 @@ final class Hostname implements Consumer<Stream> {
         if (b != 32) {
             throw new HostnameParseException("SP missing after HOSTNAME or HOSTNAME too long");
         }
+    }
+
+    @Override
+    public void clear() {
+        HOSTNAME.clear();
+    }
+
+    @Override
+    public String toString() {
+        HOSTNAME.flip();
+        return StandardCharsets.US_ASCII.decode(HOSTNAME).toString();
     }
 }

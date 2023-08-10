@@ -1,18 +1,15 @@
 package com.teragrep.rlo_06;
 
+import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
-final class SDParam implements Consumer<Stream> {
-    private final ParserResultSet resultset;
-    private final SDValueSkip sdValueSkip;
+public final class SDParam implements Consumer<Stream>, Clearable {
     private final SDParamKey sdParamKey;
     private final SDParamValue sdParamValue;
 
-    SDParam(ParserResultSet resultset) {
-        this.resultset = resultset;
-        this.sdValueSkip = new SDValueSkip();
-        this.sdParamKey = new SDParamKey(resultset);
-        this.sdParamValue = new SDParamValue(resultset);
+    SDParam() {
+        this.sdParamKey = new SDParamKey();
+        this.sdParamValue = new SDParamValue();
     }
 
     @Override
@@ -28,25 +25,26 @@ final class SDParam implements Consumer<Stream> {
             if (b != 61) { // '='
                 throw new StructuredDataParseException("EQ missing after SD_KEY or SD_KEY too long");
             }
-
-            // check if this is for us
-            if (resultset.sdSubscription.isSubscribedSDElement(resultset.sdIdIterator, resultset.sdElementIterator)) {
-                sdParamValue.accept(stream);
-            } else {
-                sdValueSkip.accept(stream);
-            }
-
-            // clean up sdElementIterator for the next one
-            resultset.sdElementIterator.flip();
-            resultset.sdElementIterator.clear();
+             sdParamValue.accept(stream);
 
             // take next one for the while to check if ' ' or if to break it
-
             if (!stream.next()) {
                 throw new ParseException("SD is too short, can't continue");
             }
             b = stream.get();
         }
+    }
 
+    @Override
+    public void clear() {
+        sdParamKey.clear();
+        sdParamValue.clear();
+    }
+
+    public SDParamValue getSDParamValue(SDVector sdVector) {
+        if (sdParamKey.key.equals(sdVector.sdKeyBB)) {
+            return sdParamValue;
+        }
+        throw new NoSuchElementException();
     }
 }

@@ -45,8 +45,7 @@
  */
 package com.teragrep.rlo_06.tests;
 
-import com.teragrep.rlo_06.ParserResultSet;
-import com.teragrep.rlo_06.RFC5424Parser;
+import com.teragrep.rlo_06.RFC5424Frame;
 import com.teragrep.rlo_06.RFC5424ParserSDSubscription;
 import com.teragrep.rlo_06.RFC5424ParserSubscription;
 import org.apache.commons.io.FileUtils;
@@ -88,7 +87,7 @@ public class TestFileTest {
 
         final File initialFile = new File("output.txt");
         final InputStream inputStream = new BufferedInputStream(new FileInputStream(initialFile),32*1024*1024);
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
+        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription, inputStream);
 
 
 

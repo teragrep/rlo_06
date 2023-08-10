@@ -1,12 +1,14 @@
 package com.teragrep.rlo_06;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-final class SDParamKey implements Consumer<Stream> {
-    private final ParserResultSet resultset;
+public final class SDParamKey implements Consumer<Stream>, Clearable {
+    final ByteBuffer key;
 
-    SDParamKey(ParserResultSet resultset) {
-        this.resultset = resultset;
+    SDParamKey() {
+        this.key = ByteBuffer.allocateDirect(32);
     }
 
     @Override
@@ -20,7 +22,7 @@ final class SDParamKey implements Consumer<Stream> {
             }
             b = stream.get();
             while (sdElemKey_max_left > 0 && b != 61) { // '='
-                resultset.sdElementIterator.put(b);
+                key.put(b);
                 sdElemKey_max_left--;
 
                 if (!stream.next()) {
@@ -28,6 +30,16 @@ final class SDParamKey implements Consumer<Stream> {
                 }
                 b = stream.get();
             }
-            resultset.sdElementIterator.flip(); // flip to READ so the compare works
+    }
+
+    @Override
+    public void clear() {
+        key.clear();
+    }
+
+    @Override
+    public String toString() {
+        key.flip();
+        return StandardCharsets.UTF_8.decode(key).toString();
     }
 }

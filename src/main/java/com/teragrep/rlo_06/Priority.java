@@ -1,9 +1,10 @@
 package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-final class Priority implements Consumer<Stream> {
+public final class Priority implements Consumer<Stream>, Clearable {
     /*
     |||
     vvv
@@ -15,8 +16,8 @@ final class Priority implements Consumer<Stream> {
     */
     private final ByteBuffer PRIORITY;
 
-    Priority(ByteBuffer PRIORITY) {
-        this.PRIORITY = PRIORITY;
+    Priority() {
+        this.PRIORITY = ByteBuffer.allocateDirect(3);
     }
 
 
@@ -31,9 +32,7 @@ final class Priority implements Consumer<Stream> {
         }
 
         if (stream.get() >= 48 && stream.get() <= 57) { // first is always a number between 0..9
-            if (PRIORITY != null) {
-                PRIORITY.put(stream.get());
-            }
+            PRIORITY.put(stream.get());
         } else {
             throw new PriorityParseException("PRIORITY number incorrect");
         }
@@ -42,18 +41,14 @@ final class Priority implements Consumer<Stream> {
             throw new ParseException("PRIORITY is too short, can't continue");
         }
         if (stream.get() >= 48 &&stream.get() <= 57) { // second may be a number between 0..9
-            if (PRIORITY != null) {
-                PRIORITY.put(stream.get());
-            }
+            PRIORITY.put(stream.get());
 
             if (!stream.next()) {
                 throw new ParseException("PRIORITY is too short, can't continue");
             }
 
             if (stream.get() >= 48 && stream.get() <= 57) { // third may be a number
-                if (PRIORITY != null) {
-                    PRIORITY.put(stream.get());
-                }
+                PRIORITY.put(stream.get());
 
                 if (!stream.next()) {
                     throw new ParseException("PRIORITY is too short, can't continue");
@@ -72,5 +67,16 @@ final class Priority implements Consumer<Stream> {
         } else {
             throw new PriorityParseException("PRIORITY number incorrect");
         }
+    }
+
+    @Override
+    public void clear() {
+        PRIORITY.clear();
+    }
+
+    @Override
+    public String toString() {
+        PRIORITY.flip();
+        return StandardCharsets.US_ASCII.decode(PRIORITY).toString();
     }
 }

@@ -1,7 +1,6 @@
 package com.teragrep.rlo_06;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -18,7 +17,7 @@ public class StructuredDataTest {
                 sdSubscription
         );
 
-        StructuredData structuredData = new StructuredData(parserResultSet);
+        StructuredData structuredData = new StructuredData();
 
         String input = "[id@0 keyHere=\"valueThere\"] "; // structured data terminates only to non [ character
 

@@ -1,9 +1,10 @@
 package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-final class Version implements Consumer<Stream> {
+public final class Version implements Consumer<Stream>, Clearable {
     /*
         ||
         vv
@@ -15,8 +16,8 @@ final class Version implements Consumer<Stream> {
     */
     private final ByteBuffer VERSION;
 
-    Version(ByteBuffer VERSION) {
-        this.VERSION = VERSION;
+    Version() {
+        this.VERSION = ByteBuffer.allocateDirect(1);
     }
 
     @Override
@@ -42,5 +43,16 @@ final class Version implements Consumer<Stream> {
         } else {
             throw new VersionParseException("VERSION not 1");
         }
+    }
+
+    @Override
+    public void clear() {
+        VERSION.clear();
+    }
+
+    @Override
+    public String toString() {
+        VERSION.flip();
+        return StandardCharsets.US_ASCII.decode(VERSION).toString();
     }
 }

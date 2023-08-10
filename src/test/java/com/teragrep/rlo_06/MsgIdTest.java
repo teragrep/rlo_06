@@ -20,7 +20,7 @@ public class MsgIdTest {
                 sdSubscription
         );
 
-        MsgId msgId = new MsgId(parserResultSet.MSGID);
+        MsgId msgId = new MsgId();
 
         String input = "987654 ";
 
@@ -47,7 +47,7 @@ public class MsgIdTest {
                 sdSubscription
         );
 
-        MsgId msgId = new MsgId(parserResultSet.MSGID);
+        MsgId msgId = new MsgId();
 
         String input = "- ";
 
@@ -74,7 +74,7 @@ public class MsgIdTest {
                 sdSubscription
         );
 
-        MsgId msgId = new MsgId(parserResultSet.MSGID);
+        MsgId msgId = new MsgId();
 
         String input = "9876543210987654321098765432109876543210 ";
 

@@ -1,9 +1,10 @@
 package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-final class Msg implements Consumer<Stream> {
+public final class Msg implements Consumer<Stream>, Clearable {
     /*
                                                                                                vvvvvvvvvv
             <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
@@ -19,8 +20,8 @@ final class Msg implements Consumer<Stream> {
     private final ByteBuffer MSG;
 
     private final boolean lineFeedTermination;
-    Msg(ByteBuffer MSG, boolean lineFeedTermination) {
-        this.MSG = MSG;
+    Msg(boolean lineFeedTermination) {
+        this.MSG = ByteBuffer.allocateDirect(256 * 1024);
         this.lineFeedTermination = lineFeedTermination;
     }
 
@@ -68,5 +69,16 @@ final class Msg implements Consumer<Stream> {
                 }
             }
         }
+    }
+
+    @Override
+    public void clear() {
+        MSG.clear();
+    }
+
+    @Override
+    public String toString() {
+        MSG.flip();
+        return StandardCharsets.UTF_8.decode(MSG).toString();
     }
 }

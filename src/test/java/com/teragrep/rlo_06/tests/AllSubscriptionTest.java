@@ -22,7 +22,7 @@ public class AllSubscriptionTest {
 
         InputStream inputStream = new ByteArrayInputStream( (SYSLOG_MESSAGE).getBytes());
 
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
+        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription, inputStream);
 
         Assertions.assertTrue(parser.next());
 
@@ -44,7 +44,7 @@ public class AllSubscriptionTest {
 
         InputStream inputStream = new ByteArrayInputStream( (SYSLOG_MESSAGE).getBytes());
 
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
+        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription, inputStream);
 
         Assertions.assertTrue(parser.next());
 

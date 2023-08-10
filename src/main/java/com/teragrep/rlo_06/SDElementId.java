@@ -1,13 +1,16 @@
 package com.teragrep.rlo_06;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-final class SDElementId implements Consumer<Stream> {
+public final class SDElementId implements Consumer<Stream>, Clearable {
 
-    private final ParserResultSet resultset;
+    final ByteBuffer sdId;
 
-    SDElementId(ParserResultSet resultset) {
-        this.resultset = resultset;
+
+    SDElementId() {
+        this.sdId = ByteBuffer.allocateDirect(32);
     }
 
     @Override
@@ -27,7 +30,7 @@ final class SDElementId implements Consumer<Stream> {
         }
         b = stream.get();
         while (sdId_max_left > 0 && b != 32 && b != 93) { // ' ' nor ']'
-            resultset.sdIdIterator.put(b);
+            sdId.put(b);
             sdId_max_left--;
 
             if (!stream.next()) {
@@ -35,6 +38,16 @@ final class SDElementId implements Consumer<Stream> {
             }
             b = stream.get();
         }
-        resultset.sdIdIterator.flip(); // flip to READ so the compare works
+    }
+
+    @Override
+    public void clear() {
+        sdId.clear();
+    }
+
+    @Override
+    public String toString() {
+        sdId.flip();
+        return StandardCharsets.UTF_8.decode(sdId).toString();
     }
 }

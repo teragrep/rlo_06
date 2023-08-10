@@ -20,7 +20,7 @@ public class ProcIdTest {
                 sdSubscription
         );
 
-        ProcId procId = new ProcId(parserResultSet.PROCID);
+        ProcId procId = new ProcId();
 
         String input = "cade00f0-3260-4b88-ab61-d644a75dfbbb ";
 
@@ -47,7 +47,7 @@ public class ProcIdTest {
                 sdSubscription
         );
 
-        ProcId procId = new ProcId(parserResultSet.PROCID);
+        ProcId procId = new ProcId();
 
         String input = "";
 
@@ -73,7 +73,7 @@ public class ProcIdTest {
                 sdSubscription
         );
 
-        ProcId procId = new ProcId(parserResultSet.PROCID);
+        ProcId procId = new ProcId();
 
         String input = new String(new char[256]).replace('\0', 'x');
 

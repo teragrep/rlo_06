@@ -1,9 +1,10 @@
 package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-final class AppName implements Consumer<Stream> {
+public final class AppName implements Consumer<Stream>, Clearable {
     /*
                                                      ||||||||
                                                      vvvvvvvv
@@ -14,8 +15,8 @@ final class AppName implements Consumer<Stream> {
         States : .......T
         */
     private final ByteBuffer APPNAME;
-    AppName(ByteBuffer APPNAME) {
-        this.APPNAME = APPNAME;
+    AppName() {
+        this.APPNAME = ByteBuffer.allocateDirect(48);
     }
 
     @Override
@@ -42,5 +43,16 @@ final class AppName implements Consumer<Stream> {
         if (b != 32) {
             throw new AppNameParseException("SP missing after APPNAME or APPNAME too long");
         }
+    }
+
+    @Override
+    public void clear() {
+        APPNAME.clear();
+    }
+
+    @Override
+    public String toString() {
+        APPNAME.flip();
+        return StandardCharsets.US_ASCII.decode(APPNAME).toString();
     }
 }

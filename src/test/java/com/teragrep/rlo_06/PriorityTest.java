@@ -12,16 +12,11 @@ public class PriorityTest {
 
     @Test
     public void parseTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.PRIORITY);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
 
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
 
-        Priority priority = new Priority(parserResultSet.PRIORITY);
+
+
+        Priority priority = new Priority();
 
         String input = "<123>";
 

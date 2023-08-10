@@ -20,7 +20,7 @@ public class AppNameTest {
                 sdSubscription
         );
 
-        AppName appName = new AppName(parserResultSet.APPNAME);
+        AppName appName = new AppName();
 
         String input = "anAppNameTag ";
 
@@ -47,7 +47,7 @@ public class AppNameTest {
                 sdSubscription
         );
 
-        AppName appName = new AppName(parserResultSet.APPNAME);
+        AppName appName = new AppName();
 
         String input = "- ";
 
@@ -74,7 +74,7 @@ public class AppNameTest {
                 sdSubscription
         );
 
-        AppName appName = new AppName(parserResultSet.APPNAME);
+        AppName appName = new AppName();
 
         String input = "ThisIsVeryLongAppNameThatShouldNotExistAndWillBeOverThe48CharLimit ";
 

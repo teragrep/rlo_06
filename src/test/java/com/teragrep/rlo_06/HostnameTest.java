@@ -20,7 +20,7 @@ public class HostnameTest {
                 sdSubscription
         );
 
-        Hostname hostname = new Hostname(parserResultSet.HOSTNAME);
+        Hostname hostname = new Hostname();
 
         String input = "example.com ";
 
@@ -47,7 +47,7 @@ public class HostnameTest {
                 sdSubscription
         );
 
-        Hostname hostname = new Hostname(parserResultSet.HOSTNAME);
+        Hostname hostname = new Hostname();
 
         String input = "- ";
 
@@ -74,7 +74,7 @@ public class HostnameTest {
                 sdSubscription
         );
 
-        Hostname hostname = new Hostname(parserResultSet.HOSTNAME);
+        Hostname hostname = new Hostname();
 
         String input = new String(new char[256]).replace('\0', 'x');
 

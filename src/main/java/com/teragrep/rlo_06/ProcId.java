@@ -1,9 +1,10 @@
 package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-final class ProcId implements Consumer<Stream> {
+public final class ProcId implements Consumer<Stream>, Clearable {
     /*
                                                              ||||
                                                              vvvv
@@ -15,8 +16,8 @@ final class ProcId implements Consumer<Stream> {
         */
 
     private final ByteBuffer PROCID;
-    ProcId(ByteBuffer PROCID) {
-        this.PROCID = PROCID;
+    ProcId() {
+        this.PROCID = ByteBuffer.allocateDirect(128);
     }
 
     public void accept(Stream stream) {
@@ -42,5 +43,16 @@ final class ProcId implements Consumer<Stream> {
         if (b != 32) {
             throw new ProcIdParseException("SP missing after PROCID or PROCID too long");
         }
+    }
+
+    @Override
+    public void clear() {
+        PROCID.clear();
+    }
+
+    @Override
+    public String toString() {
+        PROCID.flip();
+        return StandardCharsets.US_ASCII.decode(PROCID).toString();
     }
 }

@@ -18,7 +18,7 @@ public class TimestampTest {
                 sdSubscription
         );
 
-        Timestamp timestamp = new Timestamp(parserResultSet.TIMESTAMP);
+        Timestamp timestamp = new Timestamp();
 
         String input = "2023-06-16T12:08:12.123456+03:00 ";
 

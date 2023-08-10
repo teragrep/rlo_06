@@ -13,7 +13,7 @@ public class BrokenSyntaxTest {
         RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
         subscription.subscribeAll();
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription);
+        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription);
         parser.setInputStream(new ByteArrayInputStream( (SYSLOG_MESSAGE).getBytes()));
         Assertions.assertThrows(ParseException.class, parser::next);
     }
@@ -24,7 +24,7 @@ public class BrokenSyntaxTest {
         RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
         subscription.subscribeAll();
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription(true);
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription);
+        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription);
         ResultSetAsString resultsetAsString = new ResultSetAsString(parser.get());
         parser.setInputStream(new ByteArrayInputStream( (input).getBytes()));
         parser.next();
@@ -44,7 +44,7 @@ public class BrokenSyntaxTest {
         RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
         subscription.subscribeAll();
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription);
+        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription);
         parser.setInputStream(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
         Assertions.assertThrows(ParseException.class, parser::next);
     }
@@ -57,7 +57,7 @@ public class BrokenSyntaxTest {
         subscription.subscribeAll();
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription(true);
         InputStream inputStream = new ByteArrayInputStream( (input).getBytes());
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
+        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription, inputStream);
         ResultSetAsString resultsetAsString = new ResultSetAsString(parser.get());
         parser.next();
         Assertions.assertEquals("2", resultsetAsString.getPriority(), "Priority");

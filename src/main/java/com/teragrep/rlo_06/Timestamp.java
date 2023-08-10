@@ -1,9 +1,10 @@
 package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-final class Timestamp implements Consumer<Stream> {
+public final class Timestamp implements Consumer<Stream>, Clearable {
     /*
                           ||||||||||||||||||||||||||||||||
                           vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -15,8 +16,8 @@ final class Timestamp implements Consumer<Stream> {
                     */
     private final ByteBuffer TIMESTAMP;
 
-    Timestamp(ByteBuffer TIMESTAMP) {
-        this.TIMESTAMP = TIMESTAMP;
+    Timestamp() {
+        this.TIMESTAMP = ByteBuffer.allocateDirect(32);
     }
 
     public void accept(Stream stream) {
@@ -42,5 +43,16 @@ final class Timestamp implements Consumer<Stream> {
         if (b != 32) {
             throw new TimestampParseException("SP missing after TIMESTAMP or TIMESTAMP too long");
         }
+    }
+
+    @Override
+    public void clear() {
+        TIMESTAMP.clear();
+    }
+
+    @Override
+    public String toString() {
+        TIMESTAMP.flip();
+        return StandardCharsets.US_ASCII.decode(TIMESTAMP).toString();
     }
 }
