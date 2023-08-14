@@ -6,13 +6,13 @@ import java.util.function.Consumer;
 public final class SDElement implements Consumer<Stream>, Clearable {
 
     public final SDElementId sdElementId;
-    public final SDParam sdParam;
+    // FIXME implement shared SDParamCache
+    public final SDParam sdParam; // FIXME must be a list
 
     SDElement() {
         this.sdElementId = new SDElementId();
         this.sdParam = new SDParam();
     }
-
     // structured data, oh wow the performance hit
     @Override
     public void accept(Stream stream) {
@@ -47,5 +47,14 @@ public final class SDElement implements Consumer<Stream>, Clearable {
             return sdParam.getSDParamValue(sdVector);
         }
         throw new NoSuchElementException();
+    }
+
+    @Override
+    public String toString() {
+        // FIXME change to list for sdParamS <- plural
+        return "SDElement{" +
+                "sdElementId=" + sdElementId +
+                ", sdParam=" + sdParam +
+                '}';
     }
 }

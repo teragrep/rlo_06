@@ -11,7 +11,7 @@ public final class SDVector {
     final ByteBuffer sdIdBB;
     final ByteBuffer sdKeyBB;
 
-    SDVector(String sdId, String sdKey) {
+    public SDVector(String sdId, String sdKey) {
         this.sdId = sdId;
         this.sdKey = sdKey;
 

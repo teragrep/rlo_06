@@ -47,4 +47,12 @@ public final class SDParam implements Consumer<Stream>, Clearable {
         }
         throw new NoSuchElementException();
     }
+
+    @Override
+    public String toString() {
+        return "SDParam{" +
+                "sdParamKey=" + sdParamKey +
+                ", sdParamValue=" + sdParamValue +
+                '}';
+    }
 }

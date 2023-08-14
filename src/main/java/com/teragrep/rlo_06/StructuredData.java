@@ -90,7 +90,7 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
         }
     }
 
-    public SDParamValue getSDParamValue(SDVector sdVector) {
+    public SDParamValue getValue(SDVector sdVector) {
         // reverse search as last value is only that matters
         ListIterator<SDElement> listIterator = sdElements.listIterator(sdElements.size());
         while(listIterator.hasPrevious()) {
@@ -103,5 +103,12 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
             }
         }
         throw new NoSuchElementException(sdVector.toString());
+    }
+
+    @Override
+    public String toString() {
+        return "StructuredData{" +
+                "sdElements=" + sdElements +
+                '}';
     }
 }
