@@ -51,6 +51,7 @@ public final class SDElement implements Consumer<Stream>, Clearable {
             // cache clears
             sdParamCache.put(sdParam);
         }
+        sdParams.clear();
     }
 
     public SDParamValue getSDParamValue(SDVector sdVector) {

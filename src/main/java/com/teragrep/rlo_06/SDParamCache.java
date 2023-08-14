@@ -27,8 +27,8 @@ public class SDParamCache implements Cache<SDParam> {
     }
 
     public void put(SDParam sdParam) {
-        sdParam.clear();
         if (cachedSDParams.size() < numElements) {
+            sdParam.clear();
             cachedSDParams.add(sdParam);
         }
     }

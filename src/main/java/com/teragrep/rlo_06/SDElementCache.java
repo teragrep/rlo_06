@@ -31,8 +31,8 @@ final class SDElementCache implements Cache<SDElement> {
     }
 
     public void put(SDElement sdElement) {
-        sdElement.clear();
         if (cachedSDElements.size() < numElements) {
+            sdElement.clear();
             cachedSDElements.add(sdElement);
         }
     }

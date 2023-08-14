@@ -88,6 +88,7 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
             // cache clears and deallocates
             sdElementCache.put(sdElement);
         }
+        sdElements.clear();
     }
 
     public SDParamValue getValue(SDVector sdVector) {
