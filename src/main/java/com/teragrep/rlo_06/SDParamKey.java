@@ -1,11 +1,13 @@
 package com.teragrep.rlo_06;
 
+import com.github.pbbl.direct.DirectByteBufferPool;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-public final class SDParamKey implements Consumer<Stream>, Clearable {
-    final ByteBuffer key;
+public final class SDParamKey implements Consumer<Stream>, Clearable, Matchable {
+    private final ByteBuffer key;
 
     SDParamKey() {
         this.key = ByteBuffer.allocateDirect(32);
@@ -41,5 +43,11 @@ public final class SDParamKey implements Consumer<Stream>, Clearable {
     public String toString() {
         key.flip();
         return StandardCharsets.UTF_8.decode(key).toString();
+    }
+
+    @Override
+    public boolean matches(ByteBuffer buffer) {
+        key.flip();
+        return key.equals(buffer);
     }
 }

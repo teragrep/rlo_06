@@ -16,22 +16,17 @@ public final class SDParam implements Consumer<Stream>, Clearable {
     public void accept(Stream stream) {
         byte b;
         // check if we are interested in this sdId at all or skip to next sdId block
+        sdParamKey.accept(stream);
+
         b = stream.get();
+        if (b != 61) { // '='
+            throw new StructuredDataParseException("EQ missing after SD_KEY or SD_KEY too long");
+        }
+        sdParamValue.accept(stream);
 
-        while (b == 32) { // multiple ' ' separated sdKey="sdValue" pairs may exist
-            sdParamKey.accept(stream);
-
-            b = stream.get();
-            if (b != 61) { // '='
-                throw new StructuredDataParseException("EQ missing after SD_KEY or SD_KEY too long");
-            }
-             sdParamValue.accept(stream);
-
-            // take next one for the while to check if ' ' or if to break it
-            if (!stream.next()) {
-                throw new ParseException("SD is too short, can't continue");
-            }
-            b = stream.get();
+        // take next one for the while to check if ' ' or if to break it
+        if (!stream.next()) {
+            throw new ParseException("SD is too short, can't continue");
         }
     }
 
@@ -42,10 +37,10 @@ public final class SDParam implements Consumer<Stream>, Clearable {
     }
 
     public SDParamValue getSDParamValue(SDVector sdVector) {
-        if (sdParamKey.key.equals(sdVector.sdKeyBB)) {
+        if (sdParamKey.matches(sdVector.sdParamKeyBB)) {
             return sdParamValue;
         }
-        throw new NoSuchElementException();
+        throw new NoSuchElementException(sdVector.toString());
     }
 
     @Override

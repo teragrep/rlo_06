@@ -7,7 +7,7 @@ import java.util.Queue;
 /**
  * Cache object to contain multiple pre-allocated SDElements for use to avoid memory allocations for new ones
  */
-final class SDElementCache {
+final class SDElementCache implements Cache<SDElement> {
 
     private final Queue<SDElement> cachedSDElements;
 
@@ -19,7 +19,7 @@ final class SDElementCache {
     }
 
 
-    SDElement take() {
+    public SDElement take() {
         SDElement sdElement;
         try {
             sdElement = cachedSDElements.remove();
@@ -30,7 +30,7 @@ final class SDElementCache {
         return sdElement;
     }
 
-    void put(SDElement sdElement) {
+    public void put(SDElement sdElement) {
         sdElement.clear();
         if (cachedSDElements.size() < numElements) {
             cachedSDElements.add(sdElement);

@@ -1,17 +1,23 @@
 package com.teragrep.rlo_06;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 public final class SDElement implements Consumer<Stream>, Clearable {
 
     public final SDElementId sdElementId;
-    // FIXME implement shared SDParamCache
-    public final SDParam sdParam; // FIXME must be a list
+    public final List<SDParam> sdParams;
+
+    private final SDParamCache sdParamCache;
 
     SDElement() {
+        int numElements = 16;
         this.sdElementId = new SDElementId();
-        this.sdParam = new SDParam();
+        this.sdParams = new ArrayList<>(numElements);
+        this.sdParamCache = new SDParamCache(numElements);
     }
     // structured data, oh wow the performance hit
     @Override
@@ -22,12 +28,14 @@ public final class SDElement implements Consumer<Stream>, Clearable {
         sdElementId.accept(stream);
         b = stream.get();
 
-        if (b == 32) { // ' ', sdElement must exist
+        while (b == 32) { // multiple ' ' separated sdKey="sdValue" pairs may exist
+            SDParam sdParam = sdParamCache.take();
             sdParam.accept(stream);
+            sdParams.add(sdParam);
+            b = stream.get();
         }
-        else if (b == 93) { // ']', sdId only here: Payload:'[ID_A@1]' or Payload:'[ID_A@1][ID_B@1]'
 
-
+        if (b == 93) { // ']', sdId only here: Payload:'[ID_A@1]' or Payload:'[ID_A@1][ID_B@1]'
             // MSG may not exist, no \n either, Parsing may be complete. get sets this.returnAfter to false
             // Total payload: '<14>1 2015-06-20T09:14:07.12345+00:00 host02 serverd DEA MSG-01 [ID_A@1]'
         }
@@ -39,22 +47,32 @@ public final class SDElement implements Consumer<Stream>, Clearable {
     @Override
     public void clear() {
         sdElementId.clear();
-        sdParam.clear();
+        for (SDParam sdParam : sdParams) {
+            // cache clears
+            sdParamCache.put(sdParam);
+        }
     }
 
     public SDParamValue getSDParamValue(SDVector sdVector) {
-        if (sdElementId.sdId.equals(sdVector.sdIdBB)) {
-            return sdParam.getSDParamValue(sdVector);
+        if (sdElementId.matches(sdVector.sdElementIdBB)) {
+            ListIterator<SDParam> listIterator = sdParams.listIterator(sdParams.size());
+            while (listIterator.hasPrevious()) {
+                SDParam sdParam = listIterator.previous();
+                try {
+                    return sdParam.getSDParamValue(sdVector);
+                } catch (NoSuchElementException nsee) {
+                    continue;
+                }
+            }
         }
         throw new NoSuchElementException();
     }
 
     @Override
     public String toString() {
-        // FIXME change to list for sdParamS <- plural
         return "SDElement{" +
                 "sdElementId=" + sdElementId +
-                ", sdParam=" + sdParam +
+                ", sdParams=" + sdParams +
                 '}';
     }
 }

@@ -5,32 +5,32 @@ import java.nio.charset.StandardCharsets;
 
 public final class SDVector {
 
-    public final String sdId;
-    public final String sdKey;
+    public final String sdElementId;
+    public final String sdParamKey;
 
-    final ByteBuffer sdIdBB;
-    final ByteBuffer sdKeyBB;
+    final ByteBuffer sdElementIdBB;
+    final ByteBuffer sdParamKeyBB;
 
-    public SDVector(String sdId, String sdKey) {
-        this.sdId = sdId;
-        this.sdKey = sdKey;
+    public SDVector(String sdElementId, String sdParamKey) {
+        this.sdElementId = sdElementId;
+        this.sdParamKey = sdParamKey;
 
-        byte[] sdIDBytes = this.sdId.getBytes(StandardCharsets.US_ASCII);
-        this.sdIdBB = ByteBuffer.allocateDirect(sdIDBytes.length);
-        this.sdIdBB.put(sdIDBytes);
-        this.sdIdBB.flip();
+        byte[] sdIDBytes = this.sdElementId.getBytes(StandardCharsets.US_ASCII);
+        this.sdElementIdBB = ByteBuffer.allocateDirect(sdIDBytes.length);
+        this.sdElementIdBB.put(sdIDBytes);
+        this.sdElementIdBB.flip();
 
-        byte[] sdKeyBytes = this.sdKey.getBytes(StandardCharsets.US_ASCII);
-        this.sdKeyBB = ByteBuffer.allocateDirect(sdKeyBytes.length);
-        this.sdKeyBB.put(sdKeyBytes);
-        this.sdKeyBB.flip();
+        byte[] sdKeyBytes = this.sdParamKey.getBytes(StandardCharsets.US_ASCII);
+        this.sdParamKeyBB = ByteBuffer.allocateDirect(sdKeyBytes.length);
+        this.sdParamKeyBB.put(sdKeyBytes);
+        this.sdParamKeyBB.flip();
     }
 
     @Override
     public String toString() {
         return "SDVector{" +
-                "sdId='" + sdId + '\'' +
-                ", sdKey='" + sdKey + '\'' +
+                "sdElementId='" + sdElementId + '\'' +
+                ", sdParamKey='" + sdParamKey + '\'' +
                 '}';
     }
 }

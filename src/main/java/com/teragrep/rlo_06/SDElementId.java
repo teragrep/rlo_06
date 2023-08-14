@@ -4,9 +4,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-public final class SDElementId implements Consumer<Stream>, Clearable {
+public final class SDElementId implements Consumer<Stream>, Clearable, Matchable {
 
-    final ByteBuffer sdId;
+    private final ByteBuffer sdId;
 
 
     SDElementId() {
@@ -49,5 +49,11 @@ public final class SDElementId implements Consumer<Stream>, Clearable {
     public String toString() {
         sdId.flip();
         return StandardCharsets.UTF_8.decode(sdId).toString();
+    }
+
+    @Override
+    public boolean matches(ByteBuffer buffer) {
+        sdId.flip();
+        return sdId.equals(buffer);
     }
 }
