@@ -1,7 +1,5 @@
 package com.teragrep.rlo_06;
 
-import com.github.pbbl.direct.DirectByteBufferPool;
-
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
