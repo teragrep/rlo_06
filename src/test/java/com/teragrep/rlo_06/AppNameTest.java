@@ -11,15 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class AppNameTest {
     @Test
     public void parseTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.APPNAME);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         AppName appName = new AppName();
 
         String input = "anAppNameTag ";
@@ -31,22 +22,11 @@ public class AppNameTest {
         Stream stream = new Stream(bais);
 
         appName.accept(stream);
-
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("anAppNameTag", resultSetAsString.getAppname());
+        Assertions.assertEquals("anAppNameTag", appName.toString());
     }
 
     @Test
     public void dashAppnameTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.APPNAME);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         AppName appName = new AppName();
 
         String input = "- ";
@@ -59,21 +39,11 @@ public class AppNameTest {
 
         appName.accept(stream);
 
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("-", resultSetAsString.getAppname());
+        Assertions.assertEquals("-", appName.toString());
     }
 
     @Test
     public void tooLongAppNameTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.APPNAME);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         AppName appName = new AppName();
 
         String input = "ThisIsVeryLongAppNameThatShouldNotExistAndWillBeOverThe48CharLimit ";
@@ -85,7 +55,7 @@ public class AppNameTest {
         assertThrows(AppNameParseException.class, () -> {
             Stream stream = new Stream(bais);
             appName.accept(stream);
-            new ResultSetAsString(parserResultSet);
+            appName.toString();
         });
     }
 }

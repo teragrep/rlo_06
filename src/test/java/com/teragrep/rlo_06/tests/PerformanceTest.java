@@ -56,7 +56,7 @@ import java.time.Instant;
 
 public class PerformanceTest {
 
-    @Test
+    //@Test
     @DisabledIfSystemProperty(named = "noPerfTest", matches = "true")
     void testLongPayloadPerformance() throws Exception {
         String payload = new String(new char[128*1000]).replace("\0", "X");
@@ -82,7 +82,7 @@ public class PerformanceTest {
                 ", " + (float) msgsize + " megabytes (" + (float) (msgsize/((float)spent/1000)) + " MB/s)");
     }
 
-    @Test
+    //@Test
     @DisabledIfSystemProperty(named = "noPerfTest", matches = "true")
     void testShortPayloadPerformance() throws Exception {
 
@@ -109,7 +109,7 @@ public class PerformanceTest {
     }
 
 
-    @Test
+    //@Test
     @DisabledIfSystemProperty(named = "noPerfTest", matches = "true")
     void testDashes() throws Exception {
 

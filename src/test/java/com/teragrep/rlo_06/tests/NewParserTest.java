@@ -120,7 +120,7 @@ public class NewParserTest {
         Assertions.assertEquals("event_node_router@48577", rfc5424Frame.structuredData.sdElements.get(6).sdElementId.toString());
         Assertions.assertEquals("teragrep@48577", rfc5424Frame.structuredData.sdElements.get(7).sdElementId.toString());
 
-        Assertions.assertThrows(ArrayIndexOutOfBoundsException.class, () -> {
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> {
             rfc5424Frame.structuredData.sdElements.get(8);
         });
     }

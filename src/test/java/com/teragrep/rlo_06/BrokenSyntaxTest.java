@@ -10,63 +10,51 @@ public class BrokenSyntaxTest {
     @Test
     void testBrokenFail() throws Exception {
         String SYSLOG_MESSAGE = "<134>1  - [ ] ] [";
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.subscribeAll();
         RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription);
-        parser.setInputStream(new ByteArrayInputStream( (SYSLOG_MESSAGE).getBytes()));
+        RFC5424Frame parser = new RFC5424Frame();
+        parser.load(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
         Assertions.assertThrows(ParseException.class, parser::next);
     }
 
     @Test
     void testNilTimestamp() throws Exception {
         String input = "<14>1  host01 systemd DEA MSG-01 - sigsegv\n";
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.subscribeAll();
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription(true);
-        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription);
-        ResultSetAsString resultsetAsString = new ResultSetAsString(parser.get());
-        parser.setInputStream(new ByteArrayInputStream( (input).getBytes()));
-        parser.next();
-        Assertions.assertEquals("14", resultsetAsString.getPriority(), "Priority");
-        Assertions.assertEquals("1", resultsetAsString.getVersion(), "Version");
-        Assertions.assertEquals("", resultsetAsString.getTimestamp(), "Timestamp");
-        Assertions.assertEquals("host01", resultsetAsString.getHostname(), "Hostname");
-        Assertions.assertEquals("systemd", resultsetAsString.getAppname(), "Appname");
-        Assertions.assertEquals("DEA", resultsetAsString.getProcid(), "Procid");
-        Assertions.assertEquals("MSG-01", resultsetAsString.getMsgid(), "msgid");
-        Assertions.assertEquals("sigsegv", resultsetAsString.getMsg(), "msg");
+        RFC5424Frame rfc5424Frame = new RFC5424Frame();
+        rfc5424Frame.load(new ByteArrayInputStream((input).getBytes()));
+        rfc5424Frame.next();
+        Assertions.assertEquals("14", rfc5424Frame.priority.toString(), "Priority");
+        Assertions.assertEquals("1", rfc5424Frame.version.toString(), "Version");
+        Assertions.assertEquals("", rfc5424Frame.timestamp.toString(), "Timestamp");
+        Assertions.assertEquals("host01", rfc5424Frame.hostname.toString(), "Hostname");
+        Assertions.assertEquals("systemd", rfc5424Frame.appName.toString(), "Appname");
+        Assertions.assertEquals("DEA", rfc5424Frame.procId.toString(), "Procid");
+        Assertions.assertEquals("MSG-01", rfc5424Frame.msgId.toString(), "msgid");
+        Assertions.assertEquals("sigsegv", rfc5424Frame.msg.toString(), "msg");
     }
 
     @Test
     void testOpenSD() throws Exception {
         String SYSLOG_MESSAGE = "<14>1 2014-06-20T09:14:07.123456+00:00 host01 systemd DEA MSG-01 [";
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.subscribeAll();
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription);
-        parser.setInputStream(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
-        Assertions.assertThrows(ParseException.class, parser::next);
+        RFC5424Frame rfc5424Frame = new RFC5424Frame();
+        rfc5424Frame.load(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
+        Assertions.assertThrows(ParseException.class, rfc5424Frame::next);
     }
 
 
     @Test
     void testAllNil() throws Exception {
         String input = "<2>1  - - - - - ";
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.subscribeAll();
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription(true);
-        InputStream inputStream = new ByteArrayInputStream( (input).getBytes());
-        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription, inputStream);
-        ResultSetAsString resultsetAsString = new ResultSetAsString(parser.get());
-        parser.next();
-        Assertions.assertEquals("2", resultsetAsString.getPriority(), "Priority");
-        Assertions.assertEquals("1", resultsetAsString.getVersion(), "Version");
-        Assertions.assertEquals("", resultsetAsString.getTimestamp(), "Timestamp");
-        Assertions.assertEquals("-", resultsetAsString.getHostname(), "Hostname");
-        Assertions.assertEquals("-", resultsetAsString.getAppname(), "Appname");
-        Assertions.assertEquals("-", resultsetAsString.getProcid(), "ProcId");
-        Assertions.assertEquals("-", resultsetAsString.getMsgid(), "MsgId");
-        Assertions.assertEquals("", resultsetAsString.getMsg(), "Msg");
+        InputStream inputStream = new ByteArrayInputStream((input).getBytes());
+        RFC5424Frame rfc5424Frame = new RFC5424Frame();
+        rfc5424Frame.load(inputStream);
+        rfc5424Frame.next();
+        Assertions.assertEquals("2", rfc5424Frame.priority.toString(), "Priority");
+        Assertions.assertEquals("1", rfc5424Frame.version.toString(), "Version");
+        Assertions.assertEquals("", rfc5424Frame.timestamp.toString(), "Timestamp");
+        Assertions.assertEquals("-", rfc5424Frame.hostname.toString(), "Hostname");
+        Assertions.assertEquals("-", rfc5424Frame.appName.toString(), "Appname");
+        Assertions.assertEquals("-", rfc5424Frame.procId.toString(), "ProcId");
+        Assertions.assertEquals("-", rfc5424Frame.msgId.toString(), "MsgId");
+        Assertions.assertEquals("", rfc5424Frame.msg.toString(), "Msg");
     }
 }

@@ -45,8 +45,6 @@
  */
 package com.teragrep.rlo_06.tests;
 
-import com.teragrep.rlo_06.RFC5424ParserSubscription;
-
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;

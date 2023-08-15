@@ -12,10 +12,6 @@ public class PriorityTest {
 
     @Test
     public void parseTest() {
-
-
-
-
         Priority priority = new Priority();
 
         String input = "<123>";
@@ -30,22 +26,12 @@ public class PriorityTest {
         Assertions.assertTrue(stream.next());
         priority.accept(stream);
 
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("123", resultSetAsString.getPriority());
+        Assertions.assertEquals("123", priority.toString());
     }
 
     @Test
     public void emptyPriorityIdTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.PRIORITY);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
-        Priority priority = new Priority(parserResultSet.PRIORITY);
+        Priority priority = new Priority();
 
         String input = "<>";
 
@@ -58,22 +44,13 @@ public class PriorityTest {
             // priority has first byte always loaded
             Assertions.assertTrue(stream.next());
             priority.accept(stream);
-            new ResultSetAsString(parserResultSet);
+            priority.toString();
         });
     }
 
     @Test
     public void tooLongPriorityIdTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.PRIORITY);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
-        Priority priority = new Priority(parserResultSet.PRIORITY);
+        Priority priority = new Priority();
 
         String input = "<12345>";
 
@@ -86,7 +63,7 @@ public class PriorityTest {
             // priority has first byte always loaded
             Assertions.assertTrue(stream.next());
             priority.accept(stream);
-            new ResultSetAsString(parserResultSet);
+            priority.toString();
         });
     }
 }

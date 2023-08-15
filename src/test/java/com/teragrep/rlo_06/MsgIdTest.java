@@ -11,15 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class MsgIdTest {
     @Test
     public void parseTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.MSGID);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         MsgId msgId = new MsgId();
 
         String input = "987654 ";
@@ -32,21 +23,11 @@ public class MsgIdTest {
 
         msgId.accept(stream);
 
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("987654", resultSetAsString.getMsgid());
+        Assertions.assertEquals("987654", msgId.toString());
     }
 
     @Test
     public void dashMsgIdTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.MSGID);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         MsgId msgId = new MsgId();
 
         String input = "- ";
@@ -59,21 +40,11 @@ public class MsgIdTest {
 
         msgId.accept(stream);
 
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("-", resultSetAsString.getMsgid());
+        Assertions.assertEquals("-", msgId.toString());
     }
 
     @Test
     public void tooLongMsgIdTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.MSGID);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         MsgId msgId = new MsgId();
 
         String input = "9876543210987654321098765432109876543210 ";
@@ -84,7 +55,7 @@ public class MsgIdTest {
         assertThrows(MsgIdParseException.class, () -> {
             Stream stream = new Stream(bais);
             msgId.accept(stream);
-            new ResultSetAsString(parserResultSet);
+            msgId.toString();
         });
     }
 }

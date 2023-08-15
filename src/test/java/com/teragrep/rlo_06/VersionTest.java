@@ -11,16 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class VersionTest {
     @Test
     public void parseTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.VERSION);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
-        Version version = new Version(parserResultSet.VERSION);
+        Version version = new Version();
 
         String input = "1 ";
 
@@ -32,22 +23,12 @@ public class VersionTest {
 
         version.accept(stream);
 
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("1", resultSetAsString.getVersion());
+        Assertions.assertEquals("1", version.toString());
     }
 
     @Test
     public void testEmptyVersion() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.VERSION);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
-        Version version = new Version(parserResultSet.VERSION);
+        Version version = new Version();
 
         String input = " ";
 
@@ -58,23 +39,14 @@ public class VersionTest {
         assertThrows(VersionParseException.class, () -> {
             Stream stream = new Stream(bais);
             version.accept(stream);
-            new ResultSetAsString(parserResultSet);
+            version.toString();
         });
     }
 
 
     @Test
     public void testNonOneVersion() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.VERSION);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
-        Version version = new Version(parserResultSet.VERSION);
+        Version version = new Version();
 
         String input = "2 ";
 
@@ -85,7 +57,7 @@ public class VersionTest {
         assertThrows(VersionParseException.class, () -> {
             Stream stream = new Stream(bais);
             version.accept(stream);
-            new ResultSetAsString(parserResultSet);
+            version.toString();
         });
     }
 }

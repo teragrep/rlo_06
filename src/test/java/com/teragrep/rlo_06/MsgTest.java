@@ -9,15 +9,6 @@ import java.nio.charset.StandardCharsets;
 public class MsgTest {
     @Test
     public void parseLeadingSpaceNoLFTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.MSG);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         // lf termination off
         Msg msg = new Msg(false);
 
@@ -32,21 +23,11 @@ public class MsgTest {
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
 
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("msg with preceding space and no newline", resultSetAsString.getMsg());
+        Assertions.assertEquals("msg with preceding space and no newline", msg.toString());
     }
 
     @Test
     public void parseNoLeadingSpaceNoLFTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.MSG);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         // lf termination off
         Msg msg = new Msg(false);
 
@@ -61,21 +42,11 @@ public class MsgTest {
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
 
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("msg without preceding space and no newline", resultSetAsString.getMsg());
+        Assertions.assertEquals("msg without preceding space and no newline", msg.toString());
     }
 
     @Test
     public void parseNewlineTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.MSG);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         // lf termination off
         Msg msg = new Msg(false);
 
@@ -90,20 +61,10 @@ public class MsgTest {
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
 
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("yes\nnewline", resultSetAsString.getMsg());
+        Assertions.assertEquals("yes\nnewline", msg.toString());
     }
     @Test
     public void parseLFTerminationWithNextTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.MSG);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         // lf termination off
         Msg msg = new Msg(true);
 
@@ -118,21 +79,11 @@ public class MsgTest {
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
 
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("there is something after newline", resultSetAsString.getMsg());
+        Assertions.assertEquals("there is something after newline", msg.toString());
     }
 
     @Test
     public void parseLFTerminationWithoutNextTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.MSG);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         // lf termination off
         Msg msg = new Msg(true);
 
@@ -147,21 +98,11 @@ public class MsgTest {
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
 
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("there is nothing after newline", resultSetAsString.getMsg());
+        Assertions.assertEquals("there is nothing after newline", msg.toString());
     }
 
     @Test
     public void emptyMessageTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.MSG);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         // lf termination off
         Msg msg = new Msg(true);
 
@@ -176,7 +117,6 @@ public class MsgTest {
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
 
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("", resultSetAsString.getMsg());
+        Assertions.assertEquals("", msg.toString());
     }
 }
