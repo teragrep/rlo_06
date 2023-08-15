@@ -41,7 +41,6 @@ public final class Version implements Consumer<Stream>, Clearable {
         } else {
             throw new VersionParseException("VERSION not 1");
         }
-        VERSION.flip();
     }
 
     @Override
@@ -51,8 +50,7 @@ public final class Version implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
-        String string = StandardCharsets.US_ASCII.decode(VERSION).toString();
         VERSION.flip();
-        return string;
+        return StandardCharsets.US_ASCII.decode(VERSION).toString();
     }
 }

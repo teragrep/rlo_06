@@ -65,7 +65,6 @@ public final class Msg implements Consumer<Stream>, Clearable {
                 }
             }
         }
-        MSG.flip();
     }
 
     @Override
@@ -75,8 +74,7 @@ public final class Msg implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
-        String string = StandardCharsets.UTF_8.decode(MSG).toString();
         MSG.flip();
-        return string;
+        return StandardCharsets.UTF_8.decode(MSG).toString();
     }
 }

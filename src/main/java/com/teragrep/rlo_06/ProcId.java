@@ -41,7 +41,6 @@ public final class ProcId implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new ProcIdParseException("SP missing after PROCID or PROCID too long");
         }
-        PROCID.flip();
     }
 
     @Override
@@ -51,8 +50,7 @@ public final class ProcId implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
-        String string = StandardCharsets.US_ASCII.decode(PROCID).toString();
         PROCID.flip();
-        return string;
+        return StandardCharsets.US_ASCII.decode(PROCID).toString();
     }
 }

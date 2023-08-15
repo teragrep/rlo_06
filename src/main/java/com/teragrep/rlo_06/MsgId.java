@@ -41,7 +41,6 @@ public final class MsgId implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new MsgIdParseException("SP missing after MSGID or MSGID too long");
         }
-        MSGID.flip();
     }
 
     @Override
@@ -51,8 +50,7 @@ public final class MsgId implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
-        String string = StandardCharsets.US_ASCII.decode(MSGID).toString();
         MSGID.flip();
-        return string;
+        return StandardCharsets.US_ASCII.decode(MSGID).toString();
     }
 }

@@ -41,7 +41,6 @@ public final class Hostname implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new HostnameParseException("SP missing after HOSTNAME or HOSTNAME too long");
         }
-        HOSTNAME.flip();
     }
 
     @Override
@@ -51,8 +50,7 @@ public final class Hostname implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
-        String string = StandardCharsets.US_ASCII.decode(HOSTNAME).toString();
         HOSTNAME.flip();
-        return string;
+        return StandardCharsets.US_ASCII.decode(HOSTNAME).toString();
     }
 }

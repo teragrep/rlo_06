@@ -67,7 +67,6 @@ public final class Priority implements Consumer<Stream>, Clearable {
         } else {
             throw new PriorityParseException("PRIORITY number incorrect");
         }
-        PRIORITY.flip();
     }
 
     @Override
@@ -77,8 +76,7 @@ public final class Priority implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
-        String string = StandardCharsets.US_ASCII.decode(PRIORITY).toString();
         PRIORITY.flip();
-        return string;
+        return StandardCharsets.US_ASCII.decode(PRIORITY).toString();
     }
 }

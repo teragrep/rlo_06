@@ -41,7 +41,6 @@ public final class Timestamp implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new TimestampParseException("SP missing after TIMESTAMP or TIMESTAMP too long");
         }
-        TIMESTAMP.flip();
     }
 
     @Override
@@ -51,8 +50,7 @@ public final class Timestamp implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
-        String string = StandardCharsets.US_ASCII.decode(TIMESTAMP).toString();
         TIMESTAMP.flip();
-        return string;
+        return StandardCharsets.US_ASCII.decode(TIMESTAMP).toString();
     }
 }

@@ -41,7 +41,6 @@ public final class AppName implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new AppNameParseException("SP missing after APPNAME or APPNAME too long");
         }
-        APPNAME.flip();
     }
 
     @Override
@@ -51,8 +50,7 @@ public final class AppName implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
-        String string = StandardCharsets.US_ASCII.decode(APPNAME).toString();
         APPNAME.flip();
-        return string;
+        return StandardCharsets.US_ASCII.decode(APPNAME).toString();
     }
 }
