@@ -10,9 +10,9 @@ public class BrokenSyntaxTest {
     @Test
     void testBrokenFail() throws Exception {
         String SYSLOG_MESSAGE = "<134>1  - [ ] ] [";
-        RFC5424Frame parser = new RFC5424Frame();
-        parser.load(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
-        Assertions.assertThrows(ParseException.class, parser::next);
+        RFC5424Frame rfc5424Frame = new RFC5424Frame();
+        rfc5424Frame.load(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
+        Assertions.assertThrows(ParseException.class, rfc5424Frame::next);
     }
 
     @Test

@@ -78,13 +78,13 @@ public class TestFileTest {
 
         final File initialFile = new File("output.txt");
         final InputStream inputStream = new BufferedInputStream(new FileInputStream(initialFile),32*1024*1024);
-        RFC5424Frame parser = new RFC5424Frame();
-        parser.load(inputStream);
+        RFC5424Frame rfc5424Frame = new RFC5424Frame();
+        rfc5424Frame.load(inputStream);
 
         Instant instant1 = Instant.now();
         int count = 1000;
         for (int i = 0; i < count; i++) {
-            Assertions.assertTrue(parser.next());
+            Assertions.assertTrue(rfc5424Frame.next());
         }
         Instant instant2 = Instant.now();
 
