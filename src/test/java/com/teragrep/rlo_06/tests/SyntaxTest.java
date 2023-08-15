@@ -61,16 +61,10 @@ public class SyntaxTest {
         String SYSLOG_MESSAGE = "<14>1 2014-06-20T09:14:07.123456+00:00 host01 systemd DEA MSG-01 [ID_A@1 u=\"\\\"3\" e=\"t\"][ID_B@2 n=\"9\"] sigsegv\n";
         String SYSLOG_MESSAGE2 = "<31>1 2021-12-24T09:14:07.12345+00:00 host02 journald MOI ASD-05 [ID_A@1 u=\"\\\"3\" e=\"t\"][ID_B@2 n=\"9\"] normal\n";
 
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.subscribeAll();
-
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        sdSubscription.subscribeElement("ID_A@1", "u");
-
-
         InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE + SYSLOG_MESSAGE2).getBytes());
-        RFC5424Frame parser = new RFC5424Frame(subscription, sdSubscription, inputStream);
+        RFC5424Frame rfc5424Frame = new RFC5424Frame(true);
+        rfc5424Frame.load(inputStream);
+        assertTrue(rfc5424Frame.next());
 
         int count = 1;
         for (int i = 0; i < count; i++) {
