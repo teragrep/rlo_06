@@ -29,9 +29,7 @@ public final class Hostname implements Consumer<Stream>, Clearable {
         }
         byte b = stream.get();
         while (hostname_max_left > 0 && b != 32) {
-            if (HOSTNAME != null) {
-                HOSTNAME.put(b);
-            }
+            HOSTNAME.put(b);
             hostname_max_left--;
 
             if (!stream.next()) {
@@ -43,6 +41,7 @@ public final class Hostname implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new HostnameParseException("SP missing after HOSTNAME or HOSTNAME too long");
         }
+        HOSTNAME.flip();
     }
 
     @Override
@@ -52,7 +51,8 @@ public final class Hostname implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
+        String string = StandardCharsets.US_ASCII.decode(HOSTNAME).toString();
         HOSTNAME.flip();
-        return StandardCharsets.US_ASCII.decode(HOSTNAME).toString();
+        return string;
     }
 }

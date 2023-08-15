@@ -30,7 +30,7 @@ public final class Msg implements Consumer<Stream>, Clearable {
 
         byte oldByte = stream.get();
 
-        if (oldByte != ' ' && MSG != null) {
+        if (oldByte != ' ') {
             MSG.put(oldByte);
         }
         msg_current_left--;
@@ -49,9 +49,7 @@ public final class Msg implements Consumer<Stream>, Clearable {
                     throw new MsgParseException("MSG too long, no new line in 256K range");
                 }
 
-                if (MSG != null) {
-                    MSG.put(b);
-                }
+                MSG.put(b);
                 msg_current_left--;
 
 
@@ -59,9 +57,7 @@ public final class Msg implements Consumer<Stream>, Clearable {
             }
         } else { // Line-feed termination inactive, reading until EOF
             while (stream.next()) {
-                if (MSG != null) {
-                    MSG.put(stream.get());
-                }
+                MSG.put(stream.get());
                 msg_current_left--;
 
                 if (msg_current_left < 1) {
@@ -69,6 +65,7 @@ public final class Msg implements Consumer<Stream>, Clearable {
                 }
             }
         }
+        MSG.flip();
     }
 
     @Override
@@ -78,7 +75,8 @@ public final class Msg implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
+        String string = StandardCharsets.UTF_8.decode(MSG).toString();
         MSG.flip();
-        return StandardCharsets.UTF_8.decode(MSG).toString();
+        return string;
     }
 }

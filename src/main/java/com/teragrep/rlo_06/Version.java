@@ -29,9 +29,7 @@ public final class Version implements Consumer<Stream>, Clearable {
         }
         b = stream.get();
         if (b == 49) {
-            if (VERSION != null) {
-                VERSION.put(b);
-            }
+            VERSION.put(b);
 
             if (!stream.next()) {
                 throw new ParseException("VERSION is too short, can't continue");
@@ -43,6 +41,7 @@ public final class Version implements Consumer<Stream>, Clearable {
         } else {
             throw new VersionParseException("VERSION not 1");
         }
+        VERSION.flip();
     }
 
     @Override
@@ -52,7 +51,8 @@ public final class Version implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
+        String string = StandardCharsets.US_ASCII.decode(VERSION).toString();
         VERSION.flip();
-        return StandardCharsets.US_ASCII.decode(VERSION).toString();
+        return string;
     }
 }

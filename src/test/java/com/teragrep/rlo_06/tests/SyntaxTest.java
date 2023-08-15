@@ -127,10 +127,6 @@ public class SyntaxTest {
     @Test
     void testNoNewLineEOF() throws Exception {
         String SYSLOG_MESSAGE = "<14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u=\"\\\"3\" e=\"t\"][ID_B@2 n=\"9\"] sigsegv";
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        sdSubscription.subscribeElement("ID_A@1", "u");
-
         InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes());
         RFC5424Frame rfc5424Frame = new RFC5424Frame();
         rfc5424Frame.load(inputStream);

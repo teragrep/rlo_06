@@ -29,9 +29,7 @@ public final class MsgId implements Consumer<Stream>, Clearable {
         }
         b = stream.get();
         while (msgid_max_left > 0 && b != 32) {
-            if (MSGID != null) {
-                MSGID.put(b);
-            }
+            MSGID.put(b);
             msgid_max_left--;
 
             if (!stream.next()) {
@@ -43,6 +41,7 @@ public final class MsgId implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new MsgIdParseException("SP missing after MSGID or MSGID too long");
         }
+        MSGID.flip();
     }
 
     @Override
@@ -52,7 +51,8 @@ public final class MsgId implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
+        String string = StandardCharsets.US_ASCII.decode(MSGID).toString();
         MSGID.flip();
-        return StandardCharsets.US_ASCII.decode(MSGID).toString();
+        return string;
     }
 }

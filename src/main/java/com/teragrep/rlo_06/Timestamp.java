@@ -29,9 +29,7 @@ public final class Timestamp implements Consumer<Stream>, Clearable {
         }
         b = stream.get();
         while (ts_max_left > 0 && b != 32) {
-            if (TIMESTAMP != null) {
-                TIMESTAMP.put(b);
-            }
+            TIMESTAMP.put(b);
             ts_max_left--;
 
             if (!stream.next()) {
@@ -43,6 +41,7 @@ public final class Timestamp implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new TimestampParseException("SP missing after TIMESTAMP or TIMESTAMP too long");
         }
+        TIMESTAMP.flip();
     }
 
     @Override
@@ -52,7 +51,8 @@ public final class Timestamp implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
+        String string = StandardCharsets.US_ASCII.decode(TIMESTAMP).toString();
         TIMESTAMP.flip();
-        return StandardCharsets.US_ASCII.decode(TIMESTAMP).toString();
+        return string;
     }
 }

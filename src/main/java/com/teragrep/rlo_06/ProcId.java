@@ -29,9 +29,7 @@ public final class ProcId implements Consumer<Stream>, Clearable {
         }
         b = stream.get();
         while (procid_max_left > 0 && b != 32) {
-            if (PROCID != null) {
-                PROCID.put(b);
-            }
+            PROCID.put(b);
             procid_max_left--;
 
             if (!stream.next()) {
@@ -43,6 +41,7 @@ public final class ProcId implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new ProcIdParseException("SP missing after PROCID or PROCID too long");
         }
+        PROCID.flip();
     }
 
     @Override
@@ -52,7 +51,8 @@ public final class ProcId implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
+        String string = StandardCharsets.US_ASCII.decode(PROCID).toString();
         PROCID.flip();
-        return StandardCharsets.US_ASCII.decode(PROCID).toString();
+        return string;
     }
 }

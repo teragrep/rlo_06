@@ -10,7 +10,6 @@ public class BrokenSyntaxTest {
     @Test
     void testBrokenFail() throws Exception {
         String SYSLOG_MESSAGE = "<134>1  - [ ] ] [";
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
         RFC5424Frame parser = new RFC5424Frame();
         parser.load(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
         Assertions.assertThrows(ParseException.class, parser::next);

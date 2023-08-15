@@ -65,6 +65,7 @@ public final class SDParamValue implements Consumer<Stream>, Clearable {
                 b = stream.get();
             }
         }
+        value.flip();
     }
 
     @Override
@@ -74,7 +75,8 @@ public final class SDParamValue implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
+        String string = StandardCharsets.UTF_8.decode(value).toString();
         value.flip();
-        return StandardCharsets.UTF_8.decode(value).toString();
+        return string;
     }
 }
