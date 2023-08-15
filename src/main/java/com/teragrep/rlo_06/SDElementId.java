@@ -38,6 +38,7 @@ public final class SDElementId implements Consumer<Stream>, Clearable, Matchable
             }
             b = stream.get();
         }
+        sdId.flip(); // for reads
     }
 
     @Override
@@ -47,13 +48,13 @@ public final class SDElementId implements Consumer<Stream>, Clearable, Matchable
 
     @Override
     public String toString() {
+        String string = StandardCharsets.UTF_8.decode(sdId).toString();
         sdId.flip();
-        return StandardCharsets.UTF_8.decode(sdId).toString();
+        return string;
     }
 
     @Override
     public boolean matches(ByteBuffer buffer) {
-        sdId.flip();
         return sdId.equals(buffer);
     }
 }
