@@ -76,8 +76,6 @@ public class NewParserTest {
         Assertions.assertEquals("MSG-01", rfc5424Frame.msgId.toString());
         Assertions.assertEquals("sigsegv", rfc5424Frame.msg.toString());
 
-        System.out.println(rfc5424Frame.structuredData);
-
         SDVector sdVector = new SDVector("ID_A@1", "u");
         // Structured Data 1
         Assertions.assertEquals("\\\"3", rfc5424Frame.structuredData.getValue(sdVector).toString());
