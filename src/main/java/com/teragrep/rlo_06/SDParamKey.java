@@ -30,7 +30,6 @@ public final class SDParamKey implements Consumer<Stream>, Clearable, Matchable 
                 }
                 b = stream.get();
             }
-        key.flip(); // for reads
     }
 
     @Override
@@ -40,9 +39,8 @@ public final class SDParamKey implements Consumer<Stream>, Clearable, Matchable 
 
     @Override
     public String toString() {
-        String string = StandardCharsets.UTF_8.decode(key).toString();
         key.flip();
-        return string;
+        return StandardCharsets.UTF_8.decode(key).toString();
     }
 
     @Override
