@@ -3,6 +3,7 @@ package com.teragrep.rlo_06;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
+import java.time.ZonedDateTime;
 
 public final class Timestamp implements Consumer<Stream>, Clearable, Byteable {
     /*
@@ -79,5 +80,8 @@ public final class Timestamp implements Consumer<Stream>, Clearable, Byteable {
         TIMESTAMP.get(bytes);
         TIMESTAMP.rewind();
         return bytes;
+    }
+    public ZonedDateTime toZonedDateTime() {
+        return ZonedDateTime.parse(toString());
     }
 }
