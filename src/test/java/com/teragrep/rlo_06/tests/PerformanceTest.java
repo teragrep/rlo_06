@@ -110,13 +110,49 @@ public class PerformanceTest {
 
     @Test
     @DisabledIfSystemProperty(named = "noPerfTest", matches = "true")
+    void testMediumLongSDPerformance() throws Exception {
+        String payload = new String(new char[16]).replace("\0", "X");
+        StringBuilder builder = new StringBuilder();
+        for(int i=0; i<10; i++) {
+            builder.append("[verylongsdidhere@");
+            builder.append(i);
+            for(int y=0; y<10; y++) {
+                builder.append(" verylongelementnamehere=\"");
+                builder.append(payload);
+                builder.append("\"");
+            }
+            builder.append("]");
+        }
+        String SYSLOG_MESSAGE = "<14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 " + builder + " sigsegv\n";
+        InputStream inputStream = new ByteArrayInputStream(SYSLOG_MESSAGE.getBytes());
+        RFC5424Frame rfc5424Frame = new RFC5424Frame(true);
+        rfc5424Frame.load(inputStream);
+
+        Instant instant1 = Instant.now();
+        long count = 25000;
+        for (long i = 0; i < count; i++) {
+            Assertions.assertTrue(rfc5424Frame.next());
+            inputStream.reset();
+        }
+        Instant instant2 = Instant.now();
+
+        long msgsize = (count * SYSLOG_MESSAGE.length())/1024/1024;
+        long spent = instant2.toEpochMilli()-instant1.toEpochMilli();
+        System.out.println("testMediumLongSDPerformance: time taken " + spent + " for " + count +
+                ", total RPS: " + (float) count/ ((float) spent/1000) +
+                ", " + (float) msgsize + " megabytes (" + (float) (msgsize/((float)spent/1000)) + " MB/s)");
+
+    }
+
+    @Test
+    @DisabledIfSystemProperty(named = "noPerfTest", matches = "true")
     void testVeryLongSDPerformance() throws Exception {
         String payload = new String(new char[128]).replace("\0", "X");
         StringBuilder builder = new StringBuilder();
-        for(int i=0; i<=100; i++) {
+        for(int i=0; i<100; i++) {
             builder.append("[verylongsdidhere@");
             builder.append(i);
-            for(int y=0; y<=100; y++) {
+            for(int y=0; y<100; y++) {
                 builder.append(" verylongelementnamehere=\"");
                 builder.append(payload);
                 builder.append("\"");
@@ -132,7 +168,6 @@ public class PerformanceTest {
         Instant instant1 = Instant.now();
         long count = 500;
         for (long i = 0; i < count; i++) {
-            System.out.println("Currently going at " + i);
             Assertions.assertTrue(rfc5424Frame.next());
             inputStream.reset();
         }
