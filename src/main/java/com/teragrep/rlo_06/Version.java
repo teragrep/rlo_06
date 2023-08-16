@@ -49,6 +49,7 @@ public final class Version implements Consumer<Stream>, Clearable {
         } else {
             throw new VersionParseException("VERSION not 1");
         }
+        VERSION.flip();
         fragmentState = FragmentState.WRITTEN;
     }
 
@@ -63,7 +64,9 @@ public final class Version implements Consumer<Stream>, Clearable {
         if (fragmentState != FragmentState.WRITTEN) {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
-        VERSION.flip();
-        return StandardCharsets.US_ASCII.decode(VERSION).toString();
+
+        String string = StandardCharsets.US_ASCII.decode(VERSION).toString();
+        VERSION.rewind();
+        return string;
     }
 }

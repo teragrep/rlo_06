@@ -47,7 +47,7 @@ public final class Hostname implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new HostnameParseException("SP missing after HOSTNAME or HOSTNAME too long");
         }
-
+        HOSTNAME.flip();
         fragmentState = FragmentState.WRITTEN;
     }
 
@@ -62,7 +62,8 @@ public final class Hostname implements Consumer<Stream>, Clearable {
         if (fragmentState != FragmentState.WRITTEN) {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
-        HOSTNAME.flip();
-        return StandardCharsets.US_ASCII.decode(HOSTNAME).toString();
+        String string = StandardCharsets.US_ASCII.decode(HOSTNAME).toString();
+        HOSTNAME.rewind();
+        return string;
     }
 }

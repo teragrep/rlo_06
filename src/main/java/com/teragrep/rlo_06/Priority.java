@@ -74,7 +74,7 @@ public final class Priority implements Consumer<Stream>, Clearable {
         } else {
             throw new PriorityParseException("PRIORITY number incorrect");
         }
-
+        PRIORITY.flip();
         fragmentState = FragmentState.WRITTEN;
     }
 
@@ -90,7 +90,8 @@ public final class Priority implements Consumer<Stream>, Clearable {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
 
-        PRIORITY.flip();
-        return StandardCharsets.US_ASCII.decode(PRIORITY).toString();
+        String string = StandardCharsets.US_ASCII.decode(PRIORITY).toString();
+        PRIORITY.rewind();
+        return string;
     }
 }

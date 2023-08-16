@@ -48,6 +48,7 @@ public final class Timestamp implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new TimestampParseException("SP missing after TIMESTAMP or TIMESTAMP too long");
         }
+        TIMESTAMP.flip();
         fragmentState = FragmentState.WRITTEN;
     }
 
@@ -62,7 +63,9 @@ public final class Timestamp implements Consumer<Stream>, Clearable {
         if (fragmentState != FragmentState.WRITTEN) {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
-        TIMESTAMP.flip();
-        return StandardCharsets.US_ASCII.decode(TIMESTAMP).toString();
+
+        String string = StandardCharsets.US_ASCII.decode(TIMESTAMP).toString();
+        TIMESTAMP.rewind();
+        return string;
     }
 }

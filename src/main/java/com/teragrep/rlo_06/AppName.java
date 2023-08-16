@@ -49,6 +49,7 @@ public final class AppName implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new AppNameParseException("SP missing after APPNAME or APPNAME too long");
         }
+        APPNAME.flip();
         fragmentState = FragmentState.WRITTEN;
     }
 
@@ -63,7 +64,8 @@ public final class AppName implements Consumer<Stream>, Clearable {
         if (fragmentState != FragmentState.WRITTEN) {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
-        APPNAME.flip();
-        return StandardCharsets.US_ASCII.decode(APPNAME).toString();
+        String string = StandardCharsets.US_ASCII.decode(APPNAME).toString();
+        APPNAME.rewind();
+        return string;
     }
 }

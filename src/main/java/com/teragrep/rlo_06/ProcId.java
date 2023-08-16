@@ -49,7 +49,7 @@ public final class ProcId implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new ProcIdParseException("SP missing after PROCID or PROCID too long");
         }
-
+        PROCID.flip();
         fragmentState = FragmentState.WRITTEN;
     }
 
@@ -64,7 +64,9 @@ public final class ProcId implements Consumer<Stream>, Clearable {
         if (fragmentState != FragmentState.WRITTEN) {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
-        PROCID.flip();
-        return StandardCharsets.US_ASCII.decode(PROCID).toString();
+
+        String string = StandardCharsets.US_ASCII.decode(PROCID).toString();
+        PROCID.rewind();
+        return string;
     }
 }

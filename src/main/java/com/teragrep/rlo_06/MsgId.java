@@ -48,7 +48,7 @@ public final class MsgId implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new MsgIdParseException("SP missing after MSGID or MSGID too long");
         }
-
+        MSGID.flip();
         fragmentState = FragmentState.WRITTEN;
     }
 
@@ -63,7 +63,9 @@ public final class MsgId implements Consumer<Stream>, Clearable {
         if (fragmentState != FragmentState.WRITTEN) {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
-        MSGID.flip();
-        return StandardCharsets.US_ASCII.decode(MSGID).toString();
+
+        String string = StandardCharsets.US_ASCII.decode(MSGID).toString();
+        MSGID.rewind();
+        return string;
     }
 }

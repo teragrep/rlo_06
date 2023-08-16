@@ -72,6 +72,7 @@ public final class SDParamValue implements Consumer<Stream>, Clearable {
                 b = stream.get();
             }
         }
+        value.flip();
         fragmentState = FragmentState.WRITTEN;
     }
 
@@ -86,7 +87,9 @@ public final class SDParamValue implements Consumer<Stream>, Clearable {
         if (fragmentState != FragmentState.WRITTEN) {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
-        value.flip();
-        return StandardCharsets.UTF_8.decode(value).toString();
+
+        String string = StandardCharsets.UTF_8.decode(value).toString();
+        value.rewind();
+        return string;
     }
 }

@@ -21,22 +21,22 @@ public final class SDParamKey implements Consumer<Stream>, Clearable, Matchable 
         }
         byte b;
 
-            short sdElemKey_max_left = 32;
+        short sdElemKey_max_left = 32;
+
+        if (!stream.next()) {
+            throw new ParseException("SD is too short, can't continue");
+        }
+        b = stream.get();
+        while (sdElemKey_max_left > 0 && b != 61) { // '='
+            key.put(b);
+            sdElemKey_max_left--;
 
             if (!stream.next()) {
                 throw new ParseException("SD is too short, can't continue");
             }
             b = stream.get();
-            while (sdElemKey_max_left > 0 && b != 61) { // '='
-                key.put(b);
-                sdElemKey_max_left--;
-
-                if (!stream.next()) {
-                    throw new ParseException("SD is too short, can't continue");
-                }
-                b = stream.get();
-            }
-            key.flip();
+        }
+        key.flip();
         fragmentState = FragmentState.WRITTEN;
 
     }

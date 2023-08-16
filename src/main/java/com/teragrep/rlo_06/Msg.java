@@ -72,6 +72,7 @@ public final class Msg implements Consumer<Stream>, Clearable {
                 }
             }
         }
+        MSG.flip();
         fragmentState = FragmentState.WRITTEN;
     }
 
@@ -87,7 +88,8 @@ public final class Msg implements Consumer<Stream>, Clearable {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
 
-        MSG.flip();
-        return StandardCharsets.UTF_8.decode(MSG).toString();
+        String string = StandardCharsets.UTF_8.decode(MSG).toString();
+        MSG.rewind();
+        return string;
     }
 }
