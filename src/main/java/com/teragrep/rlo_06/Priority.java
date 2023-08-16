@@ -97,6 +97,10 @@ public final class Priority implements Consumer<Stream>, Clearable, Byteable {
 
     @Override
     public byte[] toBytes() {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
+
         final byte[] bytes = new byte[PRIORITY.remaining()];
         PRIORITY.get(bytes);
         PRIORITY.rewind();

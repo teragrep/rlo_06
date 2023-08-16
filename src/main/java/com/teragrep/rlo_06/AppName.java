@@ -71,6 +71,10 @@ public final class AppName implements Consumer<Stream>, Clearable, Byteable {
 
     @Override
     public byte[] toBytes() {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
+
         final byte[] bytes = new byte[APPNAME.remaining()];
         APPNAME.get(bytes);
         APPNAME.rewind();

@@ -72,6 +72,10 @@ public final class ProcId implements Consumer<Stream>, Clearable, Byteable {
 
     @Override
     public byte[] toBytes() {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
+
         final byte[] bytes = new byte[PROCID.remaining()];
         PROCID.get(bytes);
         PROCID.rewind();

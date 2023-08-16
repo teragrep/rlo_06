@@ -73,6 +73,10 @@ public final class SDElementId implements Consumer<Stream>, Clearable, Matchable
 
     @Override
     public byte[] toBytes() {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
+
         final byte[] bytes = new byte[sdId.remaining()];
         sdId.get(bytes);
         sdId.rewind();

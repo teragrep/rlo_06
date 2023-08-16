@@ -69,6 +69,10 @@ public final class Hostname implements Consumer<Stream>, Clearable, Byteable {
 
     @Override
     public byte[] toBytes() {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
+
         final byte[] bytes = new byte[HOSTNAME.remaining()];
         HOSTNAME.get(bytes);
         HOSTNAME.rewind();
