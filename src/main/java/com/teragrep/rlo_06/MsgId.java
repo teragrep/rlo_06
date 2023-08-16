@@ -15,12 +15,19 @@ public final class MsgId implements Consumer<Stream>, Clearable {
     States : ......T
     */
     private final ByteBuffer MSGID;
+
+    private FragmentState fragmentState;
     MsgId() {
         this.MSGID = ByteBuffer.allocateDirect(32);
+        this.fragmentState = FragmentState.EMPTY;
     }
 
     @Override
     public void accept(Stream stream) {
+        if (fragmentState != FragmentState.EMPTY) {
+            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
+        }
+
         byte b;
         short msgid_max_left = 32;
 
@@ -41,15 +48,21 @@ public final class MsgId implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new MsgIdParseException("SP missing after MSGID or MSGID too long");
         }
+
+        fragmentState = FragmentState.WRITTEN;
     }
 
     @Override
     public void clear() {
         MSGID.clear();
+        fragmentState = FragmentState.EMPTY;
     }
 
     @Override
     public String toString() {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
         MSGID.flip();
         return StandardCharsets.US_ASCII.decode(MSGID).toString();
     }

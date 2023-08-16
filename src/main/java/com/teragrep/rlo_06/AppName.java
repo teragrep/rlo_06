@@ -15,12 +15,20 @@ public final class AppName implements Consumer<Stream>, Clearable {
         States : .......T
         */
     private final ByteBuffer APPNAME;
+
+    private FragmentState fragmentState;
+
     AppName() {
         this.APPNAME = ByteBuffer.allocateDirect(48);
+        this.fragmentState = FragmentState.EMPTY;
     }
 
     @Override
     public void accept(Stream stream) {
+        if (fragmentState != FragmentState.EMPTY) {
+            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
+        }
+
         byte b;
         short appname_max_left = 48;
 
@@ -41,15 +49,20 @@ public final class AppName implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new AppNameParseException("SP missing after APPNAME or APPNAME too long");
         }
+        fragmentState = FragmentState.WRITTEN;
     }
 
     @Override
     public void clear() {
         APPNAME.clear();
+        fragmentState = FragmentState.EMPTY;
     }
 
     @Override
     public String toString() {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
         APPNAME.flip();
         return StandardCharsets.US_ASCII.decode(APPNAME).toString();
     }

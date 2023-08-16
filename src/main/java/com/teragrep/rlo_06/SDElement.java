@@ -13,15 +13,22 @@ public final class SDElement implements Consumer<Stream>, Clearable {
 
     private final SDParamCache sdParamCache;
 
+    private FragmentState fragmentState;
+
     SDElement() {
         int numElements = 16;
         this.sdElementId = new SDElementId();
         this.sdParams = new ArrayList<>(numElements);
         this.sdParamCache = new SDParamCache(numElements);
+        this.fragmentState = FragmentState.EMPTY;
     }
     // structured data, oh wow the performance hit
     @Override
     public void accept(Stream stream) {
+        if (fragmentState != FragmentState.EMPTY) {
+            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
+        }
+
         byte b;
 
         // parse the sdId
@@ -42,6 +49,7 @@ public final class SDElement implements Consumer<Stream>, Clearable {
         else {
             throw new StructuredDataParseException("SP missing after SD_ID or SD_ID too long");
         }
+        fragmentState = FragmentState.WRITTEN;
     }
 
     @Override
@@ -52,9 +60,13 @@ public final class SDElement implements Consumer<Stream>, Clearable {
             sdParamCache.put(sdParam);
         }
         sdParams.clear();
+        fragmentState = FragmentState.EMPTY;
     }
 
     public SDParamValue getSDParamValue(SDVector sdVector) {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
         if (sdElementId.matches(sdVector.sdElementIdBB)) {
             ListIterator<SDParam> listIterator = sdParams.listIterator(sdParams.size());
             while (listIterator.hasPrevious()) {
@@ -71,6 +83,9 @@ public final class SDElement implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
         return "SDElement{" +
                 "sdElementId=" + sdElementId +
                 ", sdParams=" + sdParams +

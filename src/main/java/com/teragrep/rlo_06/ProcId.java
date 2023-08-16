@@ -16,11 +16,19 @@ public final class ProcId implements Consumer<Stream>, Clearable {
         */
 
     private final ByteBuffer PROCID;
+
+    private FragmentState fragmentState;
+
     ProcId() {
         this.PROCID = ByteBuffer.allocateDirect(128);
+        this.fragmentState = FragmentState.EMPTY;
     }
 
     public void accept(Stream stream) {
+        if (fragmentState != FragmentState.EMPTY) {
+            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
+        }
+
         byte b;
         short procid_max_left = 128;
 
@@ -41,15 +49,21 @@ public final class ProcId implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new ProcIdParseException("SP missing after PROCID or PROCID too long");
         }
+
+        fragmentState = FragmentState.WRITTEN;
     }
 
     @Override
     public void clear() {
         PROCID.clear();
+        fragmentState = FragmentState.EMPTY;
     }
 
     @Override
     public String toString() {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
         PROCID.flip();
         return StandardCharsets.US_ASCII.decode(PROCID).toString();
     }

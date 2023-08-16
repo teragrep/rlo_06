@@ -29,14 +29,22 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
     public final List<SDElement> sdElements;
     private final SDElementCache sdElementCache;
 
+    private FragmentState fragmentState;
+
+
     StructuredData() {
         int numElements = 16;
         this.sdElementCache = new SDElementCache(numElements);
         this.sdElements = new ArrayList<>(numElements);
+        this.fragmentState = FragmentState.EMPTY;
     }
 
     @Override
     public void accept(Stream stream) {
+        if (fragmentState != FragmentState.EMPTY) {
+            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
+        }
+
         byte b;
 
 
@@ -79,6 +87,7 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
             b = stream.get(); // will it be '[' or the MSG who knows.
             // let's find out, note if not '[' then R(ead) and pass to next state
         }
+        fragmentState = FragmentState.WRITTEN;
     }
 
 
@@ -89,9 +98,14 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
             sdElementCache.put(sdElement);
         }
         sdElements.clear();
+        fragmentState = FragmentState.EMPTY;
     }
 
     public SDParamValue getValue(SDVector sdVector) {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
+
         // reverse search as last value is only that matters
         ListIterator<SDElement> listIterator = sdElements.listIterator(sdElements.size());
         while(listIterator.hasPrevious()) {
@@ -108,6 +122,9 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
         return "StructuredData{" +
                 "sdElements=" + sdElements +
                 '}';

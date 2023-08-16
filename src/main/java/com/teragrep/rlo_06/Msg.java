@@ -20,12 +20,19 @@ public final class Msg implements Consumer<Stream>, Clearable {
     private final ByteBuffer MSG;
 
     private final boolean lineFeedTermination;
+
+    private FragmentState fragmentState;
     Msg(boolean lineFeedTermination) {
         this.MSG = ByteBuffer.allocateDirect(256 * 1024);
         this.lineFeedTermination = lineFeedTermination;
+        this.fragmentState = FragmentState.EMPTY;
     }
 
     public void accept(Stream stream) {
+        if (fragmentState != FragmentState.EMPTY) {
+            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
+        }
+
         int msg_current_left = 256 * 1024;
 
         byte oldByte = stream.get();
@@ -65,15 +72,21 @@ public final class Msg implements Consumer<Stream>, Clearable {
                 }
             }
         }
+        fragmentState = FragmentState.WRITTEN;
     }
 
     @Override
     public void clear() {
         MSG.clear();
+        fragmentState = FragmentState.EMPTY;
     }
 
     @Override
     public String toString() {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
+
         MSG.flip();
         return StandardCharsets.UTF_8.decode(MSG).toString();
     }

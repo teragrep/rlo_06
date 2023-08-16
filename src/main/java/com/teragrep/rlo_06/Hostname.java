@@ -15,13 +15,19 @@ public final class Hostname implements Consumer<Stream>, Clearable {
                 States : ......T
                 */
     private final ByteBuffer HOSTNAME;
+    private FragmentState fragmentState;
 
     Hostname() {
         this.HOSTNAME = ByteBuffer.allocateDirect(255);
+        this.fragmentState = FragmentState.EMPTY;
     }
 
     @Override
     public void accept(Stream stream) {
+        if (fragmentState != FragmentState.EMPTY) {
+            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
+        }
+
         short hostname_max_left = 255;
 
         if (!stream.next()) {
@@ -41,15 +47,21 @@ public final class Hostname implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new HostnameParseException("SP missing after HOSTNAME or HOSTNAME too long");
         }
+
+        fragmentState = FragmentState.WRITTEN;
     }
 
     @Override
     public void clear() {
         HOSTNAME.clear();
+        fragmentState = FragmentState.EMPTY;
     }
 
     @Override
     public String toString() {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
         HOSTNAME.flip();
         return StandardCharsets.US_ASCII.decode(HOSTNAME).toString();
     }

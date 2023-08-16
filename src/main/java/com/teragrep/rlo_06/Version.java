@@ -16,12 +16,20 @@ public final class Version implements Consumer<Stream>, Clearable {
     */
     private final ByteBuffer VERSION;
 
+    private FragmentState fragmentState;
+
+
     Version() {
         this.VERSION = ByteBuffer.allocateDirect(1);
+        this.fragmentState = FragmentState.EMPTY;
     }
 
     @Override
     public void accept(Stream stream) {
+        if (fragmentState != FragmentState.EMPTY) {
+            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
+        }
+
         byte b;
 
         if (!stream.next()) {
@@ -41,15 +49,20 @@ public final class Version implements Consumer<Stream>, Clearable {
         } else {
             throw new VersionParseException("VERSION not 1");
         }
+        fragmentState = FragmentState.WRITTEN;
     }
 
     @Override
     public void clear() {
         VERSION.clear();
+        fragmentState = FragmentState.EMPTY;
     }
 
     @Override
     public String toString() {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
         VERSION.flip();
         return StandardCharsets.US_ASCII.decode(VERSION).toString();
     }

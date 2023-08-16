@@ -16,13 +16,20 @@ public final class Priority implements Consumer<Stream>, Clearable {
     */
     private final ByteBuffer PRIORITY;
 
+    private FragmentState fragmentState;
+
     Priority() {
         this.PRIORITY = ByteBuffer.allocateDirect(3);
+        this.fragmentState = FragmentState.EMPTY;
     }
 
 
     @Override
     public void accept(Stream stream) {
+        if (fragmentState != FragmentState.EMPTY) {
+            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
+        }
+
         if (stream.get() != '<') {
             throw new PriorityParseException("PRIORITY < missing");
         }
@@ -67,15 +74,22 @@ public final class Priority implements Consumer<Stream>, Clearable {
         } else {
             throw new PriorityParseException("PRIORITY number incorrect");
         }
+
+        fragmentState = FragmentState.WRITTEN;
     }
 
     @Override
     public void clear() {
         PRIORITY.clear();
+        fragmentState = FragmentState.EMPTY;
     }
 
     @Override
     public String toString() {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
+
         PRIORITY.flip();
         return StandardCharsets.US_ASCII.decode(PRIORITY).toString();
     }
