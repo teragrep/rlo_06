@@ -47,12 +47,15 @@ public final class SDElementId implements Consumer<Stream>, Clearable, Matchable
 
     @Override
     public String toString() {
-        sdId.flip();
-        return StandardCharsets.UTF_8.decode(sdId).toString();
+        ByteBuffer readBuffer = sdId;
+        readBuffer.flip();
+        return StandardCharsets.UTF_8.decode(readBuffer).toString();
     }
 
     @Override
     public boolean matches(ByteBuffer buffer) {
-        return sdId.equals(buffer);
+        ByteBuffer compareBuffer = sdId;
+        compareBuffer.flip();
+        return compareBuffer.equals(buffer);
     }
 }

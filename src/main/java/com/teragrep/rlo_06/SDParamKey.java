@@ -39,12 +39,15 @@ public final class SDParamKey implements Consumer<Stream>, Clearable, Matchable 
 
     @Override
     public String toString() {
-        key.flip();
-        return StandardCharsets.UTF_8.decode(key).toString();
+        ByteBuffer readBuffer = key;
+        readBuffer.flip();
+        return StandardCharsets.UTF_8.decode(readBuffer).toString();
     }
 
     @Override
     public boolean matches(ByteBuffer buffer) {
-        return key.equals(buffer);
+        ByteBuffer compareBuffer = key;
+        compareBuffer.flip();
+        return compareBuffer.equals(buffer);
     }
 }
