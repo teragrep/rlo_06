@@ -81,7 +81,6 @@ public class NewParserTest {
         Assertions.assertEquals("\\\"3", rfc5424Frame.structuredData.getValue(sdVector).toString());
 
         Assertions.assertFalse(rfc5424Frame.next());
-       
 
         // Finished
         Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.priority::toString);
