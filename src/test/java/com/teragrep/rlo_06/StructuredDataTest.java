@@ -28,7 +28,7 @@ public class StructuredDataTest {
 
         structuredData.clear();
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
+        Assertions.assertThrows(IllegalStateException.class, () -> {
             structuredData.getValue(new SDVector("id@0", "keyHere")).toString();
         });
 
@@ -88,11 +88,11 @@ public class StructuredDataTest {
 
         // clear
         structuredData.sdElements.get(0).sdParams.get(0).sdParamKey.clear();
-        Assertions.assertEquals("", structuredData.sdElements.get(0).sdParams.get(0).sdParamKey.toString());
+        Assertions.assertThrows(IllegalStateException.class, () -> structuredData.sdElements.get(0).sdParams.get(0).sdParamKey.toString());
 
         // double clear
         structuredData.sdElements.get(0).sdParams.get(0).sdParamKey.clear();
-        Assertions.assertEquals("", structuredData.sdElements.get(0).sdParams.get(0).sdParamKey.toString());
+        Assertions.assertThrows(IllegalStateException.class, () -> structuredData.sdElements.get(0).sdParams.get(0).sdParamKey.toString());
     }
 
 

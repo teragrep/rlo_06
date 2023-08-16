@@ -106,17 +106,17 @@ public class SyntaxTest {
             assertFalse(rfc5424Frame.next());
 
             // Finished
-            Assertions.assertEquals("", rfc5424Frame.priority.toString());
-            Assertions.assertEquals("", rfc5424Frame.version.toString());
-            Assertions.assertEquals("", rfc5424Frame.timestamp.toString());
-            Assertions.assertEquals("", rfc5424Frame.hostname.toString());
-            Assertions.assertEquals("", rfc5424Frame.appName.toString());
-            Assertions.assertEquals("", rfc5424Frame.procId.toString());
-            Assertions.assertEquals("", rfc5424Frame.msgId.toString());
-            Assertions.assertEquals("", rfc5424Frame.msg.toString());
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.priority::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.version::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.timestamp::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.hostname::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.appName::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.procId::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msgId::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msg::toString);
 
             // Structured Data Finished
-            Assertions.assertThrows(java.util.NoSuchElementException.class, () -> {
+            Assertions.assertThrows(IllegalStateException.class, () -> {
                 rfc5424Frame.structuredData.getValue(new SDVector("ID_A@1", "u")).toString();
             });
 
@@ -151,17 +151,17 @@ public class SyntaxTest {
             assertFalse(rfc5424Frame.next());
 
             // Message Finished
-            Assertions.assertEquals("", rfc5424Frame.priority.toString());
-            Assertions.assertEquals("", rfc5424Frame.version.toString());
-            Assertions.assertEquals("", rfc5424Frame.timestamp.toString());
-            Assertions.assertEquals("", rfc5424Frame.hostname.toString());
-            Assertions.assertEquals("", rfc5424Frame.appName.toString());
-            Assertions.assertEquals("", rfc5424Frame.procId.toString());
-            Assertions.assertEquals("", rfc5424Frame.msgId.toString());
-            Assertions.assertEquals("", rfc5424Frame.msg.toString());
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.priority::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.version::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.timestamp::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.hostname::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.appName::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.procId::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msgId::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msg::toString);
 
             // Structured Data Finished
-            assertThrows(java.util.NoSuchElementException.class, () -> {
+            assertThrows(IllegalStateException.class, () -> {
                 rfc5424Frame.structuredData.getValue(new SDVector("ID_A@1", "u")).toString();
             });
             inputStream.reset();
@@ -229,17 +229,17 @@ public class SyntaxTest {
         assertFalse(rfc5424Frame.next());
 
         // Message Finished
-        Assertions.assertEquals("", rfc5424Frame.priority.toString());
-        Assertions.assertEquals("", rfc5424Frame.version.toString());
-        Assertions.assertEquals("", rfc5424Frame.timestamp.toString());
-        Assertions.assertEquals("", rfc5424Frame.hostname.toString());
-        Assertions.assertEquals("", rfc5424Frame.appName.toString());
-        Assertions.assertEquals("", rfc5424Frame.procId.toString());
-        Assertions.assertEquals("", rfc5424Frame.msgId.toString());
-        Assertions.assertEquals("", rfc5424Frame.msg.toString());
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.priority::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.version::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.timestamp::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.hostname::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.appName::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.procId::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msgId::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msg::toString);
 
         // Structured Data Finished
-        assertThrows(java.util.NoSuchElementException.class, () -> {
+        assertThrows(IllegalStateException.class, () -> {
             rfc5424Frame.structuredData.getValue(new SDVector("event_id@48577", "hostname")).toString();
         });
     }
@@ -273,18 +273,18 @@ public class SyntaxTest {
         assertFalse(rfc5424Frame.next());
 
         // Message Finished
-        Assertions.assertEquals("", rfc5424Frame.priority.toString());
-        Assertions.assertEquals("", rfc5424Frame.version.toString());
-        Assertions.assertEquals("", rfc5424Frame.timestamp.toString());
-        Assertions.assertEquals("", rfc5424Frame.hostname.toString());
-        Assertions.assertEquals("", rfc5424Frame.appName.toString());
-        Assertions.assertEquals("", rfc5424Frame.procId.toString());
-        Assertions.assertEquals("", rfc5424Frame.msgId.toString());
-        Assertions.assertEquals("", rfc5424Frame.msg.toString());
+        assertThrows(IllegalStateException.class, rfc5424Frame.priority::toString);
+        assertThrows(IllegalStateException.class, rfc5424Frame.version::toString);
+        assertThrows(IllegalStateException.class, rfc5424Frame.timestamp::toString);
+        assertThrows(IllegalStateException.class, rfc5424Frame.hostname::toString);
+        assertThrows(IllegalStateException.class, rfc5424Frame.appName::toString);
+        assertThrows(IllegalStateException.class, rfc5424Frame.procId::toString);
+        assertThrows(IllegalStateException.class, rfc5424Frame.msgId::toString);
+        assertThrows(IllegalStateException.class, rfc5424Frame.msg::toString);
 
 
         // Structured Data Finished
-        Assertions.assertThrows(java.util.NoSuchElementException.class, () -> {
+        Assertions.assertThrows(IllegalStateException.class, () -> {
             rfc5424Frame.structuredData.getValue(new SDVector("event_id@48577", "hostname")).toString();
         });
 
@@ -394,14 +394,14 @@ public class SyntaxTest {
         assertFalse(rfc5424Frame.next());
 
         // Message Finished
-        Assertions.assertEquals("", rfc5424Frame.priority.toString());
-        Assertions.assertEquals("", rfc5424Frame.version.toString());
-        Assertions.assertEquals("", rfc5424Frame.timestamp.toString());
-        Assertions.assertEquals("", rfc5424Frame.hostname.toString());
-        Assertions.assertEquals("", rfc5424Frame.appName.toString());
-        Assertions.assertEquals("", rfc5424Frame.procId.toString());
-        Assertions.assertEquals("", rfc5424Frame.msgId.toString());
-        Assertions.assertEquals("", rfc5424Frame.msg.toString());
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.priority::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.version::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.timestamp::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.hostname::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.appName::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.procId::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msgId::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msg::toString);
     }
 
     @Test
@@ -431,13 +431,13 @@ public class SyntaxTest {
         assertFalse(rfc5424Frame.next());
 
         // Message Finished
-        Assertions.assertEquals("", rfc5424Frame.priority.toString());
-        Assertions.assertEquals("", rfc5424Frame.version.toString());
-        Assertions.assertEquals("", rfc5424Frame.timestamp.toString());
-        Assertions.assertEquals("", rfc5424Frame.hostname.toString());
-        Assertions.assertEquals("", rfc5424Frame.appName.toString());
-        Assertions.assertEquals("", rfc5424Frame.procId.toString());
-        Assertions.assertEquals("", rfc5424Frame.msgId.toString());
-        Assertions.assertEquals("", rfc5424Frame.msg.toString());
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.priority::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.version::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.timestamp::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.hostname::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.appName::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.procId::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msgId::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msg::toString);
     }
 }

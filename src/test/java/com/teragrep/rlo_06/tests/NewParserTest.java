@@ -50,12 +50,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
-import java.util.NoSuchElementException;
 
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class NewParserTest {
+
 
     @Test
     void testNewParser() throws Exception {
@@ -84,17 +84,17 @@ public class NewParserTest {
        
 
         // Finished
-        Assertions.assertEquals("", rfc5424Frame.priority.toString());
-        Assertions.assertEquals("", rfc5424Frame.version.toString());
-        Assertions.assertEquals("", rfc5424Frame.timestamp.toString());
-        Assertions.assertEquals("", rfc5424Frame.hostname.toString());
-        Assertions.assertEquals("", rfc5424Frame.appName.toString());
-        Assertions.assertEquals("", rfc5424Frame.procId.toString());
-        Assertions.assertEquals("", rfc5424Frame.msgId.toString());
-        Assertions.assertEquals("", rfc5424Frame.msg.toString());
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.priority::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.version::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.timestamp::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.hostname::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.appName::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.procId::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msgId::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msg::toString);
 
         // Structured Data Finished
-        Assertions.assertThrows(NoSuchElementException.class,() -> {
+        Assertions.assertThrows(IllegalStateException.class, () -> {
             rfc5424Frame.structuredData.getValue(sdVector);
         });
     }
