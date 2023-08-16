@@ -47,7 +47,7 @@ public class ClearThrowsTest {
         SDParamValue sdParamValue = rfc5424Frame.structuredData.getValue(new SDVector("sd_one@48577", "id_one"));
         sdParamValue.clear();
         Assertions.assertThrows(IllegalStateException.class, sdParamValue::toString);
-        Assertions.assertThrows(IllegalStateException.class, sdParamValue::toString);
+        Assertions.assertThrows(IllegalStateException.class, sdParamValue::toBytes);
 
         rfc5424Frame.structuredData.clear();
         Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.structuredData::toString);
