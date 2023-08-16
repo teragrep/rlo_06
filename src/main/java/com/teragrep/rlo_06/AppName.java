@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-public final class AppName implements Consumer<Stream>, Clearable {
+public final class AppName implements Consumer<Stream>, Clearable, Byteable {
     /*
                                                      ||||||||
                                                      vvvvvvvv
@@ -67,5 +67,13 @@ public final class AppName implements Consumer<Stream>, Clearable {
         String string = StandardCharsets.US_ASCII.decode(APPNAME).toString();
         APPNAME.rewind();
         return string;
+    }
+
+    @Override
+    public byte[] toBytes() {
+        final byte[] bytes = new byte[APPNAME.remaining()];
+        APPNAME.get(bytes);
+        APPNAME.rewind();
+        return bytes;
     }
 }
