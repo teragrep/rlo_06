@@ -16,11 +16,18 @@ public final class Timestamp implements Consumer<Stream>, Clearable {
                     */
     private final ByteBuffer TIMESTAMP;
 
+    private FragmentState fragmentState;
+
     Timestamp() {
         this.TIMESTAMP = ByteBuffer.allocateDirect(32);
+        this.fragmentState = FragmentState.EMPTY;
     }
 
     public void accept(Stream stream) {
+        if (fragmentState != FragmentState.EMPTY) {
+            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
+        }
+
         byte b;
         short ts_max_left = 32;
 
@@ -41,16 +48,24 @@ public final class Timestamp implements Consumer<Stream>, Clearable {
         if (b != 32) {
             throw new TimestampParseException("SP missing after TIMESTAMP or TIMESTAMP too long");
         }
+        TIMESTAMP.flip();
+        fragmentState = FragmentState.WRITTEN;
     }
 
     @Override
     public void clear() {
         TIMESTAMP.clear();
+        fragmentState = FragmentState.EMPTY;
     }
 
     @Override
     public String toString() {
-        TIMESTAMP.flip();
-        return StandardCharsets.US_ASCII.decode(TIMESTAMP).toString();
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
+
+        String string = StandardCharsets.US_ASCII.decode(TIMESTAMP).toString();
+        TIMESTAMP.rewind();
+        return string;
     }
 }

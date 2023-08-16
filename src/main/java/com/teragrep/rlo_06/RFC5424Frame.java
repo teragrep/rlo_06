@@ -140,11 +140,4 @@ public final class RFC5424Frame {
     public void load(InputStream inputStream) {
         stream = new Stream(inputStream);
     }
-
-    /* todo create sdMatcher and such
-    public void getSDValue(SDMatcher sdMatcher) {
-        // new SDMatcher(sdId, sdKey); -> all bytebuffers ready
-    }
-
-     */
 }

@@ -7,12 +7,19 @@ import java.util.function.Consumer;
 public final class SDParamValue implements Consumer<Stream>, Clearable {
     private final ByteBuffer value;
 
+    private FragmentState fragmentState;
+
     SDParamValue() {
         this.value = ByteBuffer.allocateDirect(8 * 1024);
+        this.fragmentState = FragmentState.EMPTY;
     }
 
     @Override
     public void accept(Stream stream) {
+        if (fragmentState != FragmentState.EMPTY) {
+            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
+        }
+
         byte b;
 
         if (!stream.next()) {
@@ -65,16 +72,24 @@ public final class SDParamValue implements Consumer<Stream>, Clearable {
                 b = stream.get();
             }
         }
+        value.flip();
+        fragmentState = FragmentState.WRITTEN;
     }
 
     @Override
     public void clear() {
         value.clear();
+        fragmentState = FragmentState.EMPTY;
     }
 
     @Override
     public String toString() {
-        value.flip();
-        return StandardCharsets.UTF_8.decode(value).toString();
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
+
+        String string = StandardCharsets.UTF_8.decode(value).toString();
+        value.rewind();
+        return string;
     }
 }

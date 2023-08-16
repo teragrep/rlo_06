@@ -7,14 +7,19 @@ import java.util.function.Consumer;
 public final class SDElementId implements Consumer<Stream>, Clearable, Matchable {
 
     private final ByteBuffer sdId;
+    private FragmentState fragmentState;
 
 
     SDElementId() {
         this.sdId = ByteBuffer.allocateDirect(32);
+        this.fragmentState = FragmentState.EMPTY;
     }
 
     @Override
     public void accept(Stream stream) {
+        if (fragmentState != FragmentState.EMPTY) {
+            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
+        }
         byte b;
 
         // parse the sdId
@@ -38,24 +43,31 @@ public final class SDElementId implements Consumer<Stream>, Clearable, Matchable
             }
             b = stream.get();
         }
+        sdId.flip();
+        fragmentState = FragmentState.WRITTEN;
     }
 
     @Override
     public void clear() {
         sdId.clear();
+        fragmentState = FragmentState.EMPTY;
     }
 
     @Override
     public String toString() {
-        ByteBuffer readBuffer = sdId;
-        readBuffer.flip();
-        return StandardCharsets.UTF_8.decode(readBuffer).toString();
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
+        String string = StandardCharsets.UTF_8.decode(sdId).toString();
+        sdId.rewind();
+        return string;
     }
 
     @Override
     public boolean matches(ByteBuffer buffer) {
-        ByteBuffer compareBuffer = sdId;
-        compareBuffer.flip();
-        return compareBuffer.equals(buffer);
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
+        return sdId.equals(buffer);
     }
 }
