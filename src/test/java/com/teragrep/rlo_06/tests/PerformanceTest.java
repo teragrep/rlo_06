@@ -164,7 +164,6 @@ public class PerformanceTest {
         RFC5424Frame rfc5424Frame = new RFC5424Frame(true);
         rfc5424Frame.load(inputStream);
 
-
         Instant instant1 = Instant.now();
         long count = 500;
         for (long i = 0; i < count; i++) {
