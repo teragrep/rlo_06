@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-public final class ProcId implements Consumer<Stream>, Clearable {
+public final class ProcId implements Consumer<Stream>, Clearable, Byteable {
     /*
                                                              ||||
                                                              vvvv
@@ -68,5 +68,13 @@ public final class ProcId implements Consumer<Stream>, Clearable {
         String string = StandardCharsets.US_ASCII.decode(PROCID).toString();
         PROCID.rewind();
         return string;
+    }
+
+    @Override
+    public byte[] toBytes() {
+        final byte[] bytes = new byte[PROCID.remaining()];
+        PROCID.get(bytes);
+        PROCID.rewind();
+        return bytes;
     }
 }

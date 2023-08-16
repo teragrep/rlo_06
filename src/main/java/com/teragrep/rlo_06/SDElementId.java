@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-public final class SDElementId implements Consumer<Stream>, Clearable, Matchable {
+public final class SDElementId implements Consumer<Stream>, Clearable, Matchable, Byteable {
 
     private final ByteBuffer sdId;
     private FragmentState fragmentState;
@@ -69,5 +69,13 @@ public final class SDElementId implements Consumer<Stream>, Clearable, Matchable
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
         return sdId.equals(buffer);
+    }
+
+    @Override
+    public byte[] toBytes() {
+        final byte[] bytes = new byte[sdId.remaining()];
+        sdId.get(bytes);
+        sdId.rewind();
+        return bytes;
     }
 }

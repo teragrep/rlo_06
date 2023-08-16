@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-public final class SDParamValue implements Consumer<Stream>, Clearable {
+public final class SDParamValue implements Consumer<Stream>, Clearable, Byteable {
     private final ByteBuffer value;
 
     private FragmentState fragmentState;
@@ -91,5 +91,13 @@ public final class SDParamValue implements Consumer<Stream>, Clearable {
         String string = StandardCharsets.UTF_8.decode(value).toString();
         value.rewind();
         return string;
+    }
+
+    @Override
+    public byte[] toBytes() {
+        final byte[] bytes = new byte[value.remaining()];
+        value.get(bytes);
+        value.rewind();
+        return bytes;
     }
 }

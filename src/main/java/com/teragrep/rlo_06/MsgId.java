@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-public final class MsgId implements Consumer<Stream>, Clearable {
+public final class MsgId implements Consumer<Stream>, Clearable, Byteable {
     /*
                                                              |||||||
                                                              vvvvvvv
@@ -67,5 +67,13 @@ public final class MsgId implements Consumer<Stream>, Clearable {
         String string = StandardCharsets.US_ASCII.decode(MSGID).toString();
         MSGID.rewind();
         return string;
+    }
+
+    @Override
+    public byte[] toBytes() {
+        final byte[] bytes = new byte[MSGID.remaining()];
+        MSGID.get(bytes);
+        MSGID.rewind();
+        return bytes;
     }
 }

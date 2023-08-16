@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-public final class Timestamp implements Consumer<Stream>, Clearable {
+public final class Timestamp implements Consumer<Stream>, Clearable, Byteable {
     /*
                           ||||||||||||||||||||||||||||||||
                           vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -67,5 +67,13 @@ public final class Timestamp implements Consumer<Stream>, Clearable {
         String string = StandardCharsets.US_ASCII.decode(TIMESTAMP).toString();
         TIMESTAMP.rewind();
         return string;
+    }
+
+    @Override
+    public byte[] toBytes() {
+        final byte[] bytes = new byte[TIMESTAMP.remaining()];
+        TIMESTAMP.get(bytes);
+        TIMESTAMP.rewind();
+        return bytes;
     }
 }

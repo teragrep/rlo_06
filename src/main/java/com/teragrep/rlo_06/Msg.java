@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-public final class Msg implements Consumer<Stream>, Clearable {
+public final class Msg implements Consumer<Stream>, Clearable, Byteable {
     /*
                                                                                                vvvvvvvvvv
             <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
@@ -91,5 +91,13 @@ public final class Msg implements Consumer<Stream>, Clearable {
         String string = StandardCharsets.UTF_8.decode(MSG).toString();
         MSG.rewind();
         return string;
+    }
+
+    @Override
+    public byte[] toBytes() {
+        final byte[] bytes = new byte[MSG.remaining()];
+        MSG.get(bytes);
+        MSG.rewind();
+        return bytes;
     }
 }

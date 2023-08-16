@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-public final class Priority implements Consumer<Stream>, Clearable {
+public final class Priority implements Consumer<Stream>, Clearable, Byteable {
     /*
     |||
     vvv
@@ -93,5 +93,13 @@ public final class Priority implements Consumer<Stream>, Clearable {
         String string = StandardCharsets.US_ASCII.decode(PRIORITY).toString();
         PRIORITY.rewind();
         return string;
+    }
+
+    @Override
+    public byte[] toBytes() {
+        final byte[] bytes = new byte[PRIORITY.remaining()];
+        PRIORITY.get(bytes);
+        PRIORITY.rewind();
+        return bytes;
     }
 }

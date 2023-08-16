@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-public final class SDParamKey implements Consumer<Stream>, Clearable, Matchable {
+public final class SDParamKey implements Consumer<Stream>, Clearable, Matchable, Byteable {
     private final ByteBuffer key;
 
     private FragmentState fragmentState;
@@ -63,5 +63,13 @@ public final class SDParamKey implements Consumer<Stream>, Clearable, Matchable 
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
         return key.equals(buffer);
+    }
+
+    @Override
+    public byte[] toBytes() {
+        final byte[] bytes = new byte[key.remaining()];
+        key.get(bytes);
+        key.rewind();
+        return bytes;
     }
 }
