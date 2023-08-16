@@ -95,6 +95,10 @@ public final class SDParamValue implements Consumer<Stream>, Clearable, Byteable
 
     @Override
     public byte[] toBytes() {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
+
         final byte[] bytes = new byte[value.remaining()];
         value.get(bytes);
         value.rewind();
