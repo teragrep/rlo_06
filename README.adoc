@@ -15,7 +15,7 @@ AGPLv3 with link:https://github.com/teragrep/rlo_06/blob/master/LICENSE#L665-L67
 
 == Usage
 
-NOTE | Please note that `next()` mutates the contents of the Fragments (`rfc5424Frame.priority`, `rfc5424Frame.version` etc) and it is not advised to have references to these between the calls.
+CAUTION: Please note that `next()` mutates the contents of the Fragments (`rfc5424Frame.priority`, `rfc5424Frame.version` etc) and it is not advised to have references to these between the calls.
 
 Simply create a `new RFC5424Frame`, give it an inputstream with `load(inputStream)` and read data with `next()`. It will return true or false depending on whether there were data to read. Note that `toString()` needs to be used when printing. You can optionally pass `true` to in the constructor for enabling newline feed termination, defaults to `false`.
 
