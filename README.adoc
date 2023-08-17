@@ -48,3 +48,21 @@ SDVector sdVector = new SDVector("ID_ELEMENT_NAME@48577", "ELEMENT_KEY");
 
 System.out.println(rfc5424Frame.structuredData.getValue(sdVector).toString()); // Returns "MyValue"
 ----
+
+You can also access structured data as if it was a list:
+
+[source,java]
+----
+Map<String, Map<String,String>> sdIdSdKeySdValueMap = new HashMap<>();
+for (SDElement sdElement : rfc5424Frame.structuredData.sdElements) {
+    if (!sdIdSdKeySdValueMap.containsKey(sdElement.sdElementId.toString())) {
+        sdIdSdKeySdValueMap.put(sdElement.toString(),new HashMap<>());
+    }
+
+    Map<String,String> sdParamMap = sdIdSdKeySdValueMap.get(sdElement.sdElementId.toString());
+
+    for (SDParam sdParam : sdElement.sdParams) {
+        sdParamMap.put(sdParam.sdParamKey.toString(), sdParam.sdParamValue.toString());
+    }
+}
+----
