@@ -172,7 +172,7 @@ public class SyntaxTest {
     void testTeragrepStructuredElement() throws Exception {
         final File logFile = new File("src/test/resources/event.log");
         final InputStream inputStream = new BufferedInputStream(Files.newInputStream(logFile.toPath()), 32 * 1024 * 1024);
-        RFC5424Frame rfc5424Frame = new RFC5424Frame();
+        RFC5424Frame rfc5424Frame = new RFC5424Frame(true);
         rfc5424Frame.load(inputStream);
 
         Assertions.assertTrue(rfc5424Frame.next());
@@ -247,7 +247,7 @@ public class SyntaxTest {
     @Test
     void consecutiveWithNewLine() throws Exception {
         String SYSLOG_MESSAGE = "<46>1 2021-03-25T15:14:09.449777+02:00 logsource.example.com rsyslogd-pstats - - [event_id@48577 hostname=\"logsource.example.com\" uuid=\"30AF2CD3C24F47C8BA687D56E0300246\" unixtime=\"1616678049\" id_source=\"source\"][event_format@48577 original_format=\"rfc5424\"][event_node_relay@48577 hostname=\"logrelay.example.com\" source=\"172.17.254.29\" source_module=\"imudp\"][event_version@48577 major=\"2\" minor=\"2\" hostname=\"logrelay.example.com\" version_source=\"relay\"][event_node_router@48577 source=\"172.17.254.16\" source_module=\"imrelp\" hostname=\"logrouter.example.com\"][teragrep@48577 streamname=\"stats:impstats:0\" directory=\"rsyslogd-pstats\" unixtime=\"1616685249\"] {\"@timestamp\":\"2021-03-25T15:14:09.449777+02:00\",\"host\":\"logsource.example.com\",\"source-module\":\"impstats\", \"name\": \"resource-usage\", \"origin\": \"impstats\", \"utime\": 693053726, \"stime\": 133593735, \"maxrss\": 4690828, \"minflt\": 46694808, \"majflt\": 0, \"inblock\": 122077416, \"oublock\": 123878288, \"nvcsw\": 7199, \"nivcsw\": 9287, \"openfiles\": 20 }\n";
-        RFC5424Frame rfc5424Frame = new RFC5424Frame();
+        RFC5424Frame rfc5424Frame = new RFC5424Frame(true);
 
         int count = 2;
         for (int i = 0; i < count; i++) {
@@ -345,7 +345,7 @@ public class SyntaxTest {
 
     @Test
     public void noSDTest() throws IOException {
-        String SYSLOG_MESSAGE = "<15>1 2019-05-29T15:00:00+03:00 PROD03A  PRODA - -  http(Worker1\n";
+        String SYSLOG_MESSAGE = "<15>1 2019-05-29T15:00:00+03:00 PROD03A  PRODA - -  http(Worker1";
         InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes());
         RFC5424Frame rfc5424Frame = new RFC5424Frame();
         rfc5424Frame.load(inputStream);
@@ -371,7 +371,7 @@ public class SyntaxTest {
 
     @Test
     void consecutiveMoSDTest() throws Exception {
-        String SYSLOG_MESSAGE = "<15>1 2019-05-29T15:00:00+03:00 PROD03A  PRODA - -  http(Worker1\n";
+        String SYSLOG_MESSAGE = "<15>1 2019-05-29T15:00:00+03:00 PROD03A  PRODA - -  http(Worker1";
         RFC5424Frame rfc5424Frame = new RFC5424Frame();
 
         int count = 2;

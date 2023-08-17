@@ -65,7 +65,7 @@ public final class RFC5424Frame {
     public final Fragment msg;
 
     public RFC5424Frame() {
-        this(true);
+        this(false);
     }
 
     public RFC5424Frame(boolean lineFeedTermination) {
