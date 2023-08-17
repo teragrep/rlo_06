@@ -46,7 +46,7 @@
 package com.teragrep.rlo_06;
 
 public class RFC5424Facility {
-    private final Fragment fragment;
+    final Fragment fragment;
     public RFC5424Facility(Fragment fragment) {
         this.fragment = fragment;
     }

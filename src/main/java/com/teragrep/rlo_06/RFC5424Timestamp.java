@@ -48,7 +48,7 @@ package com.teragrep.rlo_06;
 import java.time.ZonedDateTime;
 
 public class RFC5424Timestamp {
-    private final Fragment fragment;
+    final Fragment fragment;
     public RFC5424Timestamp(Fragment fragment) {
         this.fragment = fragment;
     }

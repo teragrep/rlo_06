@@ -46,7 +46,7 @@
 package com.teragrep.rlo_06;
 
 public class RFC5424Severity {
-    private final Fragment fragment;
+    final Fragment fragment;
     public RFC5424Severity(Fragment fragment) {
         this.fragment = fragment;
     }
