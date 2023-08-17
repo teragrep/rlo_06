@@ -65,7 +65,7 @@ public final class MsgIdFunction implements BiFunction<Stream, ByteBuffer, ByteB
         short msgid_max_left = 32;
 
         if (!stream.next()) {
-            throw new ParseException("Expected MSGID, received nothing");
+            throw new MsgIdParseException("Expected MSGID, received nothing");
         }
         b = stream.get();
         while (msgid_max_left > 0 && b != 32) {
@@ -73,7 +73,7 @@ public final class MsgIdFunction implements BiFunction<Stream, ByteBuffer, ByteB
             msgid_max_left--;
 
             if (!stream.next()) {
-                throw new ParseException("MSGID is too short, can't continue");
+                throw new MsgIdParseException("MSGID is too short, can't continue");
             }
             b = stream.get();
         }

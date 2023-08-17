@@ -64,14 +64,14 @@ public final class VersionFunction implements BiFunction<Stream, ByteBuffer, Byt
         byte b;
 
         if (!stream.next()) {
-            throw new ParseException("Expected VERSION, received nothing");
+            throw new VersionParseException("Expected VERSION, received nothing");
         }
         b = stream.get();
         if (b == 49) {
             buffer.put(b);
 
             if (!stream.next()) {
-                throw new ParseException("VERSION is too short, can't continue");
+                throw new VersionParseException("VERSION is too short, can't continue");
             }
             b = stream.get();
             if (b != 32) { // omit ' '

@@ -65,7 +65,7 @@ public final class HostnameFunction implements BiFunction<Stream, ByteBuffer, By
         short hostname_max_left = 255;
 
         if (!stream.next()) {
-            throw new ParseException("Expected HOSTNAME, received nothing");
+            throw new HostnameParseException("Expected HOSTNAME, received nothing");
         }
         byte b = stream.get();
         while (hostname_max_left > 0 && b != 32) {
@@ -73,7 +73,7 @@ public final class HostnameFunction implements BiFunction<Stream, ByteBuffer, By
             hostname_max_left--;
 
             if (!stream.next()) {
-                throw new ParseException("HOSTNAME is too short, can't continue");
+                throw new HostnameParseException("HOSTNAME is too short, can't continue");
             }
             b = stream.get();
         }

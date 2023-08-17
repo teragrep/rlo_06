@@ -65,7 +65,7 @@ public final class ProcIdFunction implements BiFunction<Stream, ByteBuffer, Byte
         short procid_max_left = 128;
 
         if (!stream.next()) {
-            throw new ParseException("Expected PROCID, received nothing");
+            throw new ProcIdParseException("Expected PROCID, received nothing");
         }
         b = stream.get();
         while (procid_max_left > 0 && b != 32) {
@@ -73,7 +73,7 @@ public final class ProcIdFunction implements BiFunction<Stream, ByteBuffer, Byte
             procid_max_left--;
 
             if (!stream.next()) {
-                throw new ParseException("PROCID is too short, can't continue");
+                throw new ProcIdParseException("PROCID is too short, can't continue");
             }
             b = stream.get();
         }

@@ -67,7 +67,7 @@ public final class AppNameFunction implements BiFunction<Stream, ByteBuffer, Byt
         short appname_max_left = 48;
 
         if (!stream.next()) {
-            throw new ParseException("Expected APPNAME, received nothing");
+            throw new AppNameParseException("Expected APPNAME, received nothing");
         }
         b = stream.get();
         while (appname_max_left > 0 && b != 32) {
@@ -75,7 +75,7 @@ public final class AppNameFunction implements BiFunction<Stream, ByteBuffer, Byt
             appname_max_left--;
 
             if (!stream.next()) {
-                throw new ParseException("APPNAME is too short, can't continue");
+                throw new AppNameParseException("APPNAME is too short, can't continue");
             }
             b = stream.get();
         }

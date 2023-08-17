@@ -57,7 +57,7 @@ public final class SDParamKeyFunction implements BiFunction<Stream, ByteBuffer, 
         short sdElemKey_max_left = 32;
 
         if (!stream.next()) {
-            throw new ParseException("SD is too short, can't continue");
+            throw new StructuredDataParseException("SD is too short, can't continue");
         }
         b = stream.get();
         while (sdElemKey_max_left > 0 && b != 61) { // '='
@@ -65,7 +65,7 @@ public final class SDParamKeyFunction implements BiFunction<Stream, ByteBuffer, 
             sdElemKey_max_left--;
 
             if (!stream.next()) {
-                throw new ParseException("SD is too short, can't continue");
+                throw new StructuredDataParseException("SD is too short, can't continue");
             }
             b = stream.get();
         }
