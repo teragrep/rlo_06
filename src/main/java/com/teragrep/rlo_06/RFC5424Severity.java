@@ -45,67 +45,13 @@
  */
 package com.teragrep.rlo_06;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.time.ZonedDateTime;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-
-public final class Fragment implements Consumer<Stream>, Clearable, Matchable, Byteable {
-
-    private final ByteBuffer buffer;
-    private FragmentState fragmentState;
-
-    final BiFunction<Stream, ByteBuffer, ByteBuffer> parseRule;
-
-    Fragment(int bufferSize, BiFunction<Stream, ByteBuffer, ByteBuffer> parseRule) {
-        this.buffer = ByteBuffer.allocateDirect(bufferSize);
-        this.fragmentState = FragmentState.EMPTY;
-        this.parseRule = parseRule;
+public class RFC5424Severity {
+    final Fragment fragment;
+    public RFC5424Severity(Fragment fragment) {
+        this.fragment = fragment;
     }
 
-    @Override
-    public void accept(Stream stream) {
-        if (fragmentState != FragmentState.EMPTY) {
-            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
-        }
-        parseRule.apply(stream, buffer);
-        fragmentState = FragmentState.WRITTEN;
-    }
-
-    @Override
-    public void clear() {
-        buffer.clear();
-        fragmentState = FragmentState.EMPTY;
-    }
-
-    @Override
-    public String toString() {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
-        }
-        String string = StandardCharsets.UTF_8.decode(buffer).toString();
-        buffer.rewind();
-        return string;
-    }
-
-    @Override
-    public boolean matches(ByteBuffer other) {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
-        }
-        return buffer.equals(other);
-    }
-
-    @Override
-    public byte[] toBytes() {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
-        }
-
-        final byte[] bytes = new byte[buffer.remaining()];
-        buffer.get(bytes);
-        buffer.rewind();
-        return bytes;
+    public int asInt() {
+        return Integer.parseInt(fragment.toString()) & 7;
     }
 }

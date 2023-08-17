@@ -15,6 +15,7 @@ AGPLv3 with link:https://github.com/teragrep/rlo_06/blob/master/LICENSE#L665-L67
 
 == Usage
 
+NOTE | Please note that `next()` mutates the contents of the Fragments (`rfc5424Frame.priority`, `rfc5424Frame.version` etc) and it is not advised to have references to these between the calls.
 
 Simply create a `new RFC5424Frame`, give it an inputstream with `load(inputStream)` and read data with `next()`. It will return true or false depending on whether there were data to read. Note that `toString()` needs to be used when printing. You can optionally pass `true` to in the constructor for enabling newline feed termination, defaults to `false`.
 
@@ -59,4 +60,25 @@ for (SDElement sdElement : rfc5424Frame.structuredData.sdElements) {
         System.out.println("\tKey: '" + sdParam.sdParamKey + "' Value: '"+ sdParam.sdParamValue + "'");
     }
 }
+----
+
+You can get Severity and Facility values using `RFC5424Severity` and `RFC5424Facility` classes:
+
+[source,java]
+----
+// "<134>1 2018-01-01T10:12:00+01:00 hostname appname - - - Message";
+// 16*8 + 6 = 134
+RFC5424Facility facility = new RFC5424Facility(rfc5424Frame.priority);
+RFC5424Severity severity = new RFC5424Severity(rfc5424Frame.priority);
+
+System.out.println("Facility is " + facility.asInt()); // 16
+System.out.println("Severity is " + severity.asInt()); // 6
+----
+
+You can get `ZonedDateTime` using `RFC5424Timestamp` class:
+
+[source,java]
+----
+RFC5424Timestamp timestamp = new RFC5424Timestamp(rfc5424Frame.timestamp);
+System.out.println("Current timestamp in ZonedDateTime: " + timestamp.toZonedDateTime());
 ----

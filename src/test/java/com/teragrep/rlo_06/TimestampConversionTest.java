@@ -68,6 +68,7 @@ public class TimestampConversionTest {
         Assertions.assertEquals("2023-01-01T00:00Z", getTimestamp("2023-01-01T00:00:00.000000+00:00"));
         Assertions.assertEquals("2023-01-01T00:00Z", getTimestamp("2023-01-01T00:00:00.000000-00:00"));
         Assertions.assertEquals("2023-01-01T00:00+02:00", getTimestamp("2023-01-01T00:00:00+02:00"));
+
     }
 
     private String getTimestamp(String timestamp) throws IOException {
@@ -76,6 +77,6 @@ public class TimestampConversionTest {
         RFC5424Frame rfc5424Frame = new RFC5424Frame(true);
         rfc5424Frame.load(inputStream);
         assertTrue(rfc5424Frame.next());
-        return rfc5424Frame.timestamp.toZonedDateTime().toString();
+        return new RFC5424Timestamp(rfc5424Frame.timestamp).toZonedDateTime().toString();
     }
 }
