@@ -77,7 +77,7 @@ public final class SDParam implements Consumer<Stream>, Clearable {
 
         // take next one for the while to check if ' ' or if to break it
         if (!stream.next()) {
-            throw new ParseException("SD is too short, can't continue");
+            throw new StructuredDataParseException("SD is too short, can't continue");
         }
         fragmentState = FragmentState.WRITTEN;
     }

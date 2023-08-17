@@ -63,7 +63,7 @@ public final class SDElementIdFunction implements BiFunction<Stream, ByteBuffer,
                     */
 
         if (!stream.next()) {
-            throw new ParseException("SD is too short, can't continue");
+            throw new StructuredDataParseException("SD is too short, can't continue");
         }
         b = stream.get();
         while (sdId_max_left > 0 && b != 32 && b != 93) { // ' ' nor ']'
@@ -71,7 +71,7 @@ public final class SDElementIdFunction implements BiFunction<Stream, ByteBuffer,
             sdId_max_left--;
 
             if (!stream.next()) {
-                throw new ParseException("SD is too short, can't continue");
+                throw new StructuredDataParseException("SD is too short, can't continue");
             }
             b = stream.get();
         }

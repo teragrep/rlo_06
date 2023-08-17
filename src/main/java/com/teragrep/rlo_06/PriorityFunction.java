@@ -66,7 +66,7 @@ public final class PriorityFunction implements BiFunction<Stream, ByteBuffer, By
         }
 
         if (!stream.next()) {
-            throw new ParseException("Expected PRIORITY, received nothing");
+            throw new PriorityParseException("Expected PRIORITY, received nothing");
         }
 
         if (stream.get() >= 48 && stream.get() <= 57) { // first is always a number between 0..9
@@ -76,20 +76,20 @@ public final class PriorityFunction implements BiFunction<Stream, ByteBuffer, By
         }
 
         if (!stream.next()) {
-            throw new ParseException("PRIORITY is too short, can't continue");
+            throw new PriorityParseException("PRIORITY is too short, can't continue");
         }
         if (stream.get() >= 48 &&stream.get() <= 57) { // second may be a number between 0..9
             buffer.put(stream.get());
 
             if (!stream.next()) {
-                throw new ParseException("PRIORITY is too short, can't continue");
+                throw new PriorityParseException("PRIORITY is too short, can't continue");
             }
 
             if (stream.get() >= 48 && stream.get() <= 57) { // third may be a number
                 buffer.put(stream.get());
 
                 if (!stream.next()) {
-                    throw new ParseException("PRIORITY is too short, can't continue");
+                    throw new PriorityParseException("PRIORITY is too short, can't continue");
                 }
 
                 if (stream.get() != 62) { // omit

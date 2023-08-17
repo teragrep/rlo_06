@@ -55,7 +55,7 @@ public final class SDParamValueFunction implements BiFunction<Stream, ByteBuffer
         byte b;
 
         if (!stream.next()) {
-            throw new ParseException("SD is too short, can't continue");
+            throw new StructuredDataParseException("SD is too short, can't continue");
         }
         b = stream.get();
         if (b != 34) { // '"'
@@ -65,7 +65,7 @@ public final class SDParamValueFunction implements BiFunction<Stream, ByteBuffer
         short sdElemVal_max_left = 8 * 1024;
 
         if (!stream.next()) {
-            throw new ParseException("SD is too short, can't continue");
+            throw new StructuredDataParseException("SD is too short, can't continue");
         }
         b = stream.get();
 
@@ -78,7 +78,7 @@ public final class SDParamValueFunction implements BiFunction<Stream, ByteBuffer
                 // read next
 
                 if (!stream.next()) {
-                    throw new ParseException("SD is too short, can't continue");
+                    throw new StructuredDataParseException("SD is too short, can't continue");
                 }
                 b = stream.get();
 
@@ -89,7 +89,7 @@ public final class SDParamValueFunction implements BiFunction<Stream, ByteBuffer
                         sdElemVal_max_left--;
 
                         if (!stream.next()) {
-                            throw new ParseException("SD is too short, can't continue");
+                            throw new StructuredDataParseException("SD is too short, can't continue");
                         }
                         b = stream.get();
                     }
@@ -99,7 +99,7 @@ public final class SDParamValueFunction implements BiFunction<Stream, ByteBuffer
                 sdElemVal_max_left--;
 
                 if (!stream.next()) {
-                    throw new ParseException("SD is too short, can't continue");
+                    throw new StructuredDataParseException("SD is too short, can't continue");
                 }
                 b = stream.get();
             }

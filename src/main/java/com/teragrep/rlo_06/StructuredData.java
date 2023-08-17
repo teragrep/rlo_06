@@ -94,7 +94,7 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
 
 
         if (!stream.next()) {
-            throw new ParseException("Expected SD, received nothing");
+            throw new StructuredDataParseException("Expected SD, received nothing");
         }
         b = stream.get();
 
@@ -111,7 +111,7 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
             // if '-' then R(ead) and pass to next state
 
             if (!stream.next()) {
-                throw new ParseException("SD is too short, can't continue");
+                throw new StructuredDataParseException("SD is too short, can't continue");
             }
             return;
         }
@@ -127,7 +127,7 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
             */
 
             if (!stream.next()) {
-                throw new ParseException("SD is too short, can't continue");
+                throw new StructuredDataParseException("SD is too short, can't continue");
             }
             b = stream.get(); // will it be '[' or the MSG who knows.
             // let's find out, note if not '[' then R(ead) and pass to next state
