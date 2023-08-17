@@ -46,25 +46,12 @@
 package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.function.Consumer;
+import java.util.function.BiFunction;
 
-public final class SDParamValue implements Consumer<Stream>, Clearable, Byteable {
-    private final ByteBuffer value;
-
-    private FragmentState fragmentState;
-
-    SDParamValue() {
-        this.value = ByteBuffer.allocateDirect(8 * 1024);
-        this.fragmentState = FragmentState.EMPTY;
-    }
+public final class SDParamValueFunction implements BiFunction<Stream, ByteBuffer, ByteBuffer> {
 
     @Override
-    public void accept(Stream stream) {
-        if (fragmentState != FragmentState.EMPTY) {
-            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
-        }
-
+    public ByteBuffer apply(Stream stream, ByteBuffer buffer) {
         byte b;
 
         if (!stream.next()) {
@@ -86,7 +73,7 @@ public final class SDParamValue implements Consumer<Stream>, Clearable, Byteable
             // escaped are special: \" \\ \] ...
             if (b == 92) { // \
                 // insert
-                value.put(b);
+                buffer.put(b);
                 sdElemVal_max_left--;
                 // read next
 
@@ -98,7 +85,7 @@ public final class SDParamValue implements Consumer<Stream>, Clearable, Byteable
                 // if it is a '"' then it must be taken care of, loop can do the rest
                 if (b == 34) {
                     if (sdElemVal_max_left > 0) {
-                        value.put(b);
+                        buffer.put(b);
                         sdElemVal_max_left--;
 
                         if (!stream.next()) {
@@ -108,7 +95,7 @@ public final class SDParamValue implements Consumer<Stream>, Clearable, Byteable
                     }
                 }
             } else {
-                value.put(b);
+                buffer.put(b);
                 sdElemVal_max_left--;
 
                 if (!stream.next()) {
@@ -117,36 +104,7 @@ public final class SDParamValue implements Consumer<Stream>, Clearable, Byteable
                 b = stream.get();
             }
         }
-        value.flip();
-        fragmentState = FragmentState.WRITTEN;
-    }
-
-    @Override
-    public void clear() {
-        value.clear();
-        fragmentState = FragmentState.EMPTY;
-    }
-
-    @Override
-    public String toString() {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
-        }
-
-        String string = StandardCharsets.UTF_8.decode(value).toString();
-        value.rewind();
-        return string;
-    }
-
-    @Override
-    public byte[] toBytes() {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
-        }
-
-        final byte[] bytes = new byte[value.remaining()];
-        value.get(bytes);
-        value.rewind();
-        return bytes;
+        buffer.flip();
+        return buffer;
     }
 }

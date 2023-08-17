@@ -45,62 +45,37 @@
  */
 package com.teragrep.rlo_06;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import java.nio.ByteBuffer;
+import java.util.function.BiFunction;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
+public final class SDElementIdFunction implements BiFunction<Stream, ByteBuffer, ByteBuffer> {
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+    @Override
+    public ByteBuffer apply(Stream stream, ByteBuffer buffer) {
+        byte b;
 
-public class MsgIdTest {
-    @Test
-    public void parseTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
+        // parse the sdId
+        short sdId_max_left = 32;
+                    /*
+                              vvvvvv
+                    Payload:'[ID_A@1 u="3" e="t"][ID_B@2 n="9"] '
+                    Payload:'[ID_A@1]'
+                    */
 
-        String input = "987654 ";
+        if (!stream.next()) {
+            throw new ParseException("SD is too short, can't continue");
+        }
+        b = stream.get();
+        while (sdId_max_left > 0 && b != 32 && b != 93) { // ' ' nor ']'
+            buffer.put(b);
+            sdId_max_left--;
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-
-        Stream stream = new Stream(bais);
-
-        msgId.accept(stream);
-
-        Assertions.assertEquals("987654", msgId.toString());
-    }
-
-    @Test
-    public void dashMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
-
-        String input = "- ";
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-
-        Stream stream = new Stream(bais);
-
-        msgId.accept(stream);
-
-        Assertions.assertEquals("-", msgId.toString());
-    }
-
-    @Test
-    public void tooLongMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
-
-        String input = "9876543210987654321098765432109876543210 ";
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-        assertThrows(MsgIdParseException.class, () -> {
-            Stream stream = new Stream(bais);
-            msgId.accept(stream);
-            msgId.toString();
-        });
+            if (!stream.next()) {
+                throw new ParseException("SD is too short, can't continue");
+            }
+            b = stream.get();
+        }
+        buffer.flip();
+        return buffer;
     }
 }

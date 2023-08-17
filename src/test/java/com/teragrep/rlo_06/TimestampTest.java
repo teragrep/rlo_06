@@ -54,7 +54,7 @@ import java.nio.charset.StandardCharsets;
 public class TimestampTest {
     @Test
     public void parseTest() {
-        Timestamp timestamp = new Timestamp();
+        Fragment timestamp = new Fragment(32, new TimestampFunction());
 
         String input = "2023-06-16T12:08:12.123456+03:00 ";
 

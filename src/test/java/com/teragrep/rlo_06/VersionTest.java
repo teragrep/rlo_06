@@ -56,7 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class VersionTest {
     @Test
     public void parseTest() {
-        Version version = new Version();
+        Fragment version = new Fragment(1, new VersionFunction());
 
         String input = "1 ";
 
@@ -73,7 +73,7 @@ public class VersionTest {
 
     @Test
     public void testEmptyVersion() {
-        Version version = new Version();
+        Fragment version = new Fragment(1, new VersionFunction());
 
         String input = " ";
 
@@ -91,7 +91,7 @@ public class VersionTest {
 
     @Test
     public void testNonOneVersion() {
-        Version version = new Version();
+        Fragment version = new Fragment(1, new VersionFunction());
 
         String input = "2 ";
 

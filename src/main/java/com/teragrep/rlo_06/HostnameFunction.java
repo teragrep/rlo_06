@@ -46,79 +46,42 @@
 package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.function.Consumer;
+import java.util.function.BiFunction;
 
-public final class SDParamKey implements Consumer<Stream>, Clearable, Matchable, Byteable {
-    private final ByteBuffer key;
+public final class HostnameFunction implements BiFunction<Stream, ByteBuffer, ByteBuffer> {
+    /*
+                                                      |||||||
+                                                      vvvvvvv
+                <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
 
-    private FragmentState fragmentState;
-
-    SDParamKey() {
-        this.key = ByteBuffer.allocateDirect(32);
-        this.fragmentState = FragmentState.EMPTY;
-    }
+                Actions: ______O
+                Payload:'host01 '
+                States : ......T
+                */
 
     @Override
-    public void accept(Stream stream) {
-        if (fragmentState != FragmentState.EMPTY) {
-            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
-        }
-        byte b;
+    public ByteBuffer apply(Stream stream, ByteBuffer buffer) {
 
-        short sdElemKey_max_left = 32;
+        short hostname_max_left = 255;
 
         if (!stream.next()) {
-            throw new ParseException("SD is too short, can't continue");
+            throw new ParseException("Expected HOSTNAME, received nothing");
         }
-        b = stream.get();
-        while (sdElemKey_max_left > 0 && b != 61) { // '='
-            key.put(b);
-            sdElemKey_max_left--;
+        byte b = stream.get();
+        while (hostname_max_left > 0 && b != 32) {
+            buffer.put(b);
+            hostname_max_left--;
 
             if (!stream.next()) {
-                throw new ParseException("SD is too short, can't continue");
+                throw new ParseException("HOSTNAME is too short, can't continue");
             }
             b = stream.get();
         }
-        key.flip();
-        fragmentState = FragmentState.WRITTEN;
 
-    }
-
-    @Override
-    public void clear() {
-        key.clear();
-        fragmentState = FragmentState.EMPTY;
-    }
-
-    @Override
-    public String toString() {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        if (b != 32) {
+            throw new HostnameParseException("SP missing after HOSTNAME or HOSTNAME too long");
         }
-        String string = StandardCharsets.UTF_8.decode(key).toString();
-        key.rewind();
-        return string;
-    }
-
-    @Override
-    public boolean matches(ByteBuffer buffer) {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
-        }
-        return key.equals(buffer);
-    }
-
-    @Override
-    public byte[] toBytes() {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
-        }
-
-        final byte[] bytes = new byte[key.remaining()];
-        key.get(bytes);
-        key.rewind();
-        return bytes;
+        buffer.flip();
+        return buffer;
     }
 }

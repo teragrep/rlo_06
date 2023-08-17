@@ -46,10 +46,9 @@
 package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.function.Consumer;
+import java.util.function.BiFunction;
 
-public final class Msg implements Consumer<Stream>, Clearable, Byteable {
+public final class MsgFunction implements BiFunction<Stream, ByteBuffer, ByteBuffer> {
     /*
                                                                                                vvvvvvvvvv
             <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
@@ -62,28 +61,20 @@ public final class Msg implements Consumer<Stream>, Clearable, Byteable {
 
             */
 
-    private final ByteBuffer MSG;
-
     private final boolean lineFeedTermination;
 
-    private FragmentState fragmentState;
-    Msg(boolean lineFeedTermination) {
-        this.MSG = ByteBuffer.allocateDirect(256 * 1024);
+    MsgFunction(boolean lineFeedTermination) {
         this.lineFeedTermination = lineFeedTermination;
-        this.fragmentState = FragmentState.EMPTY;
     }
 
-    public void accept(Stream stream) {
-        if (fragmentState != FragmentState.EMPTY) {
-            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
-        }
-
+    @Override
+    public ByteBuffer apply(Stream stream, ByteBuffer buffer) {
         int msg_current_left = 256 * 1024;
 
         byte oldByte = stream.get();
 
         if (oldByte != ' ') {
-            MSG.put(oldByte);
+            buffer.put(oldByte);
         }
         msg_current_left--;
 
@@ -101,7 +92,7 @@ public final class Msg implements Consumer<Stream>, Clearable, Byteable {
                     throw new MsgParseException("MSG too long, no new line in 256K range");
                 }
 
-                MSG.put(b);
+                buffer.put(b);
                 msg_current_left--;
 
 
@@ -109,7 +100,7 @@ public final class Msg implements Consumer<Stream>, Clearable, Byteable {
             }
         } else { // Line-feed termination inactive, reading until EOF
             while (stream.next()) {
-                MSG.put(stream.get());
+                buffer.put(stream.get());
                 msg_current_left--;
 
                 if (msg_current_left < 1) {
@@ -117,36 +108,7 @@ public final class Msg implements Consumer<Stream>, Clearable, Byteable {
                 }
             }
         }
-        MSG.flip();
-        fragmentState = FragmentState.WRITTEN;
-    }
-
-    @Override
-    public void clear() {
-        MSG.clear();
-        fragmentState = FragmentState.EMPTY;
-    }
-
-    @Override
-    public String toString() {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
-        }
-
-        String string = StandardCharsets.UTF_8.decode(MSG).toString();
-        MSG.rewind();
-        return string;
-    }
-
-    @Override
-    public byte[] toBytes() {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
-        }
-
-        final byte[] bytes = new byte[MSG.remaining()];
-        MSG.get(bytes);
-        MSG.rewind();
-        return bytes;
+        buffer.flip();
+        return buffer;
     }
 }
