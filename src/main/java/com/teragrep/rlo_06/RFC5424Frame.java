@@ -54,30 +54,30 @@ public final class RFC5424Frame {
     private Stream stream;
     private final Consumer<Stream> streamConsumer;
 
-    public final Priority priority;
-    public final Version version;
-    public final Timestamp timestamp;
-    public final Hostname hostname;
-    public final AppName appName;
-    public final ProcId procId;
-    public final MsgId msgId;
+    public final Fragment priority;
+    public final Fragment version;
+    public final Fragment timestamp;
+    public final Fragment hostname;
+    public final Fragment appName;
+    public final Fragment procId;
+    public final Fragment msgId;
     public final StructuredData structuredData; // todo as array
-    public final Msg msg;
+    public final Fragment msg;
 
     public RFC5424Frame() {
         this(true);
     }
 
     public RFC5424Frame(boolean lineFeedTermination) {
-        this.priority = new Priority();
-        this.version = new Version();
-        this.timestamp = new Timestamp();
-        this.hostname = new Hostname();
-        this.appName = new AppName();
-        this.procId = new ProcId();
-        this.msgId = new MsgId();
-        this.structuredData = new StructuredData(); // todo as array
-        this.msg = new Msg(lineFeedTermination);
+        this.priority = new Fragment(3, new PriorityFunction());
+        this.version = new Fragment(1, new VersionFunction());
+        this.timestamp = new Fragment(32, new TimestampFunction());
+        this.hostname = new Fragment(255, new HostnameFunction());
+        this.appName = new Fragment(48, new AppNameFunction());
+        this.procId = new Fragment(128, new ProcIdFunction());
+        this.msgId = new Fragment(32, new MsgIdFunction());
+        this.structuredData = new StructuredData();
+        this.msg = new Fragment(256*1024, new MsgFunction(lineFeedTermination));
 
         this.streamConsumer = priority
                 .andThen(version

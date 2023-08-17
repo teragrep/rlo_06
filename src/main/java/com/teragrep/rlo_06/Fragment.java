@@ -47,85 +47,35 @@ package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.time.ZonedDateTime;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-public final class Priority implements Consumer<Stream>, Clearable, Byteable {
-    /*
-    |||
-    vvv
-    <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
+public final class Fragment implements Consumer<Stream>, Clearable, Matchable, Byteable {
 
-    Actions: O__O
-    Payload:'<14>'
-    States : |..T
-    */
-    private final ByteBuffer PRIORITY;
-
+    private final ByteBuffer buffer;
     private FragmentState fragmentState;
 
-    Priority() {
-        this.PRIORITY = ByteBuffer.allocateDirect(3);
-        this.fragmentState = FragmentState.EMPTY;
-    }
+    final BiFunction<Stream, ByteBuffer, ByteBuffer> parseRule;
 
+    Fragment(int bufferSize, BiFunction<Stream, ByteBuffer, ByteBuffer> parseRule) {
+        this.buffer = ByteBuffer.allocateDirect(bufferSize);
+        this.fragmentState = FragmentState.EMPTY;
+        this.parseRule = parseRule;
+    }
 
     @Override
     public void accept(Stream stream) {
         if (fragmentState != FragmentState.EMPTY) {
             throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
         }
-
-        if (stream.get() != '<') {
-            throw new PriorityParseException("PRIORITY < missing");
-        }
-
-        if (!stream.next()) {
-            throw new ParseException("Expected PRIORITY, received nothing");
-        }
-
-        if (stream.get() >= 48 && stream.get() <= 57) { // first is always a number between 0..9
-            PRIORITY.put(stream.get());
-        } else {
-            throw new PriorityParseException("PRIORITY number incorrect");
-        }
-
-        if (!stream.next()) {
-            throw new ParseException("PRIORITY is too short, can't continue");
-        }
-        if (stream.get() >= 48 &&stream.get() <= 57) { // second may be a number between 0..9
-            PRIORITY.put(stream.get());
-
-            if (!stream.next()) {
-                throw new ParseException("PRIORITY is too short, can't continue");
-            }
-
-            if (stream.get() >= 48 && stream.get() <= 57) { // third may be a number
-                PRIORITY.put(stream.get());
-
-                if (!stream.next()) {
-                    throw new ParseException("PRIORITY is too short, can't continue");
-                }
-
-                if (stream.get() != 62) { // omit
-                    throw new PriorityParseException("PRIORITY > missing");
-                }
-            } else if (stream.get() == 62) { // third may be a '>'
-// omit '>'
-            } else {
-                throw new PriorityParseException("PRIORITY number incorrect");
-            }
-        } else if (stream.get() == 62) { // second may be a '>'
-            // omit '>'
-        } else {
-            throw new PriorityParseException("PRIORITY number incorrect");
-        }
-        PRIORITY.flip();
+        parseRule.apply(stream, buffer);
         fragmentState = FragmentState.WRITTEN;
     }
 
     @Override
     public void clear() {
-        PRIORITY.clear();
+        buffer.clear();
         fragmentState = FragmentState.EMPTY;
     }
 
@@ -134,10 +84,17 @@ public final class Priority implements Consumer<Stream>, Clearable, Byteable {
         if (fragmentState != FragmentState.WRITTEN) {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
-
-        String string = StandardCharsets.US_ASCII.decode(PRIORITY).toString();
-        PRIORITY.rewind();
+        String string = StandardCharsets.UTF_8.decode(buffer).toString();
+        buffer.rewind();
         return string;
+    }
+
+    @Override
+    public boolean matches(ByteBuffer other) {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
+        return buffer.equals(other);
     }
 
     @Override
@@ -146,9 +103,14 @@ public final class Priority implements Consumer<Stream>, Clearable, Byteable {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
 
-        final byte[] bytes = new byte[PRIORITY.remaining()];
-        PRIORITY.get(bytes);
-        PRIORITY.rewind();
+        final byte[] bytes = new byte[buffer.remaining()];
+        buffer.get(bytes);
+        buffer.rewind();
         return bytes;
     }
+
+    public ZonedDateTime toZonedDateTime() {
+        return ZonedDateTime.parse(toString());
+    }
+
 }

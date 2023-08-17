@@ -57,7 +57,7 @@ public class PriorityTest {
 
     @Test
     public void parseTest() {
-        Priority priority = new Priority();
+        Fragment priority = new Fragment(3, new PriorityFunction());
 
         String input = "<123>";
 
@@ -76,7 +76,7 @@ public class PriorityTest {
 
     @Test
     public void emptyPriorityIdTest() {
-        Priority priority = new Priority();
+        Fragment priority = new Fragment(3, new PriorityFunction());
 
         String input = "<>";
 
@@ -95,7 +95,7 @@ public class PriorityTest {
 
     @Test
     public void tooLongPriorityIdTest() {
-        Priority priority = new Priority();
+        Fragment priority = new Fragment(3, new PriorityFunction());
 
         String input = "<12345>";
 

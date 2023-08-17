@@ -46,85 +46,43 @@
 package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.function.Consumer;
+import java.util.function.BiFunction;
 
-public final class SDElementId implements Consumer<Stream>, Clearable, Matchable, Byteable {
+public final class TimestampFunction implements BiFunction<Stream, ByteBuffer, ByteBuffer> {
+    /*
+                          ||||||||||||||||||||||||||||||||
+                          vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+                    <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
 
-    private final ByteBuffer sdId;
-    private FragmentState fragmentState;
-
-
-    SDElementId() {
-        this.sdId = ByteBuffer.allocateDirect(32);
-        this.fragmentState = FragmentState.EMPTY;
-    }
-
-    @Override
-    public void accept(Stream stream) {
-        if (fragmentState != FragmentState.EMPTY) {
-            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
-        }
-        byte b;
-
-        // parse the sdId
-        short sdId_max_left = 32;
-                    /*
-                              vvvvvv
-                    Payload:'[ID_A@1 u="3" e="t"][ID_B@2 n="9"] '
-                    Payload:'[ID_A@1]'
+                    Actions: _______________________________O
+                    Payload:'2014-06-20T09:14:07.12345+00:00 '
+                    States : ...............................T
                     */
 
+    @Override
+    public ByteBuffer apply(Stream stream, ByteBuffer buffer) {
+
+        byte b;
+        short ts_max_left = 32;
+
         if (!stream.next()) {
-            throw new ParseException("SD is too short, can't continue");
+            throw new ParseException("Expected TIMESTAMP, received nothing");
         }
         b = stream.get();
-        while (sdId_max_left > 0 && b != 32 && b != 93) { // ' ' nor ']'
-            sdId.put(b);
-            sdId_max_left--;
+        while (ts_max_left > 0 && b != 32) {
+            buffer.put(b);
+            ts_max_left--;
 
             if (!stream.next()) {
-                throw new ParseException("SD is too short, can't continue");
+                throw new ParseException("TIMESTAMP is too short, can't continue");
             }
             b = stream.get();
         }
-        sdId.flip();
-        fragmentState = FragmentState.WRITTEN;
-    }
 
-    @Override
-    public void clear() {
-        sdId.clear();
-        fragmentState = FragmentState.EMPTY;
-    }
-
-    @Override
-    public String toString() {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        if (b != 32) {
+            throw new TimestampParseException("SP missing after TIMESTAMP or TIMESTAMP too long");
         }
-        String string = StandardCharsets.UTF_8.decode(sdId).toString();
-        sdId.rewind();
-        return string;
-    }
-
-    @Override
-    public boolean matches(ByteBuffer buffer) {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
-        }
-        return sdId.equals(buffer);
-    }
-
-    @Override
-    public byte[] toBytes() {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
-        }
-
-        final byte[] bytes = new byte[sdId.remaining()];
-        sdId.get(bytes);
-        sdId.rewind();
-        return bytes;
+        buffer.flip();
+        return buffer;
     }
 }

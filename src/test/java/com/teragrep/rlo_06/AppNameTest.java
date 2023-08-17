@@ -56,7 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class AppNameTest {
     @Test
     public void parseTest() {
-        AppName appName = new AppName();
+        Fragment appName = new Fragment(48, new AppNameFunction());
 
         String input = "anAppNameTag ";
 
@@ -72,7 +72,7 @@ public class AppNameTest {
 
     @Test
     public void dashAppnameTest() {
-        AppName appName = new AppName();
+        Fragment appName = new Fragment(48, new AppNameFunction());
 
         String input = "- ";
 
@@ -89,7 +89,7 @@ public class AppNameTest {
 
     @Test
     public void tooLongAppNameTest() {
-        AppName appName = new AppName();
+        Fragment appName = new Fragment(48, new AppNameFunction());
 
         String input = "ThisIsVeryLongAppNameThatShouldNotExistAndWillBeOverThe48CharLimit ";
 

@@ -46,10 +46,9 @@
 package com.teragrep.rlo_06;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.function.Consumer;
+import java.util.function.BiFunction;
 
-public final class Version implements Consumer<Stream>, Clearable, Byteable {
+public final class VersionFunction implements BiFunction<Stream, ByteBuffer, ByteBuffer> {
     /*
         ||
         vv
@@ -59,22 +58,9 @@ public final class Version implements Consumer<Stream>, Clearable, Byteable {
     Payload:'1 '
     States : .T
     */
-    private final ByteBuffer VERSION;
-
-    private FragmentState fragmentState;
-
-
-    Version() {
-        this.VERSION = ByteBuffer.allocateDirect(1);
-        this.fragmentState = FragmentState.EMPTY;
-    }
 
     @Override
-    public void accept(Stream stream) {
-        if (fragmentState != FragmentState.EMPTY) {
-            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
-        }
-
+    public ByteBuffer apply(Stream stream, ByteBuffer buffer) {
         byte b;
 
         if (!stream.next()) {
@@ -82,7 +68,7 @@ public final class Version implements Consumer<Stream>, Clearable, Byteable {
         }
         b = stream.get();
         if (b == 49) {
-            VERSION.put(b);
+            buffer.put(b);
 
             if (!stream.next()) {
                 throw new ParseException("VERSION is too short, can't continue");
@@ -94,36 +80,7 @@ public final class Version implements Consumer<Stream>, Clearable, Byteable {
         } else {
             throw new VersionParseException("VERSION not 1");
         }
-        VERSION.flip();
-        fragmentState = FragmentState.WRITTEN;
-    }
-
-    @Override
-    public void clear() {
-        VERSION.clear();
-        fragmentState = FragmentState.EMPTY;
-    }
-
-    @Override
-    public String toString() {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
-        }
-
-        String string = StandardCharsets.US_ASCII.decode(VERSION).toString();
-        VERSION.rewind();
-        return string;
-    }
-
-    @Override
-    public byte[] toBytes() {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
-        }
-
-        final byte[] bytes = new byte[VERSION.remaining()];
-        VERSION.get(bytes);
-        VERSION.rewind();
-        return bytes;
+        buffer.flip();
+        return buffer;
     }
 }

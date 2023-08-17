@@ -55,7 +55,7 @@ public class MsgTest {
     @Test
     public void parseLeadingSpaceNoLFTest() {
         // lf termination off
-        Msg msg = new Msg(false);
+        Fragment msg = new Fragment(256*1024, new MsgFunction(false));
 
         String input = " msg with preceding space and no newline";
 
@@ -74,7 +74,7 @@ public class MsgTest {
     @Test
     public void parseNoLeadingSpaceNoLFTest() {
         // lf termination off
-        Msg msg = new Msg(false);
+        Fragment msg = new Fragment(256*1024, new MsgFunction(false));
 
         String input = "msg without preceding space and no newline";
 
@@ -93,7 +93,7 @@ public class MsgTest {
     @Test
     public void parseNewlineTest() {
         // lf termination off
-        Msg msg = new Msg(false);
+        Fragment msg = new Fragment(256*1024, new MsgFunction(false));
 
         String input = " yes\nnewline";
 
@@ -111,7 +111,7 @@ public class MsgTest {
     @Test
     public void parseLFTerminationWithNextTest() {
         // lf termination off
-        Msg msg = new Msg(true);
+        Fragment msg = new Fragment(256*1024, new MsgFunction(true));
 
         String input = " there is something after newline\nanother";
 
@@ -130,7 +130,7 @@ public class MsgTest {
     @Test
     public void parseLFTerminationWithoutNextTest() {
         // lf termination off
-        Msg msg = new Msg(true);
+        Fragment msg = new Fragment(256*1024, new MsgFunction(true));
 
         String input = " there is nothing after newline\n";
 
@@ -149,7 +149,7 @@ public class MsgTest {
     @Test
     public void emptyMessageTest() {
         // lf termination off
-        Msg msg = new Msg(true);
+        Fragment msg = new Fragment(256*1024, new MsgFunction(true));
 
         String input = " ";
 

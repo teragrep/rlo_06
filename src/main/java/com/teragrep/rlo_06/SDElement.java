@@ -53,7 +53,7 @@ import java.util.function.Consumer;
 
 public final class SDElement implements Consumer<Stream>, Clearable {
 
-    public final SDElementId sdElementId;
+    public final Fragment sdElementId;
     public final List<SDParam> sdParams;
 
     private final SDParamCache sdParamCache;
@@ -62,7 +62,7 @@ public final class SDElement implements Consumer<Stream>, Clearable {
 
     SDElement() {
         int numElements = 16;
-        this.sdElementId = new SDElementId();
+        this.sdElementId = new Fragment(32, new SDElementIdFunction());
         this.sdParams = new ArrayList<>(numElements);
         this.sdParamCache = new SDParamCache(numElements);
         this.fragmentState = FragmentState.EMPTY;
@@ -108,7 +108,7 @@ public final class SDElement implements Consumer<Stream>, Clearable {
         fragmentState = FragmentState.EMPTY;
     }
 
-    public SDParamValue getSDParamValue(SDVector sdVector) {
+    public Fragment getSDParamValue(SDVector sdVector) {
         if (fragmentState != FragmentState.WRITTEN) {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }

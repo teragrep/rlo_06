@@ -146,7 +146,7 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
         fragmentState = FragmentState.EMPTY;
     }
 
-    public SDParamValue getValue(SDVector sdVector) {
+    public Fragment getValue(SDVector sdVector) {
         if (fragmentState != FragmentState.WRITTEN) {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }

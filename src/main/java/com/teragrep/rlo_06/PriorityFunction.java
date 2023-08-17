@@ -45,68 +45,67 @@
  */
 package com.teragrep.rlo_06;
 
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
+import java.nio.ByteBuffer;
+import java.util.function.BiFunction;
 
-public final class SDParam implements Consumer<Stream>, Clearable {
-    public final Fragment sdParamKey;
-    public final Fragment sdParamValue;
+public final class PriorityFunction implements BiFunction<Stream, ByteBuffer, ByteBuffer> {
+    /*
+    |||
+    vvv
+    <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
 
-    private FragmentState fragmentState;
-
-    SDParam() {
-        this.sdParamKey = new Fragment(32, new SDParamKeyFunction());
-        this.sdParamValue = new Fragment(8*1024, new SDParamValueFunction());
-        this.fragmentState = FragmentState.EMPTY;
-    }
+    Actions: O__O
+    Payload:'<14>'
+    States : |..T
+    */
 
     @Override
-    public void accept(Stream stream) {
-        if (fragmentState != FragmentState.EMPTY) {
-            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
+    public ByteBuffer apply(Stream stream, ByteBuffer buffer) {
+        if (stream.get() != '<') {
+            throw new PriorityParseException("PRIORITY < missing");
         }
-        byte b;
-        // check if we are interested in this sdId at all or skip to next sdId block
-        sdParamKey.accept(stream);
 
-        b = stream.get();
-        if (b != 61) { // '='
-            throw new StructuredDataParseException("EQ missing after SD_KEY or SD_KEY too long");
-        }
-        sdParamValue.accept(stream);
-
-        // take next one for the while to check if ' ' or if to break it
         if (!stream.next()) {
-            throw new ParseException("SD is too short, can't continue");
+            throw new ParseException("Expected PRIORITY, received nothing");
         }
-        fragmentState = FragmentState.WRITTEN;
-    }
 
-    @Override
-    public void clear() {
-        sdParamKey.clear();
-        sdParamValue.clear();
-        fragmentState = FragmentState.EMPTY;
-    }
+        if (stream.get() >= 48 && stream.get() <= 57) { // first is always a number between 0..9
+            buffer.put(stream.get());
+        } else {
+            throw new PriorityParseException("PRIORITY number incorrect");
+        }
 
-    public Fragment getSDParamValue(SDVector sdVector) {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        if (!stream.next()) {
+            throw new ParseException("PRIORITY is too short, can't continue");
         }
-        if (sdParamKey.matches(sdVector.sdParamKeyBB)) {
-            return sdParamValue;
-        }
-        throw new NoSuchElementException(sdVector.toString());
-    }
+        if (stream.get() >= 48 &&stream.get() <= 57) { // second may be a number between 0..9
+            buffer.put(stream.get());
 
-    @Override
-    public String toString() {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+            if (!stream.next()) {
+                throw new ParseException("PRIORITY is too short, can't continue");
+            }
+
+            if (stream.get() >= 48 && stream.get() <= 57) { // third may be a number
+                buffer.put(stream.get());
+
+                if (!stream.next()) {
+                    throw new ParseException("PRIORITY is too short, can't continue");
+                }
+
+                if (stream.get() != 62) { // omit
+                    throw new PriorityParseException("PRIORITY > missing");
+                }
+            } else if (stream.get() == 62) { // third may be a '>'
+// omit '>'
+            } else {
+                throw new PriorityParseException("PRIORITY number incorrect");
+            }
+        } else if (stream.get() == 62) { // second may be a '>'
+            // omit '>'
+        } else {
+            throw new PriorityParseException("PRIORITY number incorrect");
         }
-        return "SDParam{" +
-                "sdParamKey=" + sdParamKey +
-                ", sdParamValue=" + sdParamValue +
-                '}';
+        buffer.flip();
+        return buffer;
     }
 }

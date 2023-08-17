@@ -56,7 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class HostnameTest {
     @Test
     public void parseTest() {
-        Hostname hostname = new Hostname();
+        Fragment hostname = new Fragment(255, new HostnameFunction());
 
         String input = "example.com ";
 
@@ -73,7 +73,7 @@ public class HostnameTest {
 
     @Test
     public void dashHostnameTest() {
-        Hostname hostname = new Hostname();
+        Fragment hostname = new Fragment(255, new HostnameFunction());
 
         String input = "- ";
 
@@ -90,7 +90,7 @@ public class HostnameTest {
 
     @Test
     public void tooLongHostnameTest() {
-        Hostname hostname = new Hostname();
+        Fragment hostname = new Fragment(255, new HostnameFunction());
 
         String input = new String(new char[256]).replace('\0', 'x');
 

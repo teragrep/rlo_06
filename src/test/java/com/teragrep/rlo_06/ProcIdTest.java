@@ -56,7 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ProcIdTest {
     @Test
     public void parseTest() {
-        ProcId procId = new ProcId();
+        Fragment procId = new Fragment(128, new ProcIdFunction());
 
         String input = "cade00f0-3260-4b88-ab61-d644a75dfbbb ";
 
@@ -73,7 +73,7 @@ public class ProcIdTest {
 
     @Test
     public void emptyProcIdTest() {
-        ProcId procId = new ProcId();
+        Fragment procId = new Fragment(128, new ProcIdFunction());
 
         String input = "";
 
@@ -90,7 +90,7 @@ public class ProcIdTest {
 
     @Test
     public void tooLongProcIdTest() {
-        ProcId procId = new ProcId();
+        Fragment procId = new Fragment(128, new ProcIdFunction());
 
         String input = new String(new char[256]).replace('\0', 'x');
 
