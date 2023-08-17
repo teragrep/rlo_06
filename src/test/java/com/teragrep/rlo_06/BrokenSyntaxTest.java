@@ -62,7 +62,7 @@ public class BrokenSyntaxTest {
 
     @Test
     void testNilTimestamp() throws Exception {
-        String input = "<14>1  host01 systemd DEA MSG-01 - sigsegv\n";
+        String input = "<14>1  host01 systemd DEA MSG-01 - sigsegv";
         RFC5424Frame rfc5424Frame = new RFC5424Frame();
         rfc5424Frame.load(new ByteArrayInputStream((input).getBytes()));
         rfc5424Frame.next();
