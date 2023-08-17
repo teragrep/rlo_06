@@ -49,7 +49,7 @@ SDVector sdVector = new SDVector("ID_ELEMENT_NAME@48577", "ELEMENT_KEY");
 System.out.println(rfc5424Frame.structuredData.getValue(sdVector).toString()); // Returns "MyValue"
 ----
 
-You can also access structured data as if it was a list:
+You can also access structured data directly as a list:
 
 [source,java]
 ----
