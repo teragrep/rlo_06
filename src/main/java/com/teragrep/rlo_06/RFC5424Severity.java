@@ -46,12 +46,12 @@
 package com.teragrep.rlo_06;
 
 public class RFC5424Severity {
-    private final int severity;
+    private final Fragment fragment;
     public RFC5424Severity(Fragment fragment) {
-        severity = Integer.parseInt(fragment.toString()) & 7;
+        this.fragment = fragment;
     }
 
-    public int getSeverity() {
-        return severity;
+    public int asInt() {
+        return Integer.parseInt(fragment.toString()) & 7;
     }
 }

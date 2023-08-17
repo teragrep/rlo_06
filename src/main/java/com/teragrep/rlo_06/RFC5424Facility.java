@@ -46,11 +46,11 @@
 package com.teragrep.rlo_06;
 
 public class RFC5424Facility {
-    private final int facility;
+    private final Fragment fragment;
     public RFC5424Facility(Fragment fragment) {
-        facility = Integer.parseInt(fragment.toString()) >> 3;
+        this.fragment = fragment;
     }
-    public int getFacility() {
-        return facility;
+    public int asInt() {
+        return Integer.parseInt(fragment.toString()) >> 3;
     }
 }

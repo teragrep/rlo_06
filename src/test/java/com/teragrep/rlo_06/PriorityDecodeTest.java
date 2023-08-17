@@ -66,7 +66,7 @@ public class PriorityDecodeTest {
         RFC5424Severity severity = new RFC5424Severity(rfc5424Frame.priority);
         RFC5424Facility facility = new RFC5424Facility(rfc5424Frame.priority);
 
-        Assertions.assertEquals(6, severity.getSeverity());
-        Assertions.assertEquals(16, facility.getFacility());
+        Assertions.assertEquals(6, severity.asInt());
+        Assertions.assertEquals(16, facility.asInt());
     }
 }
