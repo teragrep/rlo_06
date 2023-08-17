@@ -68,6 +68,7 @@ public class TimestampConversionTest {
         Assertions.assertEquals("2023-01-01T00:00Z", getTimestamp("2023-01-01T00:00:00.000000+00:00"));
         Assertions.assertEquals("2023-01-01T00:00Z", getTimestamp("2023-01-01T00:00:00.000000-00:00"));
         Assertions.assertEquals("2023-01-01T00:00+02:00", getTimestamp("2023-01-01T00:00:00+02:00"));
+
     }
 
     private String getTimestamp(String timestamp) throws IOException {
