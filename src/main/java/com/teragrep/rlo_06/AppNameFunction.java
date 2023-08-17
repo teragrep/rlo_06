@@ -45,62 +45,45 @@
  */
 package com.teragrep.rlo_06;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import java.nio.ByteBuffer;
+import java.util.function.BiFunction;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
+public final class AppNameFunction implements BiFunction<Stream, ByteBuffer, ByteBuffer> {
+    /*
+                                                     ||||||||
+                                                     vvvvvvvv
+        <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+        Actions: _______O
+        Payload:'systemd '
+        States : .......T
+        */
 
-public class MsgIdTest {
-    @Test
-    public void parseTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
 
-        String input = "987654 ";
+    @Override
+    public ByteBuffer apply(Stream stream, ByteBuffer buffer) {
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        byte b;
+        short appname_max_left = 48;
 
-        Stream stream = new Stream(bais);
+        if (!stream.next()) {
+            throw new ParseException("Expected APPNAME, received nothing");
+        }
+        b = stream.get();
+        while (appname_max_left > 0 && b != 32) {
+            buffer.put(b);
+            appname_max_left--;
 
-        msgId.accept(stream);
+            if (!stream.next()) {
+                throw new ParseException("APPNAME is too short, can't continue");
+            }
+            b = stream.get();
+        }
 
-        Assertions.assertEquals("987654", msgId.toString());
-    }
-
-    @Test
-    public void dashMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
-
-        String input = "- ";
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-
-        Stream stream = new Stream(bais);
-
-        msgId.accept(stream);
-
-        Assertions.assertEquals("-", msgId.toString());
-    }
-
-    @Test
-    public void tooLongMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
-
-        String input = "9876543210987654321098765432109876543210 ";
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-        assertThrows(MsgIdParseException.class, () -> {
-            Stream stream = new Stream(bais);
-            msgId.accept(stream);
-            msgId.toString();
-        });
+        if (b != 32) {
+            throw new AppNameParseException("SP missing after APPNAME or APPNAME too long");
+        }
+        buffer.flip();
+        return buffer;
     }
 }

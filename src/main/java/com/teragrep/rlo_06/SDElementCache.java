@@ -45,62 +45,40 @@
  */
 package com.teragrep.rlo_06;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import java.util.Stack;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
+/**
+ * Cache object to contain multiple pre-allocated SDElements for use to avoid memory allocations for new ones
+ */
+final class SDElementCache implements Cache<SDElement> {
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+    private final Stack<SDElement> cachedSDElements;
 
-public class MsgIdTest {
-    @Test
-    public void parseTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
+    final int numElements;
 
-        String input = "987654 ";
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-
-        Stream stream = new Stream(bais);
-
-        msgId.accept(stream);
-
-        Assertions.assertEquals("987654", msgId.toString());
+    SDElementCache(int numElements) {
+        this.numElements = numElements;
+        cachedSDElements = new Stack<>();
     }
 
-    @Test
-    public void dashMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
 
-        String input = "- ";
+    public SDElement take() {
+        SDElement sdElement;
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        if (cachedSDElements.isEmpty()) {
+            sdElement = new SDElement();
+        }
+        else {
+            sdElement = cachedSDElements.pop();
+        }
 
-        Stream stream = new Stream(bais);
-
-        msgId.accept(stream);
-
-        Assertions.assertEquals("-", msgId.toString());
+        return sdElement;
     }
 
-    @Test
-    public void tooLongMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
-
-        String input = "9876543210987654321098765432109876543210 ";
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-        assertThrows(MsgIdParseException.class, () -> {
-            Stream stream = new Stream(bais);
-            msgId.accept(stream);
-            msgId.toString();
-        });
+    public void put(SDElement sdElement) {
+        if (cachedSDElements.size() < numElements) {
+            sdElement.clear();
+            cachedSDElements.push(sdElement);
+        }
     }
 }

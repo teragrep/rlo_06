@@ -52,8 +52,6 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -61,90 +59,25 @@ public class ResultSetAsByteBufferTest {
 
     @Test
     public void read() throws IOException {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.TIMESTAMP);
-        subscription.add(ParserEnum.MSG);
-
-        // Structured
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-        sdSubscription.subscribeElement("event_node_source@48577","source");
-        sdSubscription.subscribeElement("event_node_relay@48577","source");
-        sdSubscription.subscribeElement("event_node_source@48577","source_module");
-        sdSubscription.subscribeElement("event_node_relay@48577","source_module");
-        sdSubscription.subscribeElement("event_node_source@48577","hostname");
-        sdSubscription.subscribeElement("event_node_relay@48577","hostname");
-
-        // match string initializers, here to make them finals as optimized for instantiation
-        byte[] ens = "event_node_source@48577".getBytes(StandardCharsets.US_ASCII);
-        // subscribed fields as bytebuffer
-        ByteBuffer eventNodeSourceBB = ByteBuffer.allocateDirect(ens.length);
-        eventNodeSourceBB.put(ens, 0, ens.length);
-        eventNodeSourceBB.flip();
-
-        byte[] enr = "event_node_relay@48577".getBytes(StandardCharsets.US_ASCII);
-        ByteBuffer eventNodeRelayBB = ByteBuffer.allocateDirect(enr.length);
-        eventNodeRelayBB.put(enr, 0, enr.length);
-        eventNodeRelayBB.flip();
-
-        byte[] sm = "source_module".getBytes(StandardCharsets.US_ASCII);
-        ByteBuffer sourceModuleBB = ByteBuffer.allocateDirect(sm.length);
-        sourceModuleBB.put(sm, 0, sm.length);
-        sourceModuleBB.flip();
-
-        byte[] hn = "hostname".getBytes(StandardCharsets.US_ASCII);
-        ByteBuffer hostnameBB = ByteBuffer.allocateDirect(hn.length);
-        hostnameBB.put(hn, 0, hn.length);
-        hostnameBB.flip();
-
-        byte[] sourceBytes = "source".getBytes(StandardCharsets.US_ASCII);
-        ByteBuffer sourceBB = ByteBuffer.allocateDirect(sourceBytes.length);
-        sourceBB.put(sourceBytes, 0, sourceBytes.length);
-        sourceBB.flip();
-
         String SYSLOG_MESSAGE = "<14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u=\"\\\"3\" e=\"t\"][ID_B@2 n=\"9\"][event_id@48577 hostname=\"sc-99-99-14-247\" uuid=\"0FD92E51B37748EB90CD894CCEE63907\" unixtime=\"1612047600.0\" id_source=\"source\"][event_node_source@48577 hostname=\"sc-99-99-14-247\" source=\"f17_ssmis_20210131v7.nc\" source_module=\"imfile\"][event_node_relay@48577 hostname=\"localhost\" source=\"sc-99-99-14-247\" source_module=\"imrelp\"][event_version@48577 major=\"2\" minor=\"2\" hostname=\"localhost\" version_source=\"relay\"][event_node_router@48577 source=\"logrouter.example.com\" source_module=\"imrelp\" hostname=\"localhost\"][teragrep@48577 streamname=\"log:f17:0\" directory=\"com_teragrep_audit\" unixtime=\"1612047600.0\"] msg\n";
-        InputStream inputStream = new ByteArrayInputStream( (SYSLOG_MESSAGE).getBytes());
+        InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes());
 
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
+        RFC5424Frame rfc5424Frame = new RFC5424Frame();
+        rfc5424Frame.load(inputStream);
 
-        Assertions.assertTrue(parser.next());
+        Assertions.assertTrue(rfc5424Frame.next());
 
-        ByteBuffer sourceStringBB = ByteBuffer.allocateDirect(8*1024 + 1 + 8*1024 + 1 + 8*1024);
-
-        ResultSetAsByteBuffer resultsetAsByteBuffer = new ResultSetAsByteBuffer(parser.get());
-
-        ByteBuffer source_module = resultsetAsByteBuffer.getSdValue(eventNodeSourceBB, sourceModuleBB);
-        if(source_module == null || !source_module.hasRemaining()){
-            source_module = resultsetAsByteBuffer.getSdValue(eventNodeRelayBB, sourceModuleBB);
-        }
-        ByteBuffer hostname = resultsetAsByteBuffer.getSdValue(eventNodeSourceBB, hostnameBB);
-        if(hostname == null || !hostname.hasRemaining()){
-            hostname = resultsetAsByteBuffer.getSdValue(eventNodeRelayBB, hostnameBB);
-        }
-        ByteBuffer source = resultsetAsByteBuffer.getSdValue(eventNodeSourceBB, sourceBB);
-        if(source == null || !source.hasRemaining()){
-            source = resultsetAsByteBuffer.getSdValue(eventNodeRelayBB, sourceBB);
-        }
-
-
-        // sm:hn:s
-        sourceStringBB.clear();
-        // source_module:hostname:source"
-        if(source_module != null) {
-            sourceStringBB.put(source_module);
-        }
-        sourceStringBB.put((byte) ':');
-        if (hostname != null) {
-            sourceStringBB.put(hostname);
-        }
-        sourceStringBB.put((byte)':');
-        if (source != null) {
-            sourceStringBB.put(source);
-        }
-
-        sourceStringBB.flip();
+        String sourceModule = rfc5424Frame.structuredData.getValue(new SDVector("event_node_source@48577", "source_module")).toString();
+        String hostname = rfc5424Frame.structuredData.getValue(new SDVector("event_node_relay@48577", "source")).toString();
+        String sourceFile = rfc5424Frame.structuredData.getValue(new SDVector("event_node_source@48577", "source")).toString();
         assertEquals(
                 "imfile:sc-99-99-14-247:f17_ssmis_20210131v7.nc",
-                StandardCharsets.US_ASCII.decode(sourceStringBB).toString()
+                String.format(
+                        "%s:%s:%s",
+                        sourceModule,
+                        hostname,
+                        sourceFile
+                )
         );
     }
 }

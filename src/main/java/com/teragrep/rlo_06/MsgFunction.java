@@ -45,62 +45,70 @@
  */
 package com.teragrep.rlo_06;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import java.nio.ByteBuffer;
+import java.util.function.BiFunction;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
+public final class MsgFunction implements BiFunction<Stream, ByteBuffer, ByteBuffer> {
+    /*
+                                                                                               vvvvvvvvvv
+            <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+            Actions: x_______OO
+            Actions: _           // if not space
+            Actions: O           // if space
+            Payload:' sigsegv\n'
+            States : %.......TT
 
-public class MsgIdTest {
-    @Test
-    public void parseTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
+            */
 
-        String input = "987654 ";
+    private final boolean lineFeedTermination;
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-
-        Stream stream = new Stream(bais);
-
-        msgId.accept(stream);
-
-        Assertions.assertEquals("987654", msgId.toString());
+    MsgFunction(boolean lineFeedTermination) {
+        this.lineFeedTermination = lineFeedTermination;
     }
 
-    @Test
-    public void dashMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
+    @Override
+    public ByteBuffer apply(Stream stream, ByteBuffer buffer) {
+        int msg_current_left = 256 * 1024;
 
-        String input = "- ";
+        byte oldByte = stream.get();
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        if (oldByte != ' ') {
+            buffer.put(oldByte);
+        }
+        msg_current_left--;
 
-        Stream stream = new Stream(bais);
 
-        msgId.accept(stream);
+        // this little while here is the steamroller of this parser
+        if (this.lineFeedTermination) { // Line-feed termination active
+            while (stream.next()) {
+                final byte b = stream.get();
 
-        Assertions.assertEquals("-", msgId.toString());
-    }
+                if (b == '\n') {
+                    // new line is not added to the payload
+                    break;
+                }
+                else if (msg_current_left < 1) {
+                    throw new MsgParseException("MSG too long, no new line in 256K range");
+                }
 
-    @Test
-    public void tooLongMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
+                buffer.put(b);
+                msg_current_left--;
 
-        String input = "9876543210987654321098765432109876543210 ";
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-        assertThrows(MsgIdParseException.class, () -> {
-            Stream stream = new Stream(bais);
-            msgId.accept(stream);
-            msgId.toString();
-        });
+
+            }
+        } else { // Line-feed termination inactive, reading until EOF
+            while (stream.next()) {
+                buffer.put(stream.get());
+                msg_current_left--;
+
+                if (msg_current_left < 1) {
+                    throw new MsgParseException("MSG too long");
+                }
+            }
+        }
+        buffer.flip();
+        return buffer;
     }
 }

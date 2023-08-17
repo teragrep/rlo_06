@@ -45,62 +45,36 @@
  */
 package com.teragrep.rlo_06;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import java.util.Stack;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
+public class SDParamCache implements Cache<SDParam> {
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class MsgIdTest {
-    @Test
-    public void parseTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
-
-        String input = "987654 ";
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-
-        Stream stream = new Stream(bais);
-
-        msgId.accept(stream);
-
-        Assertions.assertEquals("987654", msgId.toString());
+    private final Stack<SDParam> cachedSDParams;
+    final int numElements;
+    
+    SDParamCache(int numElements) {
+        this.numElements = numElements;
+        this.cachedSDParams = new Stack<>();
     }
 
-    @Test
-    public void dashMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
+    public SDParam take() {
+        SDParam sdParam;
 
-        String input = "- ";
+        if (cachedSDParams.isEmpty()) {
+            sdParam = new SDParam();
+        }
+        else {
+            sdParam = cachedSDParams.pop();
+        }
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-
-        Stream stream = new Stream(bais);
-
-        msgId.accept(stream);
-
-        Assertions.assertEquals("-", msgId.toString());
+        return sdParam;
     }
 
-    @Test
-    public void tooLongMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
-
-        String input = "9876543210987654321098765432109876543210 ";
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-        assertThrows(MsgIdParseException.class, () -> {
-            Stream stream = new Stream(bais);
-            msgId.accept(stream);
-            msgId.toString();
-        });
+    public void put(SDParam sdParam) {
+        if (cachedSDParams.size() < numElements) {
+            sdParam.clear();
+            cachedSDParams.push(sdParam);
+        }
     }
 }

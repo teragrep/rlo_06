@@ -45,32 +45,44 @@
  */
 package com.teragrep.rlo_06;
 
-import java.util.EnumSet;
+import java.nio.ByteBuffer;
+import java.util.function.BiFunction;
 
-/**
- * subscription controls that which fields are returned to a Map{ParserEnum, Value}
- * NOTE: SD_PARSE controls whenever SD is going to be parsed at all
- */
+public final class TimestampFunction implements BiFunction<Stream, ByteBuffer, ByteBuffer> {
+    /*
+                          ||||||||||||||||||||||||||||||||
+                          vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+                    <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
 
-public class RFC5424ParserSubscription  {
-    protected EnumSet<ParserEnum> subscription = EnumSet.noneOf(ParserEnum.class);
+                    Actions: _______________________________O
+                    Payload:'2014-06-20T09:14:07.12345+00:00 '
+                    States : ...............................T
+                    */
 
-    public RFC5424ParserSubscription() {
-    }
+    @Override
+    public ByteBuffer apply(Stream stream, ByteBuffer buffer) {
 
-    public void subscribeAll() {
-        this.subscription = EnumSet.allOf(ParserEnum.class);
-    }
+        byte b;
+        short ts_max_left = 32;
 
-    public void clearAll() {
-        this.subscription =  EnumSet.noneOf(ParserEnum.class);
-    }
+        if (!stream.next()) {
+            throw new ParseException("Expected TIMESTAMP, received nothing");
+        }
+        b = stream.get();
+        while (ts_max_left > 0 && b != 32) {
+            buffer.put(b);
+            ts_max_left--;
 
-    public void add(ParserEnum field) {
-        this.subscription.add(field);
-    }
+            if (!stream.next()) {
+                throw new ParseException("TIMESTAMP is too short, can't continue");
+            }
+            b = stream.get();
+        }
 
-    public void remove(ParserEnum field) {
-        this.subscription.remove(field);
+        if (b != 32) {
+            throw new TimestampParseException("SP missing after TIMESTAMP or TIMESTAMP too long");
+        }
+        buffer.flip();
+        return buffer;
     }
 }

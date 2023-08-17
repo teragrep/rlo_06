@@ -1,3 +1,48 @@
+/*
+ * Java RFC524 parser library  RLO-06
+ * Copyright (C) 2022  Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+ */
 package com.teragrep.rlo_06;
 
 import org.junit.jupiter.api.Assertions;
@@ -9,17 +54,8 @@ import java.nio.charset.StandardCharsets;
 public class MsgTest {
     @Test
     public void parseLeadingSpaceNoLFTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.MSG);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         // lf termination off
-        Msg msg = new Msg(parserResultSet.MSG, false);
+        Fragment msg = new Fragment(256*1024, new MsgFunction(false));
 
         String input = " msg with preceding space and no newline";
 
@@ -32,23 +68,13 @@ public class MsgTest {
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
 
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("msg with preceding space and no newline", resultSetAsString.getMsg());
+        Assertions.assertEquals("msg with preceding space and no newline", msg.toString());
     }
 
     @Test
     public void parseNoLeadingSpaceNoLFTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.MSG);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         // lf termination off
-        Msg msg = new Msg(parserResultSet.MSG, false);
+        Fragment msg = new Fragment(256*1024, new MsgFunction(false));
 
         String input = "msg without preceding space and no newline";
 
@@ -61,23 +87,13 @@ public class MsgTest {
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
 
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("msg without preceding space and no newline", resultSetAsString.getMsg());
+        Assertions.assertEquals("msg without preceding space and no newline", msg.toString());
     }
 
     @Test
     public void parseNewlineTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.MSG);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         // lf termination off
-        Msg msg = new Msg(parserResultSet.MSG, false);
+        Fragment msg = new Fragment(256*1024, new MsgFunction(false));
 
         String input = " yes\nnewline";
 
@@ -90,22 +106,12 @@ public class MsgTest {
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
 
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("yes\nnewline", resultSetAsString.getMsg());
+        Assertions.assertEquals("yes\nnewline", msg.toString());
     }
     @Test
     public void parseLFTerminationWithNextTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.MSG);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         // lf termination off
-        Msg msg = new Msg(parserResultSet.MSG, true);
+        Fragment msg = new Fragment(256*1024, new MsgFunction(true));
 
         String input = " there is something after newline\nanother";
 
@@ -118,23 +124,13 @@ public class MsgTest {
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
 
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("there is something after newline", resultSetAsString.getMsg());
+        Assertions.assertEquals("there is something after newline", msg.toString());
     }
 
     @Test
     public void parseLFTerminationWithoutNextTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.MSG);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         // lf termination off
-        Msg msg = new Msg(parserResultSet.MSG, true);
+        Fragment msg = new Fragment(256*1024, new MsgFunction(true));
 
         String input = " there is nothing after newline\n";
 
@@ -147,23 +143,13 @@ public class MsgTest {
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
 
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("there is nothing after newline", resultSetAsString.getMsg());
+        Assertions.assertEquals("there is nothing after newline", msg.toString());
     }
 
     @Test
     public void emptyMessageTest() {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.MSG);
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        ParserResultSet parserResultSet = new ParserResultSet(
-                subscription,
-                sdSubscription
-        );
-
         // lf termination off
-        Msg msg = new Msg(parserResultSet.MSG, true);
+        Fragment msg = new Fragment(256*1024, new MsgFunction(true));
 
         String input = " ";
 
@@ -176,7 +162,6 @@ public class MsgTest {
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
 
-        ResultSetAsString resultSetAsString = new ResultSetAsString(parserResultSet);
-        Assertions.assertEquals("", resultSetAsString.getMsg());
+        Assertions.assertEquals("", msg.toString());
     }
 }

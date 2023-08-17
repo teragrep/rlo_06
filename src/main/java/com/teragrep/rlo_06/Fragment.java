@@ -45,62 +45,72 @@
  */
 package com.teragrep.rlo_06;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayInputStream;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.time.ZonedDateTime;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+public final class Fragment implements Consumer<Stream>, Clearable, Matchable, Byteable {
 
-public class MsgIdTest {
-    @Test
-    public void parseTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
+    private final ByteBuffer buffer;
+    private FragmentState fragmentState;
 
-        String input = "987654 ";
+    final BiFunction<Stream, ByteBuffer, ByteBuffer> parseRule;
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-
-        Stream stream = new Stream(bais);
-
-        msgId.accept(stream);
-
-        Assertions.assertEquals("987654", msgId.toString());
+    Fragment(int bufferSize, BiFunction<Stream, ByteBuffer, ByteBuffer> parseRule) {
+        this.buffer = ByteBuffer.allocateDirect(bufferSize);
+        this.fragmentState = FragmentState.EMPTY;
+        this.parseRule = parseRule;
     }
 
-    @Test
-    public void dashMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
-
-        String input = "- ";
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-
-        Stream stream = new Stream(bais);
-
-        msgId.accept(stream);
-
-        Assertions.assertEquals("-", msgId.toString());
+    @Override
+    public void accept(Stream stream) {
+        if (fragmentState != FragmentState.EMPTY) {
+            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
+        }
+        parseRule.apply(stream, buffer);
+        fragmentState = FragmentState.WRITTEN;
     }
 
-    @Test
-    public void tooLongMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
-
-        String input = "9876543210987654321098765432109876543210 ";
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-        assertThrows(MsgIdParseException.class, () -> {
-            Stream stream = new Stream(bais);
-            msgId.accept(stream);
-            msgId.toString();
-        });
+    @Override
+    public void clear() {
+        buffer.clear();
+        fragmentState = FragmentState.EMPTY;
     }
+
+    @Override
+    public String toString() {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
+        String string = StandardCharsets.UTF_8.decode(buffer).toString();
+        buffer.rewind();
+        return string;
+    }
+
+    @Override
+    public boolean matches(ByteBuffer other) {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
+        return buffer.equals(other);
+    }
+
+    @Override
+    public byte[] toBytes() {
+        if (fragmentState != FragmentState.WRITTEN) {
+            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
+        }
+
+        final byte[] bytes = new byte[buffer.remaining()];
+        buffer.get(bytes);
+        buffer.rewind();
+        return bytes;
+    }
+
+    public ZonedDateTime toZonedDateTime() {
+        return ZonedDateTime.parse(toString());
+    }
+
 }

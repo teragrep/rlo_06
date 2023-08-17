@@ -45,62 +45,66 @@
  */
 package com.teragrep.rlo_06;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import java.nio.ByteBuffer;
+import java.util.function.BiFunction;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
+public final class SDParamValueFunction implements BiFunction<Stream, ByteBuffer, ByteBuffer> {
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+    @Override
+    public ByteBuffer apply(Stream stream, ByteBuffer buffer) {
+        byte b;
 
-public class MsgIdTest {
-    @Test
-    public void parseTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
+        if (!stream.next()) {
+            throw new ParseException("SD is too short, can't continue");
+        }
+        b = stream.get();
+        if (b != 34) { // '"'
+            throw new StructuredDataParseException("\" missing after SD_KEY EQ");
+        }
 
-        String input = "987654 ";
+        short sdElemVal_max_left = 8 * 1024;
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        if (!stream.next()) {
+            throw new ParseException("SD is too short, can't continue");
+        }
+        b = stream.get();
 
-        Stream stream = new Stream(bais);
+        while (sdElemVal_max_left > 0 && b != 34) { // '"'
+            // escaped are special: \" \\ \] ...
+            if (b == 92) { // \
+                // insert
+                buffer.put(b);
+                sdElemVal_max_left--;
+                // read next
 
-        msgId.accept(stream);
+                if (!stream.next()) {
+                    throw new ParseException("SD is too short, can't continue");
+                }
+                b = stream.get();
 
-        Assertions.assertEquals("987654", msgId.toString());
-    }
+                // if it is a '"' then it must be taken care of, loop can do the rest
+                if (b == 34) {
+                    if (sdElemVal_max_left > 0) {
+                        buffer.put(b);
+                        sdElemVal_max_left--;
 
-    @Test
-    public void dashMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
+                        if (!stream.next()) {
+                            throw new ParseException("SD is too short, can't continue");
+                        }
+                        b = stream.get();
+                    }
+                }
+            } else {
+                buffer.put(b);
+                sdElemVal_max_left--;
 
-        String input = "- ";
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-
-        Stream stream = new Stream(bais);
-
-        msgId.accept(stream);
-
-        Assertions.assertEquals("-", msgId.toString());
-    }
-
-    @Test
-    public void tooLongMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
-
-        String input = "9876543210987654321098765432109876543210 ";
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-        assertThrows(MsgIdParseException.class, () -> {
-            Stream stream = new Stream(bais);
-            msgId.accept(stream);
-            msgId.toString();
-        });
+                if (!stream.next()) {
+                    throw new ParseException("SD is too short, can't continue");
+                }
+                b = stream.get();
+            }
+        }
+        buffer.flip();
+        return buffer;
     }
 }

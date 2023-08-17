@@ -50,6 +50,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.nio.file.Files;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -61,70 +62,63 @@ public class SyntaxTest {
         String SYSLOG_MESSAGE = "<14>1 2014-06-20T09:14:07.123456+00:00 host01 systemd DEA MSG-01 [ID_A@1 u=\"\\\"3\" e=\"t\"][ID_B@2 n=\"9\"] sigsegv\n";
         String SYSLOG_MESSAGE2 = "<31>1 2021-12-24T09:14:07.12345+00:00 host02 journald MOI ASD-05 [ID_A@1 u=\"\\\"3\" e=\"t\"][ID_B@2 n=\"9\"] normal\n";
 
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.subscribeAll();
-
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        sdSubscription.subscribeElement("ID_A@1", "u");
-
-
         InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE + SYSLOG_MESSAGE2).getBytes());
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
+        RFC5424Frame rfc5424Frame = new RFC5424Frame(true);
+        rfc5424Frame.load(inputStream);
 
         int count = 1;
         for (int i = 0; i < count; i++) {
-            Assertions.assertTrue(parser.next());
-            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
+            Assertions.assertTrue(rfc5424Frame.next());
 
-            Assertions.assertEquals("14", strings1.getPriority());
-            Assertions.assertEquals("1", strings1.getVersion());
-            Assertions.assertEquals("2014-06-20T09:14:07.123456+00:00", strings1.getTimestamp());
-            Assertions.assertEquals("host01", strings1.getHostname());
-            Assertions.assertEquals("systemd", strings1.getAppname());
-            Assertions.assertEquals("DEA", strings1.getProcid());
-            Assertions.assertEquals("MSG-01", strings1.getMsgid());
-            Assertions.assertEquals("sigsegv", strings1.getMsg());
+            Assertions.assertEquals("14", rfc5424Frame.priority.toString());
+            Assertions.assertEquals("1", rfc5424Frame.version.toString());
+            Assertions.assertEquals("2014-06-20T09:14:07.123456+00:00", rfc5424Frame.timestamp.toString());
+            Assertions.assertEquals("host01", rfc5424Frame.hostname.toString());
+            Assertions.assertEquals("systemd", rfc5424Frame.appName.toString());
+            Assertions.assertEquals("DEA", rfc5424Frame.procId.toString());
+            Assertions.assertEquals("MSG-01", rfc5424Frame.msgId.toString());
+            Assertions.assertEquals("sigsegv", rfc5424Frame.msg.toString());
 
 
             // Structured Data 1
-            Assertions.assertEquals("\\\"3", strings1.getSdValue("ID_A@1", "u"));
+            SDVector sdVector = new SDVector("ID_A@1", "u");
+            Assertions.assertEquals("\\\"3", rfc5424Frame.structuredData.getValue(sdVector).toString());
 
-            Assertions.assertTrue(parser.next());
-           strings1 = new ResultSetAsString(parser.get());
+            Assertions.assertTrue(rfc5424Frame.next());
 
             // Message 2
-            Assertions.assertEquals("31", strings1.getPriority());
-            Assertions.assertEquals("1", strings1.getVersion());
-            Assertions.assertEquals("2021-12-24T09:14:07.12345+00:00", strings1.getTimestamp());
-            //Instant instant = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(strings1.getTimestamp(), Instant::from);
+            Assertions.assertEquals("31", rfc5424Frame.priority.toString());
+            Assertions.assertEquals("1", rfc5424Frame.version.toString());
+            Assertions.assertEquals("2021-12-24T09:14:07.12345+00:00", rfc5424Frame.timestamp.toString());
+            //Instant instant = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(rfc5424Frame.timestamp.toString(), Instant::from);
             //System.out.println("TIMESTAMP INSTANT: >" + instant + "<");
             //System.out.println("TIMESTAMP CONVERTED: >" + Timestamp.from(instant) + "<");
-            Assertions.assertEquals("host02", strings1.getHostname());
-            Assertions.assertEquals("journald", strings1.getAppname());
-            Assertions.assertEquals("MOI", strings1.getProcid());
-            Assertions.assertEquals("ASD-05", strings1.getMsgid());
-            Assertions.assertEquals("normal", strings1.getMsg());
+            Assertions.assertEquals("host02", rfc5424Frame.hostname.toString());
+            Assertions.assertEquals("journald", rfc5424Frame.appName.toString());
+            Assertions.assertEquals("MOI", rfc5424Frame.procId.toString());
+            Assertions.assertEquals("ASD-05", rfc5424Frame.msgId.toString());
+            Assertions.assertEquals("normal", rfc5424Frame.msg.toString());
 
 
             // Structured Data 2
-            Assertions.assertEquals("\\\"3", strings1.getSdValue("ID_A@1", "u"));
+            Assertions.assertEquals("\\\"3", rfc5424Frame.structuredData.getValue(new SDVector("ID_A@1", "u")).toString());
 
-            assertFalse(parser.next());
-           strings1 = new ResultSetAsString(parser.get());
+            assertFalse(rfc5424Frame.next());
 
             // Finished
-            Assertions.assertEquals("", strings1.getPriority());
-            Assertions.assertEquals("", strings1.getVersion());
-            Assertions.assertEquals("", strings1.getTimestamp());
-            Assertions.assertEquals("", strings1.getHostname());
-            Assertions.assertEquals("", strings1.getAppname());
-            Assertions.assertEquals("", strings1.getProcid());
-            Assertions.assertEquals("", strings1.getMsgid());
-            Assertions.assertEquals("", strings1.getMsg());
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.priority::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.version::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.timestamp::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.hostname::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.appName::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.procId::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msgId::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msg::toString);
 
             // Structured Data Finished
-            Assertions.assertEquals("", strings1.getSdValue("ID_A@1", "u"));
+            Assertions.assertThrows(IllegalStateException.class, () -> {
+                rfc5424Frame.structuredData.getValue(new SDVector("ID_A@1", "u")).toString();
+            });
 
             inputStream.reset();
         }
@@ -133,213 +127,166 @@ public class SyntaxTest {
     @Test
     void testNoNewLineEOF() throws Exception {
         String SYSLOG_MESSAGE = "<14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u=\"\\\"3\" e=\"t\"][ID_B@2 n=\"9\"] sigsegv";
-
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.subscribeAll();
-
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        sdSubscription.subscribeElement("ID_A@1", "u");
-
         InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes());
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
+        RFC5424Frame rfc5424Frame = new RFC5424Frame();
+        rfc5424Frame.load(inputStream);
 
         int count = 1;
         for (int i = 0; i < count; i++) {
-            Assertions.assertTrue(parser.next());
-            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
+            Assertions.assertTrue(rfc5424Frame.next());
 
             // Message 1
-            Assertions.assertEquals("14", strings1.getPriority());
-            Assertions.assertEquals("1", strings1.getVersion());
-            Assertions.assertEquals("2014-06-20T09:14:07.12345+00:00", strings1.getTimestamp());
-            Assertions.assertEquals("host01", strings1.getHostname());
-            Assertions.assertEquals("systemd", strings1.getAppname());
-            Assertions.assertEquals("DEA", strings1.getProcid());
-            Assertions.assertEquals("MSG-01", strings1.getMsgid());
-            Assertions.assertEquals("sigsegv", strings1.getMsg());
+            Assertions.assertEquals("14", rfc5424Frame.priority.toString());
+            Assertions.assertEquals("1", rfc5424Frame.version.toString());
+            Assertions.assertEquals("2014-06-20T09:14:07.12345+00:00", rfc5424Frame.timestamp.toString());
+            Assertions.assertEquals("host01", rfc5424Frame.hostname.toString());
+            Assertions.assertEquals("systemd", rfc5424Frame.appName.toString());
+            Assertions.assertEquals("DEA", rfc5424Frame.procId.toString());
+            Assertions.assertEquals("MSG-01", rfc5424Frame.msgId.toString());
+            Assertions.assertEquals("sigsegv", rfc5424Frame.msg.toString());
 
             // Structured Data 1
-            Assertions.assertEquals("\\\"3", strings1.getSdValue("ID_A@1", "u"));
+            Assertions.assertEquals("\\\"3", rfc5424Frame.structuredData.getValue(new SDVector("ID_A@1", "u")).toString());
 
-            assertFalse(parser.next());
-           strings1 = new ResultSetAsString(parser.get());
+            assertFalse(rfc5424Frame.next());
 
             // Message Finished
-            Assertions.assertEquals("", strings1.getPriority());
-            Assertions.assertEquals("", strings1.getVersion());
-            Assertions.assertEquals("", strings1.getTimestamp());
-            Assertions.assertEquals("", strings1.getHostname());
-            Assertions.assertEquals("", strings1.getAppname());
-            Assertions.assertEquals("", strings1.getProcid());
-            Assertions.assertEquals("", strings1.getMsgid());
-            Assertions.assertEquals("", strings1.getMsg());
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.priority::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.version::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.timestamp::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.hostname::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.appName::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.procId::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msgId::toString);
+            Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msg::toString);
 
             // Structured Data Finished
-            Assertions.assertEquals("", strings1.getSdValue("ID_A@1", "u"));
-
+            assertThrows(IllegalStateException.class, () -> {
+                rfc5424Frame.structuredData.getValue(new SDVector("ID_A@1", "u")).toString();
+            });
             inputStream.reset();
         }
     }
 
     @Test
     void testTeragrepStructuredElement() throws Exception {
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.add(ParserEnum.TIMESTAMP);
-        subscription.add(ParserEnum.HOSTNAME);
-        subscription.add(ParserEnum.PROCID);
-        subscription.add(ParserEnum.MSGID);
-        subscription.add(ParserEnum.MSG);
-
-        // Structured
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-        sdSubscription.subscribeElement("event_node_source@48577", "source");
-        sdSubscription.subscribeElement("event_node_source@48577", "source_module");
-        sdSubscription.subscribeElement("event_node_source@48577", "hostname");
-        sdSubscription.subscribeElement("event_node_relay@48577", "source");
-        sdSubscription.subscribeElement("event_node_relay@48577", "source_module");
-        sdSubscription.subscribeElement("event_node_relay@48577", "hostname");
-        // [teragrep@48577 streamname="log:f17:0" directory="com_teragrep_audit" unixtime="1584572400.0"]
-        sdSubscription.subscribeElement("teragrep@48577", "streamname");
-        sdSubscription.subscribeElement("teragrep@48577", "directory");
-        sdSubscription.subscribeElement("teragrep@48577", "unixtime");
-
         final File logFile = new File("src/test/resources/event.log");
-        final InputStream inputStream = new BufferedInputStream(new FileInputStream(logFile), 32 * 1024 * 1024);
-        final InputStream inputStream2 = new BufferedInputStream(new FileInputStream(logFile), 32 * 1024 * 1024);
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
+        final InputStream inputStream = new BufferedInputStream(Files.newInputStream(logFile.toPath()), 32 * 1024 * 1024);
+        RFC5424Frame rfc5424Frame = new RFC5424Frame();
+        rfc5424Frame.load(inputStream);
 
-        Assertions.assertTrue(parser.next());
-        ResultSetAsString strings1 = new ResultSetAsString(parser.get());
+        Assertions.assertTrue(rfc5424Frame.next());
 
         // Teragrep structured
-        Assertions.assertEquals("2020-03-19T01:00:00+00:00", strings1.getTimestamp());
-        Assertions.assertEquals("sc-99-99-14-25", strings1.getHostname());
-        Assertions.assertEquals("-", strings1.getProcid());
-        Assertions.assertEquals("-", strings1.getMsgid());
-        Assertions.assertEquals("{\"rainfall_rate\": 0.0, \"wind_speed\": 8.0, \"atmosphere_water_vapor_content\": 4.800000190734863, \"atmosphere_cloud_liquid_water_content\": 0.029999997466802597, \"latitude\": -89.875, \"longitude\": 0.125}", strings1.getMsg());
+        Assertions.assertEquals("2020-03-19T01:00:00+00:00", rfc5424Frame.timestamp.toString());
+        Assertions.assertEquals("sc-99-99-14-25", rfc5424Frame.hostname.toString());
+        Assertions.assertEquals("-", rfc5424Frame.procId.toString());
+        Assertions.assertEquals("-", rfc5424Frame.msgId.toString());
+        Assertions.assertEquals("{\"rainfall_rate\": 0.0, \"wind_speed\": 8.0, \"atmosphere_water_vapor_content\": 4.800000190734863, \"atmosphere_cloud_liquid_water_content\": 0.029999997466802597, \"latitude\": -89.875, \"longitude\": 0.125}", rfc5424Frame.msg.toString());
 
         // event_node_source@48577
-        Assertions.assertEquals("f17_ssmis_20200319v7.nc", strings1.getSdValue("event_node_source@48577", "source"));
-        Assertions.assertEquals("imfile", strings1.getSdValue("event_node_source@48577", "source_module"));
-        Assertions.assertEquals("sc-99-99-14-25", strings1.getSdValue("event_node_source@48577", "hostname"));
+        Assertions.assertEquals("f17_ssmis_20200319v7.nc", rfc5424Frame.structuredData.getValue(new SDVector("event_node_source@48577", "source")).toString());
+        Assertions.assertEquals("imfile", rfc5424Frame.structuredData.getValue(new SDVector("event_node_source@48577", "source_module")).toString());
+        Assertions.assertEquals("sc-99-99-14-25", rfc5424Frame.structuredData.getValue(new SDVector("event_node_source@48577", "hostname")).toString());
 
         // event_node_relay@48577
-        Assertions.assertEquals("sc-99-99-14-25", strings1.getSdValue("event_node_relay@48577", "source"));
-        Assertions.assertEquals("imrelp", strings1.getSdValue("event_node_relay@48577", "source_module"));
-        Assertions.assertEquals("localhost", strings1.getSdValue("event_node_relay@48577", "hostname"));
+        Assertions.assertEquals("sc-99-99-14-25", rfc5424Frame.structuredData.getValue(new SDVector("event_node_relay@48577", "source")).toString());
+        Assertions.assertEquals("imrelp", rfc5424Frame.structuredData.getValue(new SDVector("event_node_relay@48577", "source_module")).toString());
+        Assertions.assertEquals("localhost", rfc5424Frame.structuredData.getValue(new SDVector("event_node_relay@48577", "hostname")).toString());
         // teragrep@48577
-        Assertions.assertEquals("log:f17:0", strings1.getSdValue("teragrep@48577", "streamname"));
-        Assertions.assertEquals("com_teragrep_audit", strings1.getSdValue("teragrep@48577", "directory"));
-        Assertions.assertEquals("1584572400.0", strings1.getSdValue("teragrep@48577", "unixtime"));
+        Assertions.assertEquals("log:f17:0", rfc5424Frame.structuredData.getValue(new SDVector("teragrep@48577", "streamname")).toString());
+        Assertions.assertEquals("com_teragrep_audit", rfc5424Frame.structuredData.getValue(new SDVector("teragrep@48577", "directory")).toString());
+        Assertions.assertEquals("1584572400.0", rfc5424Frame.structuredData.getValue(new SDVector("teragrep@48577", "unixtime")).toString());
         // Message Finished
     }
 
     @Test
     void consecutiveNoNewLine() throws Exception {
         String SYSLOG_MESSAGE = "<46>1 2021-03-18T12:29:36.842898+02:00 logsource.example.com rsyslogd-pstats - - [event_id@48577 hostname=\"logsource.example.com\" uuid=\"80AA765156F34854B9806BC69FF68659\" unixtime=\"1616063376\" id_source=\"source\"][event_format@48577 original_format=\"rfc5424\"][event_node_relay@48577 hostname=\"logrelay.example.com\" source=\"172.17.254.29\" source_module=\"imudp\"][event_version@48577 major=\"2\" minor=\"2\" hostname=\"logrelay.example.com\" version_source=\"relay\"][event_node_router@48577 source=\"172.17.254.16\" source_module=\"imrelp\" hostname=\"logrouter.example.com\"][teragrep@48577 streamname=\"stats:impstats:0\" directory=\"rsyslogd-pstats\" unixtime=\"1616070576\"] {\"@timestamp\":\"2021-03-18T12:29:36.842898+02:00\",\"host\":\"logsource.example.com\",\"source-module\":\"impstats\", \"name\": \"tags-out\", \"origin\": \"dynstats.bucket\", \"values\": { } }";
-
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.subscribeAll();
-
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        sdSubscription.subscribeElement("event_id@48577", "hostname");
-
-
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription);
+        RFC5424Frame rfc5424Frame = new RFC5424Frame();
 
         int count = 2;
         for (int i = 0; i < count; i++) {
-            parser.setInputStream(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
+            rfc5424Frame.load(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
 
-            Assertions.assertTrue(parser.next());
-            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
+            Assertions.assertTrue(rfc5424Frame.next());
 
             // Message 1
-            Assertions.assertEquals("46", strings1.getPriority());
-            Assertions.assertEquals("1", strings1.getVersion());
-            Assertions.assertEquals("2021-03-18T12:29:36.842898+02:00", strings1.getTimestamp());
-            Assertions.assertEquals("logsource.example.com", strings1.getHostname());
-            Assertions.assertEquals("rsyslogd-pstats", strings1.getAppname());
-            Assertions.assertEquals("-", strings1.getProcid());
-            Assertions.assertEquals("-", strings1.getMsgid());
-            Assertions.assertEquals("{\"@timestamp\":\"2021-03-18T12:29:36.842898+02:00\",\"host\":\"logsource.example.com\",\"source-module\":\"impstats\", \"name\": \"tags-out\", \"origin\": \"dynstats.bucket\", \"values\": { } }", strings1.getMsg());
+            Assertions.assertEquals("46", rfc5424Frame.priority.toString());
+            Assertions.assertEquals("1", rfc5424Frame.version.toString());
+            Assertions.assertEquals("2021-03-18T12:29:36.842898+02:00", rfc5424Frame.timestamp.toString());
+            Assertions.assertEquals("logsource.example.com", rfc5424Frame.hostname.toString());
+            Assertions.assertEquals("rsyslogd-pstats", rfc5424Frame.appName.toString());
+            Assertions.assertEquals("-", rfc5424Frame.procId.toString());
+            Assertions.assertEquals("-", rfc5424Frame.msgId.toString());
+            Assertions.assertEquals("{\"@timestamp\":\"2021-03-18T12:29:36.842898+02:00\",\"host\":\"logsource.example.com\",\"source-module\":\"impstats\", \"name\": \"tags-out\", \"origin\": \"dynstats.bucket\", \"values\": { } }", rfc5424Frame.msg.toString());
 
             // Structured Data 1
-            Assertions.assertEquals("logsource.example.com", strings1.getSdValue("event_id@48577", "hostname"));
+            Assertions.assertEquals("logsource.example.com", rfc5424Frame.structuredData.getValue(new SDVector("event_id@48577", "hostname")).toString());
         }
 
         // finally empty
-        assertFalse(parser.next());
-        ResultSetAsString strings1 = new ResultSetAsString(parser.get());
+        assertFalse(rfc5424Frame.next());
 
         // Message Finished
-        Assertions.assertEquals("", strings1.getPriority());
-        Assertions.assertEquals("", strings1.getVersion());
-        Assertions.assertEquals("", strings1.getTimestamp());
-        Assertions.assertEquals("", strings1.getHostname());
-        Assertions.assertEquals("", strings1.getAppname());
-        Assertions.assertEquals("", strings1.getProcid());
-        Assertions.assertEquals("", strings1.getMsgid());
-        Assertions.assertEquals("", strings1.getMsg());
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.priority::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.version::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.timestamp::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.hostname::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.appName::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.procId::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msgId::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msg::toString);
 
         // Structured Data Finished
-        Assertions.assertEquals("", strings1.getSdValue("event_id@48577", "hostname"));
-
+        assertThrows(IllegalStateException.class, () -> {
+            rfc5424Frame.structuredData.getValue(new SDVector("event_id@48577", "hostname")).toString();
+        });
     }
 
     @Test
     void consecutiveWithNewLine() throws Exception {
         String SYSLOG_MESSAGE = "<46>1 2021-03-25T15:14:09.449777+02:00 logsource.example.com rsyslogd-pstats - - [event_id@48577 hostname=\"logsource.example.com\" uuid=\"30AF2CD3C24F47C8BA687D56E0300246\" unixtime=\"1616678049\" id_source=\"source\"][event_format@48577 original_format=\"rfc5424\"][event_node_relay@48577 hostname=\"logrelay.example.com\" source=\"172.17.254.29\" source_module=\"imudp\"][event_version@48577 major=\"2\" minor=\"2\" hostname=\"logrelay.example.com\" version_source=\"relay\"][event_node_router@48577 source=\"172.17.254.16\" source_module=\"imrelp\" hostname=\"logrouter.example.com\"][teragrep@48577 streamname=\"stats:impstats:0\" directory=\"rsyslogd-pstats\" unixtime=\"1616685249\"] {\"@timestamp\":\"2021-03-25T15:14:09.449777+02:00\",\"host\":\"logsource.example.com\",\"source-module\":\"impstats\", \"name\": \"resource-usage\", \"origin\": \"impstats\", \"utime\": 693053726, \"stime\": 133593735, \"maxrss\": 4690828, \"minflt\": 46694808, \"majflt\": 0, \"inblock\": 122077416, \"oublock\": 123878288, \"nvcsw\": 7199, \"nivcsw\": 9287, \"openfiles\": 20 }\n";
-
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.subscribeAll();
-
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        sdSubscription.subscribeElement("event_id@48577", "hostname");
-
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription);
+        RFC5424Frame rfc5424Frame = new RFC5424Frame();
 
         int count = 2;
         for (int i = 0; i < count; i++) {
-            parser.setInputStream(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
+            rfc5424Frame.load(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
 
-            Assertions.assertTrue(parser.next());
-            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
+            Assertions.assertTrue(rfc5424Frame.next());
 
             // Message 1
-            Assertions.assertEquals("46", strings1.getPriority());
-            Assertions.assertEquals("1", strings1.getVersion());
-            Assertions.assertEquals("2021-03-25T15:14:09.449777+02:00", strings1.getTimestamp());
-            Assertions.assertEquals("logsource.example.com", strings1.getHostname());
-            Assertions.assertEquals("rsyslogd-pstats", strings1.getAppname());
-            Assertions.assertEquals("-", strings1.getProcid());
-            Assertions.assertEquals("-", strings1.getMsgid());
-            Assertions.assertEquals("{\"@timestamp\":\"2021-03-25T15:14:09.449777+02:00\",\"host\":\"logsource.example.com\",\"source-module\":\"impstats\", \"name\": \"resource-usage\", \"origin\": \"impstats\", \"utime\": 693053726, \"stime\": 133593735, \"maxrss\": 4690828, \"minflt\": 46694808, \"majflt\": 0, \"inblock\": 122077416, \"oublock\": 123878288, \"nvcsw\": 7199, \"nivcsw\": 9287, \"openfiles\": 20 }", strings1.getMsg());
+            Assertions.assertEquals("46", rfc5424Frame.priority.toString());
+            Assertions.assertEquals("1", rfc5424Frame.version.toString());
+            Assertions.assertEquals("2021-03-25T15:14:09.449777+02:00", rfc5424Frame.timestamp.toString());
+            Assertions.assertEquals("logsource.example.com", rfc5424Frame.hostname.toString());
+            Assertions.assertEquals("rsyslogd-pstats", rfc5424Frame.appName.toString());
+            Assertions.assertEquals("-", rfc5424Frame.procId.toString());
+            Assertions.assertEquals("-", rfc5424Frame.msgId.toString());
+            Assertions.assertEquals("{\"@timestamp\":\"2021-03-25T15:14:09.449777+02:00\",\"host\":\"logsource.example.com\",\"source-module\":\"impstats\", \"name\": \"resource-usage\", \"origin\": \"impstats\", \"utime\": 693053726, \"stime\": 133593735, \"maxrss\": 4690828, \"minflt\": 46694808, \"majflt\": 0, \"inblock\": 122077416, \"oublock\": 123878288, \"nvcsw\": 7199, \"nivcsw\": 9287, \"openfiles\": 20 }", rfc5424Frame.msg.toString());
 
             // Structured Data 1
-            Assertions.assertEquals("logsource.example.com", strings1.getSdValue("event_id@48577", "hostname"));
+            Assertions.assertEquals("logsource.example.com", rfc5424Frame.structuredData.getValue(new SDVector("event_id@48577", "hostname")).toString());
         }
 
         // finally empty
-        assertFalse(parser.next());
-        ResultSetAsString strings1 = new ResultSetAsString(parser.get());
+        assertFalse(rfc5424Frame.next());
 
         // Message Finished
-        Assertions.assertEquals("", strings1.getPriority());
-        Assertions.assertEquals("", strings1.getVersion());
-        Assertions.assertEquals("", strings1.getTimestamp());
-        Assertions.assertEquals("", strings1.getHostname());
-        Assertions.assertEquals("", strings1.getAppname());
-        Assertions.assertEquals("", strings1.getProcid());
-        Assertions.assertEquals("", strings1.getMsgid());
-        Assertions.assertEquals("", strings1.getMsg());
+        assertThrows(IllegalStateException.class, rfc5424Frame.priority::toString);
+        assertThrows(IllegalStateException.class, rfc5424Frame.version::toString);
+        assertThrows(IllegalStateException.class, rfc5424Frame.timestamp::toString);
+        assertThrows(IllegalStateException.class, rfc5424Frame.hostname::toString);
+        assertThrows(IllegalStateException.class, rfc5424Frame.appName::toString);
+        assertThrows(IllegalStateException.class, rfc5424Frame.procId::toString);
+        assertThrows(IllegalStateException.class, rfc5424Frame.msgId::toString);
+        assertThrows(IllegalStateException.class, rfc5424Frame.msg::toString);
 
 
         // Structured Data Finished
-        Assertions.assertEquals("", strings1.getSdValue("event_id@48577", "hostname"));
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+            rfc5424Frame.structuredData.getValue(new SDVector("event_id@48577", "hostname")).toString();
+        });
 
     }
 
@@ -347,31 +294,23 @@ public class SyntaxTest {
     public void testNoSd() throws IOException {
         String SYSLOG_MESSAGE = "<134>1 2019-03-08T14:00:00+02:00 host-1-2-3-4 app-tag - - -  1.2.3.4 - - [08/Mar/2019:14:00:00 +0200] \"POST /idt/device/";
 
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.subscribeAll();
-
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        //sdSubscription.subscribeElement("ID_A@1","u");
-
         InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes());
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
+        RFC5424Frame rfc5424Frame = new RFC5424Frame();
+        rfc5424Frame.load(inputStream);
 
         int count = 1;
         for (int i = 0; i < count; i++) {
-            Assertions.assertTrue(parser.next());
-            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
+            Assertions.assertTrue(rfc5424Frame.next());
+            Assertions.assertEquals("134", rfc5424Frame.priority.toString());
+            Assertions.assertEquals("1", rfc5424Frame.version.toString());
+            Assertions.assertEquals("2019-03-08T14:00:00+02:00", rfc5424Frame.timestamp.toString());
+            Assertions.assertEquals("host-1-2-3-4", rfc5424Frame.hostname.toString());
+            Assertions.assertEquals("app-tag", rfc5424Frame.appName.toString());
+            Assertions.assertEquals("-", rfc5424Frame.procId.toString());
+            Assertions.assertEquals("-", rfc5424Frame.msgId.toString());
+            Assertions.assertEquals(" 1.2.3.4 - - [08/Mar/2019:14:00:00 +0200] \"POST /idt/device/", rfc5424Frame.msg.toString());
 
-            Assertions.assertEquals("134", strings1.getPriority());
-            Assertions.assertEquals("1", strings1.getVersion());
-            Assertions.assertEquals("2019-03-08T14:00:00+02:00", strings1.getTimestamp());
-            Assertions.assertEquals("host-1-2-3-4", strings1.getHostname());
-            Assertions.assertEquals("app-tag", strings1.getAppname());
-            Assertions.assertEquals("-", strings1.getProcid());
-            Assertions.assertEquals("-", strings1.getMsgid());
-            Assertions.assertEquals(" 1.2.3.4 - - [08/Mar/2019:14:00:00 +0200] \"POST /idt/device/", strings1.getMsg());
-
-            assertFalse(parser.next());
+            assertFalse(rfc5424Frame.next());
 
             inputStream.reset();
         }
@@ -380,36 +319,24 @@ public class SyntaxTest {
     @Test
     public void brokenSDElemWorkaroundTest() throws IOException {
         String SYSLOG_MESSAGE = "<15>1 2021-11-10T12:46:33+02:00 HOST01A  PROD01A - [event_id@48577 hostname=\"somehostname.tld\" uuid=\"4849E84B6C1C42C09551DC06F4D7F4AE\" unixtime=\"1636548393\" id_source=\"relay\"][rfc3164@48577 syslogtag=\"[i][be][broken][sdelem]\"][event_format@48577 original_format=\"rfc3164\"][event_node_relay@48577 hostname=\"relay.somedomain.tld\" source=\"gateway\" source_module=\"imptcp\"][event_version@48577 major=\"2\" minor=\"2\" hostname=\"relay.somedomain.tld\" version_source=\"relay\"][event_node_router@48577 source=\"127.1.2.3\" source_module=\"imrelp\" hostname=\"route.somedomain.tld\"][teragrep@48577 streamname=\"on:two:messages:0\" directory=\"host_log_data\" unixtime=\"1636548394\"]  source-http <snip>";
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.subscribeAll();
-
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        /*
-         there is an illegal field in syslogtag containing brackets
-         it is fixed by subscribing to it.
-         */
-        sdSubscription.subscribeElement("rfc3164@48577", "syslogtag");
-
 
         InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes());
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream, false);
+        RFC5424Frame rfc5424Frame = new RFC5424Frame(false);
+        rfc5424Frame.load(inputStream);
 
         int count = 1;
         for (int i = 0; i < count; i++) {
-            Assertions.assertTrue(parser.next());
-            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
+            Assertions.assertTrue(rfc5424Frame.next());
+            Assertions.assertEquals("15", rfc5424Frame.priority.toString());
+            Assertions.assertEquals("1", rfc5424Frame.version.toString());
+            Assertions.assertEquals("2021-11-10T12:46:33+02:00", rfc5424Frame.timestamp.toString());
+            Assertions.assertEquals("HOST01A", rfc5424Frame.hostname.toString());
+            Assertions.assertEquals("", rfc5424Frame.appName.toString());
+            Assertions.assertEquals("PROD01A", rfc5424Frame.procId.toString());
+            Assertions.assertEquals("-", rfc5424Frame.msgId.toString());
+            Assertions.assertEquals(" source-http <snip>", rfc5424Frame.msg.toString());
 
-            Assertions.assertEquals("15", strings1.getPriority());
-            Assertions.assertEquals("1", strings1.getVersion());
-            Assertions.assertEquals("2021-11-10T12:46:33+02:00", strings1.getTimestamp());
-            Assertions.assertEquals("HOST01A", strings1.getHostname());
-            Assertions.assertEquals("", strings1.getAppname());
-            Assertions.assertEquals("PROD01A", strings1.getProcid());
-            Assertions.assertEquals("-", strings1.getMsgid());
-            Assertions.assertEquals(" source-http <snip>", strings1.getMsg());
-
-            assertFalse(parser.next());
+            assertFalse(rfc5424Frame.next());
             
 
             inputStream.reset();
@@ -419,31 +346,24 @@ public class SyntaxTest {
     @Test
     public void noSDTest() throws IOException {
         String SYSLOG_MESSAGE = "<15>1 2019-05-29T15:00:00+03:00 PROD03A  PRODA - -  http(Worker1\n";
-
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.subscribeAll();
-
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-
         InputStream inputStream = new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes());
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
+        RFC5424Frame rfc5424Frame = new RFC5424Frame();
+        rfc5424Frame.load(inputStream);
 
         int count = 1;
         for (int i = 0; i < count; i++) {
-            Assertions.assertTrue(parser.next());
-            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
+            Assertions.assertTrue(rfc5424Frame.next());
 
-            Assertions.assertEquals("15", strings1.getPriority());
-            Assertions.assertEquals("1", strings1.getVersion());
-            Assertions.assertEquals("2019-05-29T15:00:00+03:00", strings1.getTimestamp());
-            Assertions.assertEquals("PROD03A", strings1.getHostname());
-            Assertions.assertEquals("", strings1.getAppname());
-            Assertions.assertEquals("PRODA", strings1.getProcid());
-            Assertions.assertEquals("-", strings1.getMsgid());
-            Assertions.assertEquals(" http(Worker1", strings1.getMsg());
+            Assertions.assertEquals("15", rfc5424Frame.priority.toString());
+            Assertions.assertEquals("1", rfc5424Frame.version.toString());
+            Assertions.assertEquals("2019-05-29T15:00:00+03:00", rfc5424Frame.timestamp.toString());
+            Assertions.assertEquals("PROD03A", rfc5424Frame.hostname.toString());
+            Assertions.assertEquals("", rfc5424Frame.appName.toString());
+            Assertions.assertEquals("PRODA", rfc5424Frame.procId.toString());
+            Assertions.assertEquals("-", rfc5424Frame.msgId.toString());
+            Assertions.assertEquals(" http(Worker1", rfc5424Frame.msg.toString());
 
-            assertFalse(parser.next());
+            assertFalse(rfc5424Frame.next());
 
             inputStream.reset();
         }
@@ -452,91 +372,72 @@ public class SyntaxTest {
     @Test
     void consecutiveMoSDTest() throws Exception {
         String SYSLOG_MESSAGE = "<15>1 2019-05-29T15:00:00+03:00 PROD03A  PRODA - -  http(Worker1\n";
-
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.subscribeAll();
-
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-
-        sdSubscription.subscribeElement("event_id@48577", "hostname");
-
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription);
+        RFC5424Frame rfc5424Frame = new RFC5424Frame();
 
         int count = 2;
         for (int i = 0; i < count; i++) {
-            parser.setInputStream(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
+            rfc5424Frame.load(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
 
-            Assertions.assertTrue(parser.next());
-            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
-
+            Assertions.assertTrue(rfc5424Frame.next());
             // Message 1
-            Assertions.assertEquals("15", strings1.getPriority());
-            Assertions.assertEquals("1", strings1.getVersion());
-            Assertions.assertEquals("2019-05-29T15:00:00+03:00", strings1.getTimestamp());
-            Assertions.assertEquals("PROD03A", strings1.getHostname());
-            Assertions.assertEquals("", strings1.getAppname());
-            Assertions.assertEquals("PRODA", strings1.getProcid());
-            Assertions.assertEquals("-", strings1.getMsgid());
-            Assertions.assertEquals(" http(Worker1", strings1.getMsg());
+            Assertions.assertEquals("15", rfc5424Frame.priority.toString());
+            Assertions.assertEquals("1", rfc5424Frame.version.toString());
+            Assertions.assertEquals("2019-05-29T15:00:00+03:00", rfc5424Frame.timestamp.toString());
+            Assertions.assertEquals("PROD03A", rfc5424Frame.hostname.toString());
+            Assertions.assertEquals("", rfc5424Frame.appName.toString());
+            Assertions.assertEquals("PRODA", rfc5424Frame.procId.toString());
+            Assertions.assertEquals("-", rfc5424Frame.msgId.toString());
+            Assertions.assertEquals(" http(Worker1", rfc5424Frame.msg.toString());
         }
 
         // finally empty
-        assertFalse(parser.next());
-        ResultSetAsString strings1 = new ResultSetAsString(parser.get());
+        assertFalse(rfc5424Frame.next());
 
         // Message Finished
-        Assertions.assertEquals("", strings1.getPriority());
-        Assertions.assertEquals("", strings1.getVersion());
-        Assertions.assertEquals("", strings1.getTimestamp());
-        Assertions.assertEquals("", strings1.getHostname());
-        Assertions.assertEquals("", strings1.getAppname());
-        Assertions.assertEquals("", strings1.getProcid());
-        Assertions.assertEquals("", strings1.getMsgid());
-        Assertions.assertEquals("", strings1.getMsg());
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.priority::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.version::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.timestamp::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.hostname::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.appName::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.procId::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msgId::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msg::toString);
     }
 
     @Test
     void multipleNewlinesInMsg() throws Exception {
         String SYSLOG_MESSAGE = "<14>1 2022-12-13T14:41:29.715Z test-stream 9627df7a-testi - - - Testing text.\ntest\ning.\n";
 
-        RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-        subscription.subscribeAll();
-
-        RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-        sdSubscription.subscribeElement("event_id@48577", "hostname");
-
-        RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, false);
+        RFC5424Frame rfc5424Frame = new RFC5424Frame(false);
 
         int count = 1;
         for (int i = 0; i < count; i++) {
-            parser.setInputStream(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
+            rfc5424Frame.load(new ByteArrayInputStream((SYSLOG_MESSAGE).getBytes()));
 
-            Assertions.assertTrue(parser.next());
-            ResultSetAsString strings1 = new ResultSetAsString(parser.get());
+            Assertions.assertTrue(rfc5424Frame.next());
 
             // Message 1
-            Assertions.assertEquals("14", strings1.getPriority());
-            Assertions.assertEquals("1", strings1.getVersion());
-            Assertions.assertEquals("2022-12-13T14:41:29.715Z", strings1.getTimestamp());
-            Assertions.assertEquals("test-stream", strings1.getHostname());
-            Assertions.assertEquals("9627df7a-testi", strings1.getAppname());
-            Assertions.assertEquals("-", strings1.getProcid());
-            Assertions.assertEquals("-", strings1.getMsgid());
-            Assertions.assertEquals("Testing text.\ntest\ning.\n", strings1.getMsg());
+            Assertions.assertEquals("14", rfc5424Frame.priority.toString());
+            Assertions.assertEquals("1", rfc5424Frame.version.toString());
+            Assertions.assertEquals("2022-12-13T14:41:29.715Z", rfc5424Frame.timestamp.toString());
+            Assertions.assertEquals("test-stream", rfc5424Frame.hostname.toString());
+            Assertions.assertEquals("9627df7a-testi", rfc5424Frame.appName.toString());
+            Assertions.assertEquals("-", rfc5424Frame.procId.toString());
+            Assertions.assertEquals("-", rfc5424Frame.msgId.toString());
+            Assertions.assertEquals("Testing text.\ntest\ning.\n", rfc5424Frame.msg.toString());
         }
 
         // finally empty
-        assertFalse(parser.next());
-        ResultSetAsString strings1 = new ResultSetAsString(parser.get());
+        assertFalse(rfc5424Frame.next());
 
         // Message Finished
-        Assertions.assertEquals("", strings1.getPriority());
-        Assertions.assertEquals("", strings1.getVersion());
-        Assertions.assertEquals("", strings1.getTimestamp());
-        Assertions.assertEquals("", strings1.getHostname());
-        Assertions.assertEquals("", strings1.getAppname());
-        Assertions.assertEquals("", strings1.getProcid());
-        Assertions.assertEquals("", strings1.getMsgid());
-        Assertions.assertEquals("", strings1.getMsg());
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.priority::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.version::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.timestamp::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.hostname::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.appName::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.procId::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msgId::toString);
+        Assertions.assertThrows(IllegalStateException.class, rfc5424Frame.msg::toString);
     }
 }

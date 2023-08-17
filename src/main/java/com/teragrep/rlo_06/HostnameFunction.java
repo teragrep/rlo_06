@@ -45,74 +45,43 @@
  */
 package com.teragrep.rlo_06;
 
-/*
-public static final String SYSLOG_LINE_ALL = "<14>1 2014-06-20T09:14:07+00:00 loggregator"
-            + " d0602076-b14a-4c55-852a-981e7afeed38 DEA MSG-01"
-            + " [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"]"
-            + "[exampleSDID@32480 iut=\"4\" eventSource=\"Other Application\" eventID=\"2022\"] Removing instance";
- */
+import java.nio.ByteBuffer;
+import java.util.function.BiFunction;
 
-public enum ParserEnum {
-    PRIORITY {
-        @Override
-        public ParserEnum nextState() {
-            return VERSION;
-        }
-    },
-    VERSION {
-        @Override
-        public ParserEnum nextState() {
-            return TIMESTAMP;
-        }
-    },
-    TIMESTAMP {
-        @Override
-        public ParserEnum nextState() {
-            return HOSTNAME;
-        }
-    },
-    HOSTNAME {
-        @Override
-        public ParserEnum nextState() {
-            return APPNAME;
-        }
-    },
-    APPNAME {
-        @Override
-        public ParserEnum nextState() {
-            return PROCID;
-        }
-    },
-    PROCID {
-        @Override
-        public ParserEnum nextState() {
-            return MSGID;
-        }
-    },
-    MSGID  {
-        @Override
-        public ParserEnum nextState() {
-            return SD_PARSE;
-        }
-    },
-    SD_PARSE  {
-        @Override
-        public ParserEnum nextState() {
-            return MSG;
-        }
-    },
-    MSG  {
-        @Override
-        public ParserEnum nextState() {
-            return NL;
-        }
-    },
-    NL {
-        @Override
-        public ParserEnum nextState() {
-            return this;
-        }
-    };
+public final class HostnameFunction implements BiFunction<Stream, ByteBuffer, ByteBuffer> {
+    /*
+                                                      |||||||
+                                                      vvvvvvv
+                <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
 
-    public abstract ParserEnum nextState();
+                Actions: ______O
+                Payload:'host01 '
+                States : ......T
+                */
+
+    @Override
+    public ByteBuffer apply(Stream stream, ByteBuffer buffer) {
+
+        short hostname_max_left = 255;
+
+        if (!stream.next()) {
+            throw new ParseException("Expected HOSTNAME, received nothing");
+        }
+        byte b = stream.get();
+        while (hostname_max_left > 0 && b != 32) {
+            buffer.put(b);
+            hostname_max_left--;
+
+            if (!stream.next()) {
+                throw new ParseException("HOSTNAME is too short, can't continue");
+            }
+            b = stream.get();
+        }
+
+        if (b != 32) {
+            throw new HostnameParseException("SP missing after HOSTNAME or HOSTNAME too long");
+        }
+        buffer.flip();
+        return buffer;
     }
+}

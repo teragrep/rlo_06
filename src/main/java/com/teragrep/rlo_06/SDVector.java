@@ -45,62 +45,37 @@
  */
 package com.teragrep.rlo_06;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayInputStream;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+public final class SDVector {
 
-public class MsgIdTest {
-    @Test
-    public void parseTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
+    public final String sdElementId;
+    public final String sdParamKey;
 
-        String input = "987654 ";
+    final ByteBuffer sdElementIdBB;
+    final ByteBuffer sdParamKeyBB;
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+    public SDVector(String sdElementId, String sdParamKey) {
+        this.sdElementId = sdElementId;
+        this.sdParamKey = sdParamKey;
 
-        Stream stream = new Stream(bais);
+        byte[] sdIDBytes = this.sdElementId.getBytes(StandardCharsets.US_ASCII);
+        this.sdElementIdBB = ByteBuffer.allocateDirect(sdIDBytes.length);
+        this.sdElementIdBB.put(sdIDBytes);
+        this.sdElementIdBB.flip();
 
-        msgId.accept(stream);
-
-        Assertions.assertEquals("987654", msgId.toString());
+        byte[] sdKeyBytes = this.sdParamKey.getBytes(StandardCharsets.US_ASCII);
+        this.sdParamKeyBB = ByteBuffer.allocateDirect(sdKeyBytes.length);
+        this.sdParamKeyBB.put(sdKeyBytes);
+        this.sdParamKeyBB.flip();
     }
 
-    @Test
-    public void dashMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
-
-        String input = "- ";
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-
-        Stream stream = new Stream(bais);
-
-        msgId.accept(stream);
-
-        Assertions.assertEquals("-", msgId.toString());
-    }
-
-    @Test
-    public void tooLongMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
-
-        String input = "9876543210987654321098765432109876543210 ";
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-        assertThrows(MsgIdParseException.class, () -> {
-            Stream stream = new Stream(bais);
-            msgId.accept(stream);
-            msgId.toString();
-        });
+    @Override
+    public String toString() {
+        return "SDVector{" +
+                "sdElementId='" + sdElementId + '\'' +
+                ", sdParamKey='" + sdParamKey + '\'' +
+                '}';
     }
 }

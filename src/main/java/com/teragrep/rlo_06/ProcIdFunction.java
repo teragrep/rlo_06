@@ -45,62 +45,43 @@
  */
 package com.teragrep.rlo_06;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import java.nio.ByteBuffer;
+import java.util.function.BiFunction;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
+public final class ProcIdFunction implements BiFunction<Stream, ByteBuffer, ByteBuffer> {
+    /*
+                                                             ||||
+                                                             vvvv
+        <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+        Actions: ___O
+        Payload:'DEA '
+        States : ...T
+        */
 
-public class MsgIdTest {
-    @Test
-    public void parseTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
+    @Override
+    public ByteBuffer apply(Stream stream, ByteBuffer buffer) {
+        byte b;
+        short procid_max_left = 128;
 
-        String input = "987654 ";
+        if (!stream.next()) {
+            throw new ParseException("Expected PROCID, received nothing");
+        }
+        b = stream.get();
+        while (procid_max_left > 0 && b != 32) {
+            buffer.put(b);
+            procid_max_left--;
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+            if (!stream.next()) {
+                throw new ParseException("PROCID is too short, can't continue");
+            }
+            b = stream.get();
+        }
 
-        Stream stream = new Stream(bais);
-
-        msgId.accept(stream);
-
-        Assertions.assertEquals("987654", msgId.toString());
-    }
-
-    @Test
-    public void dashMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
-
-        String input = "- ";
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-
-        Stream stream = new Stream(bais);
-
-        msgId.accept(stream);
-
-        Assertions.assertEquals("-", msgId.toString());
-    }
-
-    @Test
-    public void tooLongMsgIdTest() {
-        Fragment msgId = new Fragment(32, new MsgIdFunction());
-
-        String input = "9876543210987654321098765432109876543210 ";
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
-        assertThrows(MsgIdParseException.class, () -> {
-            Stream stream = new Stream(bais);
-            msgId.accept(stream);
-            msgId.toString();
-        });
+        if (b != 32) {
+            throw new ProcIdParseException("SP missing after PROCID or PROCID too long");
+        }
+        buffer.flip();
+        return buffer;
     }
 }
