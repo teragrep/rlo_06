@@ -53,16 +53,11 @@ You can also access structured data directly as a list:
 
 [source,java]
 ----
-Map<String, Map<String,String>> sdIdSdKeySdValueMap = new HashMap<>();
 for (SDElement sdElement : rfc5424Frame.structuredData.sdElements) {
-    if (!sdIdSdKeySdValueMap.containsKey(sdElement.sdElementId.toString())) {
-        sdIdSdKeySdValueMap.put(sdElement.toString(),new HashMap<>());
-    }
-
-    Map<String,String> sdParamMap = sdIdSdKeySdValueMap.get(sdElement.sdElementId.toString());
-
+    System.out.println("Current element: " + sdElement.sdElementId.toString());
     for (SDParam sdParam : sdElement.sdParams) {
-        sdParamMap.put(sdParam.sdParamKey.toString(), sdParam.sdParamValue.toString());
+        System.out.println("Current key: " + sdParam.sdParamKey.toString());
+        System.out.println("Current value: " + sdParam.sdParamValue.toString());
     }
 }
 ----
