@@ -14,66 +14,37 @@ AGPLv3 with link:https://github.com/teragrep/rlo_06/blob/master/LICENSE#L665-L67
 
 
 == Usage
-This parser uses subscriptions to pick up interesting message elements
-from the message stream.
-
-For generic message property extraction use:
 
 [source,java]
+
+Simply create a `new RFC5424Frame`, give it an inputstream with `load(inputStream)` and read data with `next()`. It will return true or false depending on whether there were data to read. Note that `toString()` needs to be used when printing. You can optionally pass `true` to in the constructor for enabling newline feed termination
+
 ----
-RFC5424ParserSubscription subscription = new RFC5424ParserSubscription();
-subscription.subscribeAll();
-// or following where parameter is type of ParserEnum
-subscription.add(ParserEnum.TIMESTAMP);
-subscription.add(ParserEnum.MSG);
+boolean linefeedTermination = false;
+RFC5424Frame rfc5424Frame = new RFC5424Frame(linefeedTermination);
+rfc5424Frame.load(inputStream);
+if(rfc5424Frame.next()) {
+    System.out.println("Priority: " + rfc5424Frame.priority.toString());
+    System.out.println("Version: " + rfc5424Frame.version.toString());
+    System.out.println("Timestamp: " + rfc5424Frame.timestamp.toString());
+    System.out.println("Hostname: " + rfc5424Frame.hostname.toString());
+    System.out.println("Appname: " + rfc5424Frame.appName.toString());
+    System.out.println("ProcID: " + rfc5424Frame.procId.toString());
+    System.out.println("MsgID: " + rfc5424Frame.msgId.toString());
+    System.out.println("Message: " + rfc5424Frame.msg.toString());
+}
+else {
+    System.out.printn("No data left");
+}
 ----
 
 For structured data property extraction use:
 
 [source,java]
 ----
-RFC5424ParserSDSubscription sdSubscription = new RFC5424ParserSDSubscription();
-// subscribe with following where first is SD-ID and second is PARAM-NAME
-sdSubscription.subscribeElement("event_key@12345","paramKey");
-----
+SDVector sdVector = new SDVector("ID_ELEMENT_NAME@48577", "ELEMENT_KEY");
+// "<14>1 2014-06-20T09:14:07.123456+00:00 hostname appname - - [ID_ELEMENT_NAME@48577 ELEMENT_KEY=\"MyValue\"] message";
+//                                                               ^^^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^
 
-Create a parser and set inputStream manually with automatic newline termination, defaults true
-
-[source,java]
-----
-RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription);
-parser.setInputStream(inputStream);
-----
-
-Create a parser and set inputStream manually with explicit newline termination
-
-[source,java]
-----
-RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, false);
-parser.setInputStream(inputStream);
-----
-
-You can pass the inputStream from constructor with automatic newline termination, defaults true
-
-[source,java]
-----
-RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream);
-----
-
-You can pass the inputStream from constructor with explicit newline termination
-
-[source,java]
-----
-RFC5424Parser parser = new RFC5424Parser(subscription, sdSubscription, inputStream, false);
-----
-
-Next event can be extracted as follows
-
-[source,java]
-----
-if (parser.next()) {
-  ResultSetAsString results = new ResultSetAsString(parser.get());
-  String msg = results.getMsg();
-  String sdValue = results.getSdValue("event_key@12345","paramKey");
-}
+System.out.println(rfc5424Frame.structuredData.getValue(sdVector).toString()); // Returns `MyValue`
 ----
