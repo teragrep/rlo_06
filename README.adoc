@@ -54,10 +54,9 @@ You can also access structured data directly as a list:
 [source,java]
 ----
 for (SDElement sdElement : rfc5424Frame.structuredData.sdElements) {
-    System.out.println("Current element: " + sdElement.sdElementId.toString());
+    System.out.println("SDElement " + sdElement.sdElementId + " has: ");
     for (SDParam sdParam : sdElement.sdParams) {
-        System.out.println("Current key: " + sdParam.sdParamKey.toString());
-        System.out.println("Current value: " + sdParam.sdParamValue.toString());
+        System.out.println("\tKey: '" + sdParam.sdParamKey + "' Value: '"+ sdParam.sdParamValue + "'");
     }
 }
 ----
