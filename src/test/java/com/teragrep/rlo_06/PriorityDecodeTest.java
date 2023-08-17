@@ -45,67 +45,28 @@
  */
 package com.teragrep.rlo_06;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.time.ZonedDateTime;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public final class Fragment implements Consumer<Stream>, Clearable, Matchable, Byteable {
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-    private final ByteBuffer buffer;
-    private FragmentState fragmentState;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-    final BiFunction<Stream, ByteBuffer, ByteBuffer> parseRule;
+public class PriorityDecodeTest {
+    @Test
+    public void testDecodePriority() throws IOException {
+        String SYSLOG_MESSAGE = "<134>1 2018-01-01T10:12:00+01:00 hostname appname - - - Message";
+        InputStream inputStream = new ByteArrayInputStream(SYSLOG_MESSAGE.getBytes());
+        RFC5424Frame rfc5424Frame = new RFC5424Frame(true);
+        rfc5424Frame.load(inputStream);
+        assertTrue(rfc5424Frame.next());
 
-    Fragment(int bufferSize, BiFunction<Stream, ByteBuffer, ByteBuffer> parseRule) {
-        this.buffer = ByteBuffer.allocateDirect(bufferSize);
-        this.fragmentState = FragmentState.EMPTY;
-        this.parseRule = parseRule;
-    }
+        RFC5424Severity severity = new RFC5424Severity(rfc5424Frame.priority);
+        RFC5424Facility facility = new RFC5424Facility(rfc5424Frame.priority);
 
-    @Override
-    public void accept(Stream stream) {
-        if (fragmentState != FragmentState.EMPTY) {
-            throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
-        }
-        parseRule.apply(stream, buffer);
-        fragmentState = FragmentState.WRITTEN;
-    }
-
-    @Override
-    public void clear() {
-        buffer.clear();
-        fragmentState = FragmentState.EMPTY;
-    }
-
-    @Override
-    public String toString() {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
-        }
-        String string = StandardCharsets.UTF_8.decode(buffer).toString();
-        buffer.rewind();
-        return string;
-    }
-
-    @Override
-    public boolean matches(ByteBuffer other) {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
-        }
-        return buffer.equals(other);
-    }
-
-    @Override
-    public byte[] toBytes() {
-        if (fragmentState != FragmentState.WRITTEN) {
-            throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
-        }
-
-        final byte[] bytes = new byte[buffer.remaining()];
-        buffer.get(bytes);
-        buffer.rewind();
-        return bytes;
+        Assertions.assertEquals(6, severity.getSeverity());
+        Assertions.assertEquals(16, facility.getFacility());
     }
 }

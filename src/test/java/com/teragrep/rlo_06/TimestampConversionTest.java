@@ -76,6 +76,6 @@ public class TimestampConversionTest {
         RFC5424Frame rfc5424Frame = new RFC5424Frame(true);
         rfc5424Frame.load(inputStream);
         assertTrue(rfc5424Frame.next());
-        return rfc5424Frame.timestamp.toZonedDateTime().toString();
+        return new RFC5424Timestamp(rfc5424Frame.timestamp).toZonedDateTime().toString();
     }
 }
