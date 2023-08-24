@@ -98,10 +98,6 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
         }
         b = stream.get();
 
-        if (b != 45 && b != 91) { // '-' nor '['
-            throw new StructuredDataParseException("SD does not contain '-' or '['");
-        }
-
         /*
          NOTE: here the SD parser may slip into the message, how dirty of it but
          as "-xyz" or "- xyz" or "]xyz" or "] xyz" may exist we need to handle them here.
@@ -113,24 +109,27 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
             if (!stream.next()) {
                 throw new StructuredDataParseException("SD is too short, can't continue");
             }
-            return;
         }
-
-        while (b == 91) { // '[' sd exists
-            SDElement sdElement = sdElementCache.take();
-            sdElement.accept(stream);
-            sdElements.add(sdElement);
+        else if (b == 91) {
+            while (b == 91) { // '[' sd exists
+                SDElement sdElement = sdElementCache.take();
+                sdElement.accept(stream);
+                sdElements.add(sdElement);
              /*
                                         vv            vv
             Payload:'[ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n'
             Payload:            '[ID_A@1] sigsegv\n'
             */
 
-            if (!stream.next()) {
-                throw new StructuredDataParseException("SD is too short, can't continue");
+                if (!stream.next()) {
+                    throw new StructuredDataParseException("SD is too short, can't continue");
+                }
+                b = stream.get(); // will it be '[' or the MSG who knows.
+                // let's find out, note if not '[' then R(ead) and pass to next state
             }
-            b = stream.get(); // will it be '[' or the MSG who knows.
-            // let's find out, note if not '[' then R(ead) and pass to next state
+        }
+        else {
+            throw new StructuredDataParseException("SD does not contain '-' or '['");
         }
         fragmentState = FragmentState.WRITTEN;
     }

@@ -140,5 +140,27 @@ public class StructuredDataTest {
         Assertions.assertThrows(IllegalStateException.class, () -> structuredData.sdElements.get(0).sdParams.get(0).sdParamKey.toString());
     }
 
+    @Test
+    public void parseDashTest() {
+        StructuredData structuredData = new StructuredData();
 
+        String input = "- "; // structured data terminates after the dash character
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(
+                input.getBytes(StandardCharsets.US_ASCII)
+        );
+
+        Stream stream = new Stream(bais);
+
+        structuredData.accept(stream);
+
+        Assertions.assertThrows(NoSuchElementException.class, () -> {
+            structuredData.getValue(new SDVector("id@0", "keyHere"));
+        });
+        structuredData.clear();
+
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+            structuredData.getValue(new SDVector("id@0", "keyHere")).toString();
+        });
+    }
 }
