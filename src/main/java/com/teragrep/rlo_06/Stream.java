@@ -45,6 +45,7 @@
  */
 package com.teragrep.rlo_06;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -61,12 +62,7 @@ final class Stream implements Supplier<Byte> {
 
 
     Stream() {
-        this.inputStream = new InputStream() {
-            @Override
-            public int read() {
-                return 0;
-            }
-        };
+        this.inputStream = new ByteArrayInputStream(new byte[0]);
     }
 
     public void setInputStream(InputStream inputStream) {

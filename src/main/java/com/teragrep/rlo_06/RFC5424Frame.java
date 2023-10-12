@@ -51,7 +51,7 @@ import java.io.InputStream;
 import java.util.function.Consumer;
 
 public final class RFC5424Frame {
-    private Stream stream;
+    private final Stream stream;
     private final Consumer<Stream> streamConsumer;
 
     public final Fragment priority;
@@ -96,8 +96,6 @@ public final class RFC5424Frame {
                                 )
                         )
                 );
-
-        load(new ByteArrayInputStream(new byte[0]));
     }
 
 
