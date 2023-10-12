@@ -60,12 +60,14 @@ public final class SDElement implements Consumer<Stream>, Clearable {
 
     private FragmentState fragmentState;
 
+    private final Fragment stubFragment;
     SDElement() {
         int numElements = 16;
         this.sdElementId = new Fragment(32, new SDElementIdFunction());
         this.sdParams = new ArrayList<>(numElements);
         this.sdParamCache = new SDParamCache(numElements);
         this.fragmentState = FragmentState.EMPTY;
+        this.stubFragment = new Fragment();
     }
     // structured data, oh wow the performance hit
     @Override
@@ -112,18 +114,18 @@ public final class SDElement implements Consumer<Stream>, Clearable {
         if (fragmentState != FragmentState.WRITTEN) {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
+        Fragment rv = stubFragment;
         if (sdElementId.matches(sdVector.sdElementIdBB)) {
             ListIterator<SDParam> listIterator = sdParams.listIterator(sdParams.size());
             while (listIterator.hasPrevious()) {
                 SDParam sdParam = listIterator.previous();
-                try {
-                    return sdParam.getSDParamValue(sdVector);
-                } catch (NoSuchElementException nsee) {
-                    continue;
+                rv = sdParam.getSDParamValue(sdVector);
+                if (!rv.isStub) {
+                    break;
                 }
             }
         }
-        throw new NoSuchElementException();
+        return rv;
     }
 
     @Override

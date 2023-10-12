@@ -53,11 +53,13 @@ public final class SDParam implements Consumer<Stream>, Clearable {
     public final Fragment sdParamValue;
 
     private FragmentState fragmentState;
+    private final Fragment stubFragment;
 
     SDParam() {
         this.sdParamKey = new Fragment(32, new SDParamKeyFunction());
         this.sdParamValue = new Fragment(8*1024, new SDParamValueFunction());
         this.fragmentState = FragmentState.EMPTY;
+        this.stubFragment = new Fragment();
     }
 
     @Override
@@ -93,10 +95,11 @@ public final class SDParam implements Consumer<Stream>, Clearable {
         if (fragmentState != FragmentState.WRITTEN) {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
+        Fragment rv = stubFragment;
         if (sdParamKey.matches(sdVector.sdParamKeyBB)) {
-            return sdParamValue;
+            rv = sdParamValue;
         }
-        throw new NoSuchElementException(sdVector.toString());
+        return rv;
     }
 
     @Override

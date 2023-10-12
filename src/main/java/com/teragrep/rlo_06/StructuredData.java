@@ -76,12 +76,15 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
 
     private FragmentState fragmentState;
 
+    private final Fragment stubFragment;
+
 
     StructuredData() {
         int numElements = 16;
         this.sdElementCache = new SDElementCache(numElements);
         this.sdElements = new ArrayList<>(numElements);
         this.fragmentState = FragmentState.EMPTY;
+        this.stubFragment = new Fragment();
     }
 
     @Override
@@ -152,16 +155,15 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
 
         // reverse search as last value is only that matters
         ListIterator<SDElement> listIterator = sdElements.listIterator(sdElements.size());
+        Fragment rv = stubFragment;
         while(listIterator.hasPrevious()) {
             SDElement sdElement = listIterator.previous();
-            try {
-                return sdElement.getSDParamValue(sdVector);
-            }
-            catch (NoSuchElementException nsee) {
-                continue;
+            rv = sdElement.getSDParamValue(sdVector);
+            if (!rv.isStub) {
+                break;
             }
         }
-        throw new NoSuchElementException(sdVector.toString());
+        return rv;
     }
 
     @Override

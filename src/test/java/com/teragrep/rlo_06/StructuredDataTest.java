@@ -158,9 +158,7 @@ public class StructuredDataTest {
 
         structuredData.accept(stream);
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
-            structuredData.getValue(new SDVector("id@0", "keyHere"));
-        });
+        Assertions.assertTrue(structuredData.getValue(new SDVector("id@0", "keyHere")).isStub);
         structuredData.clear();
 
         Assertions.assertThrows(IllegalStateException.class, () -> {
