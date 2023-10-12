@@ -45,7 +45,6 @@
  */
 package com.teragrep.rlo_06;
 
-import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 public final class SDParam implements Consumer<Stream>, Clearable {

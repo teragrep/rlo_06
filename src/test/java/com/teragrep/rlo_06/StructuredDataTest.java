@@ -50,7 +50,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.NoSuchElementException;
 
 public class StructuredDataTest {
     @Test

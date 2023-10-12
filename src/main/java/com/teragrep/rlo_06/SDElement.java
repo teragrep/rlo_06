@@ -48,7 +48,6 @@ package com.teragrep.rlo_06;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 public final class SDElement implements Consumer<Stream>, Clearable {
