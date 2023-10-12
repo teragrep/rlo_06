@@ -58,16 +58,29 @@ public final class Fragment implements Consumer<Stream>, Clearable, Matchable, B
 
     final BiFunction<Stream, ByteBuffer, ByteBuffer> parseRule;
 
+    final boolean isStub;
+
+    Fragment() {
+        this.isStub = true;
+        this.buffer = ByteBuffer.allocateDirect(0);
+        this.parseRule = (stream, buffer) -> ByteBuffer.allocateDirect(0);
+        this.fragmentState = FragmentState.EMPTY;
+    }
+
     Fragment(int bufferSize, BiFunction<Stream, ByteBuffer, ByteBuffer> parseRule) {
         this.buffer = ByteBuffer.allocateDirect(bufferSize);
         this.fragmentState = FragmentState.EMPTY;
         this.parseRule = parseRule;
+        this.isStub = false;
     }
 
     @Override
     public void accept(Stream stream) {
         if (fragmentState != FragmentState.EMPTY) {
             throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
+        }
+        if (isStub) {
+            throw new IllegalStateException("Fragment isStub");
         }
         parseRule.apply(stream, buffer);
         fragmentState = FragmentState.WRITTEN;

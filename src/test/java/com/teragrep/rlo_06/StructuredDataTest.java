@@ -50,7 +50,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.NoSuchElementException;
 
 public class StructuredDataTest {
     @Test
@@ -158,9 +157,7 @@ public class StructuredDataTest {
 
         structuredData.accept(stream);
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
-            structuredData.getValue(new SDVector("id@0", "keyHere"));
-        });
+        Assertions.assertTrue(structuredData.getValue(new SDVector("id@0", "keyHere")).isStub);
         structuredData.clear();
 
         Assertions.assertThrows(IllegalStateException.class, () -> {
