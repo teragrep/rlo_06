@@ -58,7 +58,7 @@ public final class Fragment implements Consumer<Stream>, Clearable, Matchable, B
 
     final BiFunction<Stream, ByteBuffer, ByteBuffer> parseRule;
 
-    final boolean isStub;
+    public final boolean isStub;
 
     Fragment() {
         this.isStub = true;
