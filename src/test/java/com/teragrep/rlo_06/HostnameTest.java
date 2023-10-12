@@ -64,7 +64,8 @@ public class HostnameTest {
                 input.getBytes(StandardCharsets.US_ASCII)
         );
 
-        Stream stream = new Stream(bais);
+        Stream stream = new Stream();
+        stream.setInputStream(bais);
 
         hostname.accept(stream);
 
@@ -81,7 +82,8 @@ public class HostnameTest {
                 input.getBytes(StandardCharsets.US_ASCII)
         );
 
-        Stream stream = new Stream(bais);
+        Stream stream = new Stream();
+        stream.setInputStream(bais);
 
         hostname.accept(stream);
 
@@ -99,7 +101,8 @@ public class HostnameTest {
         );
 
         assertThrows(HostnameParseException.class, () -> {
-            Stream stream = new Stream(bais);
+            Stream stream = new Stream();
+            stream.setInputStream(bais);
             hostname.accept(stream);
             hostname.toString();
         });

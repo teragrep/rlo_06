@@ -51,7 +51,7 @@ import java.io.InputStream;
 import java.util.function.Consumer;
 
 public final class RFC5424Frame {
-    private Stream stream;
+    private final Stream stream;
     private final Consumer<Stream> streamConsumer;
 
     public final Fragment priority;
@@ -78,6 +78,7 @@ public final class RFC5424Frame {
         this.msgId = new Fragment(32, new MsgIdFunction());
         this.structuredData = new StructuredData();
         this.msg = new Fragment(256*1024, new MsgFunction(lineFeedTermination));
+        this.stream = new Stream();
 
         this.streamConsumer = priority
                 .andThen(version
@@ -95,8 +96,6 @@ public final class RFC5424Frame {
                                 )
                         )
                 );
-
-        load(new ByteArrayInputStream(new byte[0]));
     }
 
 
@@ -138,6 +137,6 @@ public final class RFC5424Frame {
     }
 
     public void load(InputStream inputStream) {
-        stream = new Stream(inputStream);
+        stream.setInputStream(inputStream);
     }
 }

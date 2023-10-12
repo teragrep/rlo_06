@@ -64,7 +64,8 @@ public class AppNameTest {
                 input.getBytes(StandardCharsets.US_ASCII)
         );
 
-        Stream stream = new Stream(bais);
+        Stream stream = new Stream();
+        stream.setInputStream(bais);
 
         appName.accept(stream);
         Assertions.assertEquals("anAppNameTag", appName.toString());
@@ -80,7 +81,8 @@ public class AppNameTest {
                 input.getBytes(StandardCharsets.US_ASCII)
         );
 
-        Stream stream = new Stream(bais);
+        Stream stream = new Stream();
+        stream.setInputStream(bais);
 
         appName.accept(stream);
 
@@ -98,7 +100,8 @@ public class AppNameTest {
         );
 
         assertThrows(AppNameParseException.class, () -> {
-            Stream stream = new Stream(bais);
+            Stream stream = new Stream();
+            stream.setInputStream(bais);
             appName.accept(stream);
             appName.toString();
         });
