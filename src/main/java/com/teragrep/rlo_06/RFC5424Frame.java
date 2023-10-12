@@ -78,6 +78,7 @@ public final class RFC5424Frame {
         this.msgId = new Fragment(32, new MsgIdFunction());
         this.structuredData = new StructuredData();
         this.msg = new Fragment(256*1024, new MsgFunction(lineFeedTermination));
+        this.stream = new Stream();
 
         this.streamConsumer = priority
                 .andThen(version
@@ -138,6 +139,6 @@ public final class RFC5424Frame {
     }
 
     public void load(InputStream inputStream) {
-        stream = new Stream(inputStream);
+        stream.setInputStream(inputStream);
     }
 }

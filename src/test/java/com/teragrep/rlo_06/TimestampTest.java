@@ -62,7 +62,8 @@ public class TimestampTest {
                 input.getBytes(StandardCharsets.US_ASCII)
         );
 
-        Stream stream = new Stream(bais);
+        Stream stream = new Stream();
+        stream.setInputStream(bais);
 
         timestamp.accept(stream);
 

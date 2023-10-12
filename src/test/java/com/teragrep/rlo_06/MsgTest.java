@@ -63,7 +63,8 @@ public class MsgTest {
                 input.getBytes(StandardCharsets.US_ASCII)
         );
 
-        Stream stream = new Stream(bais);
+        Stream stream = new Stream();
+        stream.setInputStream(bais);
 
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
@@ -82,7 +83,8 @@ public class MsgTest {
                 input.getBytes(StandardCharsets.US_ASCII)
         );
 
-        Stream stream = new Stream(bais);
+        Stream stream = new Stream();
+        stream.setInputStream(bais);
 
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
@@ -101,7 +103,8 @@ public class MsgTest {
                 input.getBytes(StandardCharsets.US_ASCII)
         );
 
-        Stream stream = new Stream(bais);
+        Stream stream = new Stream();
+        stream.setInputStream(bais);
 
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
@@ -119,7 +122,8 @@ public class MsgTest {
                 input.getBytes(StandardCharsets.US_ASCII)
         );
 
-        Stream stream = new Stream(bais);
+        Stream stream = new Stream();
+        stream.setInputStream(bais);
 
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
@@ -138,7 +142,8 @@ public class MsgTest {
                 input.getBytes(StandardCharsets.US_ASCII)
         );
 
-        Stream stream = new Stream(bais);
+        Stream stream = new Stream();
+        stream.setInputStream(bais);
 
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
@@ -157,7 +162,8 @@ public class MsgTest {
                 input.getBytes(StandardCharsets.US_ASCII)
         );
 
-        Stream stream = new Stream(bais);
+        Stream stream = new Stream();
+        stream.setInputStream(bais);
 
         Assertions.assertTrue(stream.next()); // msg requires stream called with next
         msg.accept(stream);
