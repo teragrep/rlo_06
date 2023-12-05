@@ -7,7 +7,7 @@
   <artifactId>rlo_06</artifactId>
   <version>${revision}${sha1}${changelist}</version>
   <name>rlo_06</name>
-  <description>Java RFC5424 parser library rlo_06</description>
+  <description>Syslog (RFC 5424) library for Java</description>
   <groupId>com.teragrep</groupId>
   <url>https://teragrep.com</url>
   <properties>
