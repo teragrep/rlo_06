@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -55,6 +55,7 @@ import java.io.InputStream;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PriorityDecodeTest {
+
     @Test
     public void testDecodePriority() throws IOException {
         String SYSLOG_MESSAGE = "<134>1 2018-01-01T10:12:00+01:00 hostname appname - - - Message";

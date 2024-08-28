@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -67,17 +67,18 @@ public class ResultSetAsByteBufferTest {
 
         Assertions.assertTrue(rfc5424Frame.next());
 
-        String sourceModule = rfc5424Frame.structuredData.getValue(new SDVector("event_node_source@48577", "source_module")).toString();
-        String hostname = rfc5424Frame.structuredData.getValue(new SDVector("event_node_relay@48577", "source")).toString();
-        String sourceFile = rfc5424Frame.structuredData.getValue(new SDVector("event_node_source@48577", "source")).toString();
+        String sourceModule = rfc5424Frame.structuredData
+                .getValue(new SDVector("event_node_source@48577", "source_module"))
+                .toString();
+        String hostname = rfc5424Frame.structuredData
+                .getValue(new SDVector("event_node_relay@48577", "source"))
+                .toString();
+        String sourceFile = rfc5424Frame.structuredData
+                .getValue(new SDVector("event_node_source@48577", "source"))
+                .toString();
         assertEquals(
                 "imfile:sc-99-99-14-247:f17_ssmis_20210131v7.nc",
-                String.format(
-                        "%s:%s:%s",
-                        sourceModule,
-                        hostname,
-                        sourceFile
-                )
+                String.format("%s:%s:%s", sourceModule, hostname, sourceFile)
         );
     }
 }

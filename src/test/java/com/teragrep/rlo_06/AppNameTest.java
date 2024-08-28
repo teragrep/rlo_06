@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -54,15 +54,14 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AppNameTest {
+
     @Test
     public void parseTest() {
         Fragment appName = new Fragment(48, new AppNameFunction());
 
         String input = "anAppNameTag ";
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        ByteArrayInputStream bais = new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII));
 
         Stream stream = new Stream();
         stream.setInputStream(bais);
@@ -77,9 +76,7 @@ public class AppNameTest {
 
         String input = "- ";
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        ByteArrayInputStream bais = new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII));
 
         Stream stream = new Stream();
         stream.setInputStream(bais);
@@ -95,9 +92,7 @@ public class AppNameTest {
 
         String input = "ThisIsVeryLongAppNameThatShouldNotExistAndWillBeOverThe48CharLimit ";
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        ByteArrayInputStream bais = new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII));
 
         assertThrows(AppNameParseException.class, () -> {
             Stream stream = new Stream();

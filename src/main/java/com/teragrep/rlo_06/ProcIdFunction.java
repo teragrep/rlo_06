@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -53,7 +53,7 @@ public final class ProcIdFunction implements BiFunction<Stream, ByteBuffer, Byte
                                                              ||||
                                                              vvvv
         <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
-
+    
         Actions: ___O
         Payload:'DEA '
         States : ...T

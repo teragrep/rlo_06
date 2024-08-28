@@ -1,30 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <packaging>jar</packaging>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <groupId>com.teragrep</groupId>
   <artifactId>rlo_06</artifactId>
   <version>${revision}${sha1}${changelist}</version>
+  <packaging>jar</packaging>
   <name>rlo_06</name>
   <description>Syslog (RFC 5424) library for Java</description>
-  <groupId>com.teragrep</groupId>
   <url>https://teragrep.com</url>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <java.version>1.8</java.version>
-    <revision>0.0.1</revision>
-    <changelist>-SNAPSHOT</changelist>
-    <sha1/>
-    <junit.jupiter.version>5.7.1</junit.jupiter.version>
-    <publish.serverId>localhost</publish.serverId>
-    <publish.nexusUrl>http://localhost</publish.nexusUrl>
-    <publish.stagingRepositoryId>releases</publish.stagingRepositoryId>
-    <repository.id>releases</repository.id>
-    <repository.url>http://localhost/repository/releases/</repository.url>
-  </properties>
   <licenses>
     <license>
       <name>GNU Affero General Public License v3.0</name>
@@ -44,6 +27,27 @@
     <developerConnection>scm:git:git@github.com:teragrep/rlo_06.git</developerConnection>
     <url>https://github.com/teragrep/rlo_06/tree/master</url>
   </scm>
+  <distributionManagement>
+    <repository>
+      <id>${repository.id}</id>
+      <url>${repository.url}</url>
+    </repository>
+  </distributionManagement>
+  <properties>
+    <changelist>-SNAPSHOT</changelist>
+    <java.version>1.8</java.version>
+    <junit.jupiter.version>5.7.1</junit.jupiter.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <publish.nexusUrl>http://localhost</publish.nexusUrl>
+    <publish.serverId>localhost</publish.serverId>
+    <publish.stagingRepositoryId>releases</publish.stagingRepositoryId>
+    <repository.id>releases</repository.id>
+    <repository.url>http://localhost/repository/releases/</repository.url>
+    <revision>0.0.1</revision>
+    <sha1></sha1>
+  </properties>
   <dependencies>
     <!-- /// just for timestamp parsing \\\ -->
     <dependency>
@@ -87,18 +91,63 @@
     <finalName>rlo_06</finalName>
     <plugins>
       <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>2.30.0</version>
+        <configuration>
+          <java>
+            <eclipse>
+              <file>${project.basedir}/eclipse-java-formatter.xml</file>
+              <version>4.10.0</version>
+            </eclipse>
+            <removeUnusedImports></removeUnusedImports>
+            <licenseHeader>
+              <file>${project.basedir}/license-header</file>
+            </licenseHeader>
+          </java>
+          <pom>
+            <sortPom>
+              <!-- see https://github.com/diffplug/spotless/blob/main/plugin-maven/README.md#sortpom -->
+              <encoding>UTF-8</encoding>
+              <lineSeparator>\n</lineSeparator>
+              <expandEmptyElements>true</expandEmptyElements>
+              <keepBlankLines>false</keepBlankLines>
+              <nrOfIndentSpace>2</nrOfIndentSpace>
+              <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
+              <sortProperties>true</sortProperties>
+              <sortModules>true</sortModules>
+              <sortExecutions>true</sortExecutions>
+            </sortPom>
+          </pom>
+          <formats>
+            <format>
+              <includes>
+                <include>.gitattributes</include>
+                <include>.gitignore</include>
+              </includes>
+              <trimTrailingWhitespace></trimTrailingWhitespace>
+              <endWithNewline></endWithNewline>
+              <indent>
+                <tabs>true</tabs>
+                <spacesPerTab>4</spacesPerTab>
+              </indent>
+            </format>
+          </formats>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>compile</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
         <version>0.15</version>
         <inherited>false</inherited>
-        <executions>
-          <execution>
-            <phase>test</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
           <addDefaultLicenseMatchers>false</addDefaultLicenseMatchers>
           <licenses>
@@ -128,6 +177,14 @@
             <exclude>README.adoc</exclude>
           </excludes>
         </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>test</phase>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -168,18 +225,18 @@
         </configuration>
         <executions>
           <execution>
-            <id>flatten</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>flatten</goal>
-            </goals>
-          </execution>
-          <execution>
             <id>flatten.clean</id>
-            <phase>clean</phase>
             <goals>
               <goal>clean</goal>
             </goals>
+            <phase>clean</phase>
+          </execution>
+          <execution>
+            <id>flatten</id>
+            <goals>
+              <goal>flatten</goal>
+            </goals>
+            <phase>process-resources</phase>
           </execution>
         </executions>
       </plugin>
@@ -225,44 +282,17 @@
     </profile>
     <profile>
       <id>publish-maven-central</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.6</version>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-                <configuration>
-                  <gpgArguments>
-                    <arg>--pinentry-mode</arg>
-                    <arg>loopback</arg>
-                  </gpgArguments>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
       <distributionManagement>
-        <snapshotRepository>
-          <id>ossrh</id>
-          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
         <repository>
           <id>ossrh</id>
           <name>Central Repository OSSRH</name>
           <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
+        <snapshotRepository>
+          <id>ossrh</id>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
       </distributionManagement>
-    </profile>
-    <profile>
-      <id>publish-github-packages</id>
       <build>
         <plugins>
           <plugin>
@@ -272,10 +302,10 @@
             <executions>
               <execution>
                 <id>sign-artifacts</id>
-                <phase>verify</phase>
                 <goals>
                   <goal>sign</goal>
                 </goals>
+                <phase>verify</phase>
                 <configuration>
                   <gpgArguments>
                     <arg>--pinentry-mode</arg>
@@ -287,6 +317,9 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>publish-github-packages</id>
       <distributionManagement>
         <repository>
           <id>github</id>
@@ -294,12 +327,30 @@
           <url>https://maven.pkg.github.com/teragrep/rlo_06</url>
         </repository>
       </distributionManagement>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+                <phase>verify</phase>
+                <configuration>
+                  <gpgArguments>
+                    <arg>--pinentry-mode</arg>
+                    <arg>loopback</arg>
+                  </gpgArguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
-  <distributionManagement>
-    <repository>
-      <id>${repository.id}</id>
-      <url>${repository.url}</url>
-    </repository>
-  </distributionManagement>
 </project>

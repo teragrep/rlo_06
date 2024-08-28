@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -52,16 +52,15 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 
 public class MsgTest {
+
     @Test
     public void parseLeadingSpaceNoLFTest() {
         // lf termination off
-        Fragment msg = new Fragment(256*1024, new MsgFunction(false));
+        Fragment msg = new Fragment(256 * 1024, new MsgFunction(false));
 
         String input = " msg with preceding space and no newline";
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        ByteArrayInputStream bais = new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII));
 
         Stream stream = new Stream();
         stream.setInputStream(bais);
@@ -75,13 +74,11 @@ public class MsgTest {
     @Test
     public void parseNoLeadingSpaceNoLFTest() {
         // lf termination off
-        Fragment msg = new Fragment(256*1024, new MsgFunction(false));
+        Fragment msg = new Fragment(256 * 1024, new MsgFunction(false));
 
         String input = "msg without preceding space and no newline";
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        ByteArrayInputStream bais = new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII));
 
         Stream stream = new Stream();
         stream.setInputStream(bais);
@@ -95,13 +92,11 @@ public class MsgTest {
     @Test
     public void parseNewlineTest() {
         // lf termination off
-        Fragment msg = new Fragment(256*1024, new MsgFunction(false));
+        Fragment msg = new Fragment(256 * 1024, new MsgFunction(false));
 
         String input = " yes\nnewline";
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        ByteArrayInputStream bais = new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII));
 
         Stream stream = new Stream();
         stream.setInputStream(bais);
@@ -111,16 +106,15 @@ public class MsgTest {
 
         Assertions.assertEquals("yes\nnewline", msg.toString());
     }
+
     @Test
     public void parseLFTerminationWithNextTest() {
         // lf termination off
-        Fragment msg = new Fragment(256*1024, new MsgFunction(true));
+        Fragment msg = new Fragment(256 * 1024, new MsgFunction(true));
 
         String input = " there is something after newline\nanother";
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        ByteArrayInputStream bais = new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII));
 
         Stream stream = new Stream();
         stream.setInputStream(bais);
@@ -134,13 +128,11 @@ public class MsgTest {
     @Test
     public void parseLFTerminationWithoutNextTest() {
         // lf termination off
-        Fragment msg = new Fragment(256*1024, new MsgFunction(true));
+        Fragment msg = new Fragment(256 * 1024, new MsgFunction(true));
 
         String input = " there is nothing after newline\n";
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        ByteArrayInputStream bais = new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII));
 
         Stream stream = new Stream();
         stream.setInputStream(bais);
@@ -154,13 +146,11 @@ public class MsgTest {
     @Test
     public void emptyMessageTest() {
         // lf termination off
-        Fragment msg = new Fragment(256*1024, new MsgFunction(true));
+        Fragment msg = new Fragment(256 * 1024, new MsgFunction(true));
 
         String input = " ";
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        ByteArrayInputStream bais = new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII));
 
         Stream stream = new Stream();
         stream.setInputStream(bais);

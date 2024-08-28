@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -45,12 +45,12 @@
  */
 package com.teragrep.rlo_06;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Consumer;
 
 public final class RFC5424Frame {
+
     private final Stream stream;
     private final Consumer<Stream> streamConsumer;
 
@@ -77,34 +77,42 @@ public final class RFC5424Frame {
         this.procId = new Fragment(128, new ProcIdFunction());
         this.msgId = new Fragment(32, new MsgIdFunction());
         this.structuredData = new StructuredData();
-        this.msg = new Fragment(256*1024, new MsgFunction(lineFeedTermination));
+        this.msg = new Fragment(256 * 1024, new MsgFunction(lineFeedTermination));
         this.stream = new Stream();
 
         this.streamConsumer = priority
-                .andThen(version
-                        .andThen(timestamp
-                                .andThen(hostname
-                                        .andThen(appName
-                                                .andThen(procId
-                                                        .andThen(msgId
-                                                                .andThen(structuredData
-                                                                        .andThen(msg)
+                .andThen(
+                        version
+                                .andThen(
+                                        timestamp
+                                                .andThen(
+                                                        hostname
+                                                                .andThen(
+                                                                        appName
+                                                                                .andThen(
+                                                                                        procId
+                                                                                                .andThen(
+                                                                                                        msgId
+                                                                                                                .andThen(
+                                                                                                                        structuredData
+                                                                                                                                .andThen(
+                                                                                                                                        msg
+                                                                                                                                )
+                                                                                                                )
+                                                                                                )
+                                                                                )
                                                                 )
-                                                        )
                                                 )
-                                        )
                                 )
-                        )
                 );
     }
-
 
     public boolean next() throws IOException {
         /*
         Following abbreviations are used to indicate parsing in the comments.
-
+        
         Actions done to characters: _=Store, ^=Parser variable, O=Omit
-
+        
         O__O_O_______________________________O______O_______O___O______OO^^^^^^O^OO_OO^OO_OOO^^^^^^O^OO_OO________OO
         <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
         |..T.T...............................T......T.......T...T......T|......%.%%.%%.%%.%%|......%.%%.%T

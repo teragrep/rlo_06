@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -52,15 +52,14 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 
 public class TimestampTest {
+
     @Test
     public void parseTest() {
         Fragment timestamp = new Fragment(32, new TimestampFunction());
 
         String input = "2023-06-16T12:08:12.123456+03:00 ";
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        ByteArrayInputStream bais = new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII));
 
         Stream stream = new Stream();
         stream.setInputStream(bais);

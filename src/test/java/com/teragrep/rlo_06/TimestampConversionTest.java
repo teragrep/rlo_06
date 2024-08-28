@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -55,6 +55,7 @@ import java.io.InputStream;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TimestampConversionTest {
+
     @Test
     public void testTimestampConversion() throws IOException {
         Assertions.assertEquals("2003-08-24T05:14:15.000003-07:00", getTimestamp("2003-08-24T05:14:15.000003-07:00"));

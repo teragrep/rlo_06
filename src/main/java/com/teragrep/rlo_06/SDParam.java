@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -48,6 +48,7 @@ package com.teragrep.rlo_06;
 import java.util.function.Consumer;
 
 public final class SDParam implements Consumer<Stream>, Clearable {
+
     public final Fragment sdParamKey;
     public final Fragment sdParamValue;
 
@@ -56,7 +57,7 @@ public final class SDParam implements Consumer<Stream>, Clearable {
 
     SDParam() {
         this.sdParamKey = new Fragment(32, new SDParamKeyFunction());
-        this.sdParamValue = new Fragment(8*1024, new SDParamValueFunction());
+        this.sdParamValue = new Fragment(8 * 1024, new SDParamValueFunction());
         this.fragmentState = FragmentState.EMPTY;
         this.stubFragment = new Fragment();
     }
@@ -106,9 +107,6 @@ public final class SDParam implements Consumer<Stream>, Clearable {
         if (fragmentState != FragmentState.WRITTEN) {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
-        return "SDParam{" +
-                "sdParamKey=" + sdParamKey +
-                ", sdParamValue=" + sdParamValue +
-                '}';
+        return "SDParam{" + "sdParamKey=" + sdParamKey + ", sdParamValue=" + sdParamValue + '}';
     }
 }

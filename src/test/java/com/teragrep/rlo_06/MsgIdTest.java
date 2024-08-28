@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -54,15 +54,14 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MsgIdTest {
+
     @Test
     public void parseTest() {
         Fragment msgId = new Fragment(32, new MsgIdFunction());
 
         String input = "987654 ";
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        ByteArrayInputStream bais = new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII));
 
         Stream stream = new Stream();
         stream.setInputStream(bais);
@@ -78,9 +77,7 @@ public class MsgIdTest {
 
         String input = "- ";
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        ByteArrayInputStream bais = new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII));
 
         Stream stream = new Stream();
         stream.setInputStream(bais);
@@ -96,9 +93,7 @@ public class MsgIdTest {
 
         String input = "9876543210987654321098765432109876543210 ";
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        ByteArrayInputStream bais = new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII));
         assertThrows(MsgIdParseException.class, () -> {
             Stream stream = new Stream();
             stream.setInputStream(bais);

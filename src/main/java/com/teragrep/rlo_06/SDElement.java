@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -60,6 +60,7 @@ public final class SDElement implements Consumer<Stream>, Clearable {
     private FragmentState fragmentState;
 
     private final Fragment stubFragment;
+
     SDElement() {
         int numElements = 16;
         this.sdElementId = new Fragment(32, new SDElementIdFunction());
@@ -68,6 +69,7 @@ public final class SDElement implements Consumer<Stream>, Clearable {
         this.fragmentState = FragmentState.EMPTY;
         this.stubFragment = new Fragment();
     }
+
     // structured data, oh wow the performance hit
     @Override
     public void accept(Stream stream) {
@@ -132,9 +134,6 @@ public final class SDElement implements Consumer<Stream>, Clearable {
         if (fragmentState != FragmentState.WRITTEN) {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
-        return "SDElement{" +
-                "sdElementId=" + sdElementId +
-                ", sdParams=" + sdParams +
-                '}';
+        return "SDElement{" + "sdElementId=" + sdElementId + ", sdParams=" + sdParams + '}';
     }
 }

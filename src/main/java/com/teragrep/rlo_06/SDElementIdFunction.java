@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -56,11 +56,11 @@ public final class SDElementIdFunction implements BiFunction<Stream, ByteBuffer,
 
         // parse the sdId
         short sdId_max_left = 32;
-                    /*
-                              vvvvvv
-                    Payload:'[ID_A@1 u="3" e="t"][ID_B@2 n="9"] '
-                    Payload:'[ID_A@1]'
-                    */
+        /*
+                  vvvvvv
+        Payload:'[ID_A@1 u="3" e="t"][ID_B@2 n="9"] '
+        Payload:'[ID_A@1]'
+        */
 
         if (!stream.next()) {
             throw new StructuredDataParseException("SD is too short, can't continue");

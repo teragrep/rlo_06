@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -53,7 +53,7 @@ public final class PriorityFunction implements BiFunction<Stream, ByteBuffer, By
     |||
     vvv
     <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
-
+    
     Actions: O__O
     Payload:'<14>'
     States : |..T
@@ -71,14 +71,15 @@ public final class PriorityFunction implements BiFunction<Stream, ByteBuffer, By
 
         if (stream.get() >= 48 && stream.get() <= 57) { // first is always a number between 0..9
             buffer.put(stream.get());
-        } else {
+        }
+        else {
             throw new PriorityParseException("PRIORITY number incorrect");
         }
 
         if (!stream.next()) {
             throw new PriorityParseException("PRIORITY is too short, can't continue");
         }
-        if (stream.get() >= 48 &&stream.get() <= 57) { // second may be a number between 0..9
+        if (stream.get() >= 48 && stream.get() <= 57) { // second may be a number between 0..9
             buffer.put(stream.get());
 
             if (!stream.next()) {
@@ -95,14 +96,18 @@ public final class PriorityFunction implements BiFunction<Stream, ByteBuffer, By
                 if (stream.get() != 62) { // omit
                     throw new PriorityParseException("PRIORITY > missing");
                 }
-            } else if (stream.get() == 62) { // third may be a '>'
-// omit '>'
-            } else {
+            }
+            else if (stream.get() == 62) { // third may be a '>'
+                // omit '>'
+            }
+            else {
                 throw new PriorityParseException("PRIORITY number incorrect");
             }
-        } else if (stream.get() == 62) { // second may be a '>'
+        }
+        else if (stream.get() == 62) { // second may be a '>'
             // omit '>'
-        } else {
+        }
+        else {
             throw new PriorityParseException("PRIORITY number incorrect");
         }
         buffer.flip();

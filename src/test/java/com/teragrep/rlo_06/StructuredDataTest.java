@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -52,15 +52,14 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 
 public class StructuredDataTest {
+
     @Test
     public void parseTest() {
         StructuredData structuredData = new StructuredData();
 
         String input = "[id@0 keyHere=\"valueThere\"] "; // structured data terminates only to non [ character
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        ByteArrayInputStream bais = new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII));
 
         Stream stream = new Stream();
         stream.setInputStream(bais);
@@ -85,9 +84,7 @@ public class StructuredDataTest {
 
         String input = "[id@0 keyHere=\"valueThere\"] "; // structured data terminates only to non [ character
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        ByteArrayInputStream bais = new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII));
 
         Stream stream = new Stream();
         stream.setInputStream(bais);
@@ -101,17 +98,14 @@ public class StructuredDataTest {
         // clear
         structuredData.sdElements.get(0).sdElementId.clear();
         Assertions.assertThrows(IllegalStateException.class, () -> {
-                    structuredData.sdElements.get(0).sdElementId.toString();
-                },
-                "direction != Direction.READ");
-
+            structuredData.sdElements.get(0).sdElementId.toString();
+        }, "direction != Direction.READ");
 
         // double clear
         structuredData.sdElements.get(0).sdElementId.clear();
         Assertions.assertThrows(IllegalStateException.class, () -> {
-                    structuredData.sdElements.get(0).sdElementId.toString();
-                },
-                "direction != Direction.READ");
+            structuredData.sdElements.get(0).sdElementId.toString();
+        }, "direction != Direction.READ");
     }
 
     @Test
@@ -120,9 +114,7 @@ public class StructuredDataTest {
 
         String input = "[id@0 keyHere=\"valueThere\"] "; // structured data terminates only to non [ character
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        ByteArrayInputStream bais = new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII));
 
         Stream stream = new Stream();
         stream.setInputStream(bais);
@@ -135,11 +127,13 @@ public class StructuredDataTest {
 
         // clear
         structuredData.sdElements.get(0).sdParams.get(0).sdParamKey.clear();
-        Assertions.assertThrows(IllegalStateException.class, () -> structuredData.sdElements.get(0).sdParams.get(0).sdParamKey.toString());
+        Assertions
+                .assertThrows(IllegalStateException.class, () -> structuredData.sdElements.get(0).sdParams.get(0).sdParamKey.toString());
 
         // double clear
         structuredData.sdElements.get(0).sdParams.get(0).sdParamKey.clear();
-        Assertions.assertThrows(IllegalStateException.class, () -> structuredData.sdElements.get(0).sdParams.get(0).sdParamKey.toString());
+        Assertions
+                .assertThrows(IllegalStateException.class, () -> structuredData.sdElements.get(0).sdParams.get(0).sdParamKey.toString());
     }
 
     @Test
@@ -148,9 +142,7 @@ public class StructuredDataTest {
 
         String input = "- "; // structured data terminates after the dash character
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(
-                input.getBytes(StandardCharsets.US_ASCII)
-        );
+        ByteArrayInputStream bais = new ByteArrayInputStream(input.getBytes(StandardCharsets.US_ASCII));
 
         Stream stream = new Stream();
         stream.setInputStream(bais);

@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -46,10 +46,13 @@
 package com.teragrep.rlo_06;
 
 public class RFC5424Facility {
+
     final Fragment fragment;
+
     public RFC5424Facility(Fragment fragment) {
         this.fragment = fragment;
     }
+
     public int asInt() {
         return Integer.parseInt(fragment.toString()) >> 3;
     }

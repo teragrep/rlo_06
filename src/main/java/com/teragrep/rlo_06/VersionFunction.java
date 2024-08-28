@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -77,7 +77,8 @@ public final class VersionFunction implements BiFunction<Stream, ByteBuffer, Byt
             if (b != 32) { // omit ' '
                 throw new VersionParseException("SP missing after VERSION");
             }
-        } else {
+        }
+        else {
             throw new VersionParseException("VERSION not 1");
         }
         buffer.flip();

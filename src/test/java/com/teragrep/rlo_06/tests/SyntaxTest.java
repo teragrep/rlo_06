@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -52,7 +52,6 @@ import org.junit.jupiter.api.Test;
 import java.io.*;
 import java.nio.file.Files;
 
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SyntaxTest {
@@ -79,7 +78,6 @@ public class SyntaxTest {
             Assertions.assertEquals("MSG-01", rfc5424Frame.msgId.toString());
             Assertions.assertEquals("sigsegv", rfc5424Frame.msg.toString());
 
-
             // Structured Data 1
             SDVector sdVector = new SDVector("ID_A@1", "u");
             Assertions.assertEquals("\\\"3", rfc5424Frame.structuredData.getValue(sdVector).toString());
@@ -99,9 +97,9 @@ public class SyntaxTest {
             Assertions.assertEquals("ASD-05", rfc5424Frame.msgId.toString());
             Assertions.assertEquals("normal", rfc5424Frame.msg.toString());
 
-
             // Structured Data 2
-            Assertions.assertEquals("\\\"3", rfc5424Frame.structuredData.getValue(new SDVector("ID_A@1", "u")).toString());
+            Assertions
+                    .assertEquals("\\\"3", rfc5424Frame.structuredData.getValue(new SDVector("ID_A@1", "u")).toString());
 
             assertFalse(rfc5424Frame.next());
 
@@ -146,7 +144,8 @@ public class SyntaxTest {
             Assertions.assertEquals("sigsegv", rfc5424Frame.msg.toString());
 
             // Structured Data 1
-            Assertions.assertEquals("\\\"3", rfc5424Frame.structuredData.getValue(new SDVector("ID_A@1", "u")).toString());
+            Assertions
+                    .assertEquals("\\\"3", rfc5424Frame.structuredData.getValue(new SDVector("ID_A@1", "u")).toString());
 
             assertFalse(rfc5424Frame.next());
 
@@ -171,7 +170,10 @@ public class SyntaxTest {
     @Test
     void testTeragrepStructuredElement() throws Exception {
         final File logFile = new File("src/test/resources/event.log");
-        final InputStream inputStream = new BufferedInputStream(Files.newInputStream(logFile.toPath()), 32 * 1024 * 1024);
+        final InputStream inputStream = new BufferedInputStream(
+                Files.newInputStream(logFile.toPath()),
+                32 * 1024 * 1024
+        );
         RFC5424Frame rfc5424Frame = new RFC5424Frame(true);
         rfc5424Frame.load(inputStream);
 
@@ -182,21 +184,65 @@ public class SyntaxTest {
         Assertions.assertEquals("sc-99-99-14-25", rfc5424Frame.hostname.toString());
         Assertions.assertEquals("-", rfc5424Frame.procId.toString());
         Assertions.assertEquals("-", rfc5424Frame.msgId.toString());
-        Assertions.assertEquals("{\"rainfall_rate\": 0.0, \"wind_speed\": 8.0, \"atmosphere_water_vapor_content\": 4.800000190734863, \"atmosphere_cloud_liquid_water_content\": 0.029999997466802597, \"latitude\": -89.875, \"longitude\": 0.125}", rfc5424Frame.msg.toString());
+        Assertions
+                .assertEquals(
+                        "{\"rainfall_rate\": 0.0, \"wind_speed\": 8.0, \"atmosphere_water_vapor_content\": 4.800000190734863, \"atmosphere_cloud_liquid_water_content\": 0.029999997466802597, \"latitude\": -89.875, \"longitude\": 0.125}",
+                        rfc5424Frame.msg.toString()
+                );
 
         // event_node_source@48577
-        Assertions.assertEquals("f17_ssmis_20200319v7.nc", rfc5424Frame.structuredData.getValue(new SDVector("event_node_source@48577", "source")).toString());
-        Assertions.assertEquals("imfile", rfc5424Frame.structuredData.getValue(new SDVector("event_node_source@48577", "source_module")).toString());
-        Assertions.assertEquals("sc-99-99-14-25", rfc5424Frame.structuredData.getValue(new SDVector("event_node_source@48577", "hostname")).toString());
+        Assertions
+                .assertEquals(
+                        "f17_ssmis_20200319v7.nc", rfc5424Frame.structuredData
+                                .getValue(new SDVector("event_node_source@48577", "source"))
+                                .toString()
+                );
+        Assertions
+                .assertEquals(
+                        "imfile", rfc5424Frame.structuredData
+                                .getValue(new SDVector("event_node_source@48577", "source_module"))
+                                .toString()
+                );
+        Assertions
+                .assertEquals(
+                        "sc-99-99-14-25", rfc5424Frame.structuredData
+                                .getValue(new SDVector("event_node_source@48577", "hostname"))
+                                .toString()
+                );
 
         // event_node_relay@48577
-        Assertions.assertEquals("sc-99-99-14-25", rfc5424Frame.structuredData.getValue(new SDVector("event_node_relay@48577", "source")).toString());
-        Assertions.assertEquals("imrelp", rfc5424Frame.structuredData.getValue(new SDVector("event_node_relay@48577", "source_module")).toString());
-        Assertions.assertEquals("localhost", rfc5424Frame.structuredData.getValue(new SDVector("event_node_relay@48577", "hostname")).toString());
+        Assertions
+                .assertEquals(
+                        "sc-99-99-14-25", rfc5424Frame.structuredData
+                                .getValue(new SDVector("event_node_relay@48577", "source"))
+                                .toString()
+                );
+        Assertions
+                .assertEquals(
+                        "imrelp", rfc5424Frame.structuredData
+                                .getValue(new SDVector("event_node_relay@48577", "source_module"))
+                                .toString()
+                );
+        Assertions
+                .assertEquals(
+                        "localhost", rfc5424Frame.structuredData
+                                .getValue(new SDVector("event_node_relay@48577", "hostname"))
+                                .toString()
+                );
         // teragrep@48577
-        Assertions.assertEquals("log:f17:0", rfc5424Frame.structuredData.getValue(new SDVector("teragrep@48577", "streamname")).toString());
-        Assertions.assertEquals("com_teragrep_audit", rfc5424Frame.structuredData.getValue(new SDVector("teragrep@48577", "directory")).toString());
-        Assertions.assertEquals("1584572400.0", rfc5424Frame.structuredData.getValue(new SDVector("teragrep@48577", "unixtime")).toString());
+        Assertions
+                .assertEquals(
+                        "log:f17:0", rfc5424Frame.structuredData.getValue(new SDVector("teragrep@48577", "streamname")).toString()
+                );
+        Assertions
+                .assertEquals(
+                        "com_teragrep_audit",
+                        rfc5424Frame.structuredData.getValue(new SDVector("teragrep@48577", "directory")).toString()
+                );
+        Assertions
+                .assertEquals(
+                        "1584572400.0", rfc5424Frame.structuredData.getValue(new SDVector("teragrep@48577", "unixtime")).toString()
+                );
         // Message Finished
     }
 
@@ -219,10 +265,18 @@ public class SyntaxTest {
             Assertions.assertEquals("rsyslogd-pstats", rfc5424Frame.appName.toString());
             Assertions.assertEquals("-", rfc5424Frame.procId.toString());
             Assertions.assertEquals("-", rfc5424Frame.msgId.toString());
-            Assertions.assertEquals("{\"@timestamp\":\"2021-03-18T12:29:36.842898+02:00\",\"host\":\"logsource.example.com\",\"source-module\":\"impstats\", \"name\": \"tags-out\", \"origin\": \"dynstats.bucket\", \"values\": { } }", rfc5424Frame.msg.toString());
+            Assertions
+                    .assertEquals(
+                            "{\"@timestamp\":\"2021-03-18T12:29:36.842898+02:00\",\"host\":\"logsource.example.com\",\"source-module\":\"impstats\", \"name\": \"tags-out\", \"origin\": \"dynstats.bucket\", \"values\": { } }",
+                            rfc5424Frame.msg.toString()
+                    );
 
             // Structured Data 1
-            Assertions.assertEquals("logsource.example.com", rfc5424Frame.structuredData.getValue(new SDVector("event_id@48577", "hostname")).toString());
+            Assertions
+                    .assertEquals(
+                            "logsource.example.com",
+                            rfc5424Frame.structuredData.getValue(new SDVector("event_id@48577", "hostname")).toString()
+                    );
         }
 
         // finally empty
@@ -263,10 +317,18 @@ public class SyntaxTest {
             Assertions.assertEquals("rsyslogd-pstats", rfc5424Frame.appName.toString());
             Assertions.assertEquals("-", rfc5424Frame.procId.toString());
             Assertions.assertEquals("-", rfc5424Frame.msgId.toString());
-            Assertions.assertEquals("{\"@timestamp\":\"2021-03-25T15:14:09.449777+02:00\",\"host\":\"logsource.example.com\",\"source-module\":\"impstats\", \"name\": \"resource-usage\", \"origin\": \"impstats\", \"utime\": 693053726, \"stime\": 133593735, \"maxrss\": 4690828, \"minflt\": 46694808, \"majflt\": 0, \"inblock\": 122077416, \"oublock\": 123878288, \"nvcsw\": 7199, \"nivcsw\": 9287, \"openfiles\": 20 }", rfc5424Frame.msg.toString());
+            Assertions
+                    .assertEquals(
+                            "{\"@timestamp\":\"2021-03-25T15:14:09.449777+02:00\",\"host\":\"logsource.example.com\",\"source-module\":\"impstats\", \"name\": \"resource-usage\", \"origin\": \"impstats\", \"utime\": 693053726, \"stime\": 133593735, \"maxrss\": 4690828, \"minflt\": 46694808, \"majflt\": 0, \"inblock\": 122077416, \"oublock\": 123878288, \"nvcsw\": 7199, \"nivcsw\": 9287, \"openfiles\": 20 }",
+                            rfc5424Frame.msg.toString()
+                    );
 
             // Structured Data 1
-            Assertions.assertEquals("logsource.example.com", rfc5424Frame.structuredData.getValue(new SDVector("event_id@48577", "hostname")).toString());
+            Assertions
+                    .assertEquals(
+                            "logsource.example.com",
+                            rfc5424Frame.structuredData.getValue(new SDVector("event_id@48577", "hostname")).toString()
+                    );
         }
 
         // finally empty
@@ -281,7 +343,6 @@ public class SyntaxTest {
         assertThrows(IllegalStateException.class, rfc5424Frame.procId::toString);
         assertThrows(IllegalStateException.class, rfc5424Frame.msgId::toString);
         assertThrows(IllegalStateException.class, rfc5424Frame.msg::toString);
-
 
         // Structured Data Finished
         Assertions.assertThrows(IllegalStateException.class, () -> {
@@ -308,7 +369,10 @@ public class SyntaxTest {
             Assertions.assertEquals("app-tag", rfc5424Frame.appName.toString());
             Assertions.assertEquals("-", rfc5424Frame.procId.toString());
             Assertions.assertEquals("-", rfc5424Frame.msgId.toString());
-            Assertions.assertEquals(" 1.2.3.4 - - [08/Mar/2019:14:00:00 +0200] \"POST /idt/device/", rfc5424Frame.msg.toString());
+            Assertions
+                    .assertEquals(
+                            " 1.2.3.4 - - [08/Mar/2019:14:00:00 +0200] \"POST /idt/device/", rfc5424Frame.msg.toString()
+                    );
 
             assertFalse(rfc5424Frame.next());
 
@@ -337,7 +401,6 @@ public class SyntaxTest {
             Assertions.assertEquals(" source-http <snip>", rfc5424Frame.msg.toString());
 
             assertFalse(rfc5424Frame.next());
-            
 
             inputStream.reset();
         }

@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -52,13 +52,13 @@ public final class MsgFunction implements BiFunction<Stream, ByteBuffer, ByteBuf
     /*
                                                                                                vvvvvvvvvv
             <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
-
+    
             Actions: x_______OO
             Actions: _           // if not space
             Actions: O           // if space
             Payload:' sigsegv\n'
             States : %.......TT
-
+    
             */
 
     private final boolean lineFeedTermination;
@@ -78,7 +78,6 @@ public final class MsgFunction implements BiFunction<Stream, ByteBuffer, ByteBuf
         }
         msg_current_left--;
 
-
         // this little while here is the steamroller of this parser
         if (this.lineFeedTermination) { // Line-feed termination active
             while (stream.next()) {
@@ -95,10 +94,9 @@ public final class MsgFunction implements BiFunction<Stream, ByteBuffer, ByteBuf
                 buffer.put(b);
                 msg_current_left--;
 
-
-
             }
-        } else { // Line-feed termination inactive, reading until EOF
+        }
+        else { // Line-feed termination inactive, reading until EOF
             while (stream.next()) {
                 buffer.put(stream.get());
                 msg_current_left--;

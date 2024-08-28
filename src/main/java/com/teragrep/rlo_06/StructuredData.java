@@ -1,6 +1,6 @@
 /*
- * Java RFC524 parser library  RLO-06
- * Copyright (C) 2022  Suomen Kanuuna Oy
+ * Teragrep RFC5424 frame library for Java (rlo_06)
+ * Copyright (C) 2022-2024 Suomen Kanuuna Oy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -45,7 +45,6 @@
  */
 package com.teragrep.rlo_06;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -56,11 +55,11 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
                                                                     |||||||||||||||||||||||||||||||||||
                                                                     vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvR
     <14>1 2014-06-20T09:14:07.12345+00:00 host01 systemd DEA MSG-01 [ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n
-
+    
     Actions: O^^^^^^O^OO_OO^OO_OOO^^^^^^O^OO_OO
     Payload:'[ID_A@1 u="3" e="t"][ID_B@2 n="9"]'
     States : |......%.%%.%%.%%.%%|......%.%%.%T
-
+    
     NOTE this does not provide any proof what so ever if certain sdId exist or not, we are only interested
     in values if they exist.
     */
@@ -77,7 +76,6 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
 
     private final Fragment stubFragment;
 
-
     StructuredData() {
         int numElements = 16;
         this.sdElementCache = new SDElementCache(numElements);
@@ -93,7 +91,6 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
         }
 
         byte b;
-
 
         if (!stream.next()) {
             throw new StructuredDataParseException("Expected SD, received nothing");
@@ -117,11 +114,11 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
                 SDElement sdElement = sdElementCache.take();
                 sdElement.accept(stream);
                 sdElements.add(sdElement);
-             /*
+                /*
                                         vv            vv
-            Payload:'[ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n'
-            Payload:            '[ID_A@1] sigsegv\n'
-            */
+                Payload:'[ID_A@1 u="3" e="t"][ID_B@2 n="9"] sigsegv\n'
+                Payload:            '[ID_A@1] sigsegv\n'
+                */
 
                 if (!stream.next()) {
                     throw new StructuredDataParseException("SD is too short, can't continue");
@@ -135,7 +132,6 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
         }
         fragmentState = FragmentState.WRITTEN;
     }
-
 
     @Override
     public void clear() {
@@ -155,7 +151,7 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
         // reverse search as last value is only that matters
         ListIterator<SDElement> listIterator = sdElements.listIterator(sdElements.size());
         Fragment rv = stubFragment;
-        while(listIterator.hasPrevious()) {
+        while (listIterator.hasPrevious()) {
             SDElement sdElement = listIterator.previous();
             rv = sdElement.getSDParamValue(sdVector);
             if (!rv.isStub) {
@@ -170,8 +166,6 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
         if (fragmentState != FragmentState.WRITTEN) {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
-        return "StructuredData{" +
-                "sdElements=" + sdElements +
-                '}';
+        return "StructuredData{" + "sdElements=" + sdElements + '}';
     }
 }
