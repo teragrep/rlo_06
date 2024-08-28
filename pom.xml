@@ -153,7 +153,7 @@
           <licenses>
             <license implementation="org.apache.rat.analysis.license.SimplePatternBasedLicense">
               <patterns>
-                <pattern>Copyright (C) 2022  Suomen Kanuuna Oy</pattern>
+                <pattern>Copyright (C) 2022-2024 Suomen Kanuuna Oy</pattern>
               </patterns>
             </license>
           </licenses>
@@ -171,6 +171,7 @@
             <exclude>.github/ISSUE_TEMPLATE/*</exclude>
             <exclude>toolchains.xml</exclude>
             <exclude>settings.xml</exclude>
+            <exclude>eclipse-java-formatter.xml</exclude>
             <!-- tests -->
             <exclude>src/test/resources/event.log</exclude>
             <!-- readme -->
