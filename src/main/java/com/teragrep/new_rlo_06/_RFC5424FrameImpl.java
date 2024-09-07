@@ -46,8 +46,10 @@
 package com.teragrep.new_rlo_06;
 
 public class _RFC5424FrameImpl implements _RFC5424Frame {
+
     private final _Priority priority;
     private final _Message message;
+
     public _RFC5424FrameImpl(_Priority priority, _Message message) {
         this.priority = priority;
         this.message = message;

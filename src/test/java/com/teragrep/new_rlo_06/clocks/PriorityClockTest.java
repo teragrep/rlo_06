@@ -212,7 +212,6 @@ public class PriorityClockTest {
         Assertions.assertTrue(priorityClock.submit(buffers[0]).isStub());
         Assertions.assertTrue(priorityClock.submit(buffers[1]).isStub());
 
-
         _Priority priority = priorityClock.submit(buffers[2]);
         Assertions.assertFalse(priority.isStub());
 

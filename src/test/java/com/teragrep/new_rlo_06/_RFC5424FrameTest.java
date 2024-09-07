@@ -83,7 +83,7 @@ public class _RFC5424FrameTest {
         Assertions.assertFalse(frame.isStub());
 
         Assertions.assertFalse(frame.priority().isStub());
-        Assertions.assertEquals(14,frame.priority().toInt());
+        Assertions.assertEquals(14, frame.priority().toInt());
 
         // TODO remove and assert once complete
         System.out.println("message <[" + frame.message() + "]>");
