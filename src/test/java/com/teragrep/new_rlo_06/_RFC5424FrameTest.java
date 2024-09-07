@@ -45,6 +45,8 @@
  */
 package com.teragrep.new_rlo_06;
 
+import com.teragrep.new_rlo_06.clocks.RFC5424FrameClock;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
@@ -70,7 +72,21 @@ public class _RFC5424FrameTest {
         fragments[0] = firstFragment;
         fragments[1] = secondFragment;
 
-        _RFC5424Frame rfc5424Frame = new _RFC5424Frame();
+        RFC5424FrameClock frameClock = new RFC5424FrameClock();
+
+        frameClock.submit(fragments[0]);
+        Assertions.assertFalse(frameClock.get().isStub());
+
+        frameClock.submit(fragments[1]);
+        _RFC5424Frame frame = frameClock.get();
+
+        Assertions.assertFalse(frame.isStub());
+
+        Assertions.assertFalse(frame.priority().isStub());
+        Assertions.assertEquals(14,frame.priority().toInt());
+
+        // TODO remove and assert once complete
+        System.out.println("message <[" + frame.message() + "]>");
 
     }
 }

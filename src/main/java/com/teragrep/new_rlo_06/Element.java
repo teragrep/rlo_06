@@ -54,4 +54,6 @@ public interface Element extends Stubable {
     int toInt();
 
     long size();
+
+    // TODO toWriteable();
 }

@@ -50,7 +50,7 @@ import com.teragrep.new_rlo_06.*;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
-public class PriorityClock {
+public class PriorityClock implements Clock<_Priority> {
 
     private final LinkedList<ByteBuffer> bufferSliceList;
     private static final int maximumPriorityLength = 3;
@@ -62,6 +62,7 @@ public class PriorityClock {
         this.hasStart = false;
     }
 
+    @Override
     public _Priority submit(ByteBuffer input) {
 
         int bytesIncluded = 0;
@@ -106,8 +107,9 @@ public class PriorityClock {
 
             bytesIncluded++;
             checkOverSize(bytesIncluded);
-
         }
+
+        slice.limit(bytesIncluded);
 
         // ignore empty slices
         if (slice.capacity() != 0) {

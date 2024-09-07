@@ -190,4 +190,32 @@ public class PriorityClockTest {
 
         Assertions.assertEquals(exception.getMessage(), "priority must not contain '<' in the content");
     }
+
+    @Test
+    void testTerminationSingleBuffer() {
+        PriorityClock priorityClock = new PriorityClock();
+        StringInput input = new StringInput("<3>X");
+        ByteBuffer[] buffers = input.asBuffers(1);
+
+        _Priority priority = priorityClock.submit(buffers[0]);
+        Assertions.assertFalse(priority.isStub());
+
+        Assertions.assertEquals(3, priority.toInt());
+    }
+
+    @Test
+    void testTerminationFourBuffers() {
+        PriorityClock priorityClock = new PriorityClock();
+        StringInput input = new StringInput("<3>X");
+        ByteBuffer[] buffers = input.asBuffers(4);
+
+        Assertions.assertTrue(priorityClock.submit(buffers[0]).isStub());
+        Assertions.assertTrue(priorityClock.submit(buffers[1]).isStub());
+
+
+        _Priority priority = priorityClock.submit(buffers[2]);
+        Assertions.assertFalse(priority.isStub());
+
+        Assertions.assertEquals(3, priority.toInt());
+    }
 }

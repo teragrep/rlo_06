@@ -45,18 +45,26 @@
  */
 package com.teragrep.new_rlo_06;
 
-import java.nio.ByteBuffer;
-
-public class BufferSequence {
-
-    private final ByteBuffer[] sequences;
-
-    public BufferSequence(ByteBuffer[] buffers) {
-        this.sequences = buffers;
+public class _RFC5424FrameImpl implements _RFC5424Frame {
+    private final _Priority priority;
+    private final _Message message;
+    public _RFC5424FrameImpl(_Priority priority, _Message message) {
+        this.priority = priority;
+        this.message = message;
     }
 
-    public _RFC5424Frame rfc5424Frame() {
+    @Override
+    public _Priority priority() {
+        return priority;
+    }
 
-        return new _RFC5424Frame();
+    @Override
+    public _Message message() {
+        return message;
+    }
+
+    @Override
+    public boolean isStub() {
+        return false;
     }
 }
