@@ -45,48 +45,30 @@
  */
 package com.teragrep.new_rlo_06;
 
-import com.teragrep.new_rlo_06.clocks.RFC5424FrameClock;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+public class RFC5424FrameStub implements RFC5424Frame {
 
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
+    @Override
+    public Priority priority() {
+        throw new UnsupportedOperationException("Stub does not allow this.");
+    }
 
-public class _RFC5424FrameTest {
+    @Override
+    public RFC5424Frame priority(Priority priority) {
+        throw new UnsupportedOperationException("Stub does not allow this.");
+    }
 
-    @Test
-    public void testInterpretation() {
-        String payloadFirstFragment = "<14>1 2014-06-20T09:14:07.123456";
-        byte[] firstFragmentBytes = payloadFirstFragment.getBytes(StandardCharsets.UTF_8);
-        ByteBuffer firstFragment = ByteBuffer.allocateDirect(firstFragmentBytes.length);
-        firstFragment.put(firstFragmentBytes);
-        firstFragment.flip();
+    @Override
+    public Message message() {
+        throw new UnsupportedOperationException("Stub does not allow this.");
+    }
 
-        String payloadSecondFragment = "+00:00 host01 systemd DEA MSG-01 [ID_A@1 u=\"\\\"3\" e=\"t\"][ID_B@2 n=\"9\"] sigsegv\n";
-        byte[] secondFragmentBytes = payloadSecondFragment.getBytes(StandardCharsets.UTF_8);
-        ByteBuffer secondFragment = ByteBuffer.allocateDirect(secondFragmentBytes.length);
-        secondFragment.put(secondFragmentBytes);
-        secondFragment.flip();
+    @Override
+    public RFC5424Frame message(Message message) {
+        throw new UnsupportedOperationException("Stub does not allow this.");
+    }
 
-        ByteBuffer[] fragments = new ByteBuffer[2];
-        fragments[0] = firstFragment;
-        fragments[1] = secondFragment;
-
-        RFC5424FrameClock frameClock = new RFC5424FrameClock();
-
-        frameClock.submit(fragments[0]);
-        Assertions.assertFalse(frameClock.get().isStub());
-
-        frameClock.submit(fragments[1]);
-        _RFC5424Frame frame = frameClock.get();
-
-        Assertions.assertFalse(frame.isStub());
-
-        Assertions.assertFalse(frame.priority().isStub());
-        Assertions.assertEquals(14, frame.priority().toInt());
-
-        // TODO remove and assert once complete
-        System.out.println("message <[" + frame.message() + "]>");
-
+    @Override
+    public boolean isStub() {
+        return true;
     }
 }

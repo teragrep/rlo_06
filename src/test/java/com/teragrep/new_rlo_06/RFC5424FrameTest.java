@@ -45,9 +45,50 @@
  */
 package com.teragrep.new_rlo_06;
 
-public interface _RFC5424Frame extends Stubable {
+import com.teragrep.new_rlo_06.clocks.RFC5424FrameClock;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-    _Priority priority();
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
-    _Message message();
+public class RFC5424FrameTest {
+
+    @Test
+    public void testInterpretation() {
+        String payloadFirstFragment = "<14>1 2014-06-20T09:14:07.123456";
+        byte[] firstFragmentBytes = payloadFirstFragment.getBytes(StandardCharsets.UTF_8);
+        ByteBuffer firstFragment = ByteBuffer.allocateDirect(firstFragmentBytes.length);
+        firstFragment.put(firstFragmentBytes);
+        firstFragment.flip();
+
+        String payloadSecondFragment = "+00:00 host01 systemd DEA MSG-01 [ID_A@1 u=\"\\\"3\" e=\"t\"][ID_B@2 n=\"9\"] sigsegv\n";
+        byte[] secondFragmentBytes = payloadSecondFragment.getBytes(StandardCharsets.UTF_8);
+        ByteBuffer secondFragment = ByteBuffer.allocateDirect(secondFragmentBytes.length);
+        secondFragment.put(secondFragmentBytes);
+        secondFragment.flip();
+
+        ByteBuffer[] fragments = new ByteBuffer[2];
+        fragments[0] = firstFragment;
+        fragments[1] = secondFragment;
+
+        RFC5424FrameClock frameClock = new RFC5424FrameClock();
+
+        ByteBuffer out0 = frameClock.apply(fragments[0]);
+        Assertions.assertFalse(out0.hasRemaining());
+        Assertions.assertFalse(frameClock.get().isStub()); // message is always complete
+
+        ByteBuffer out1 = frameClock.apply(fragments[1]);
+        Assertions.assertFalse(out1.hasRemaining());
+
+        RFC5424Frame frame = frameClock.get();
+        Assertions.assertFalse(frame.isStub());
+
+        Assertions.assertFalse(frame.priority().isStub());
+        Assertions.assertEquals(14, frame.priority().toInt());
+
+        // TODO remove and assert once complete
+        System.out.println("message <[" + frame.message() + "]>");
+
+    }
 }

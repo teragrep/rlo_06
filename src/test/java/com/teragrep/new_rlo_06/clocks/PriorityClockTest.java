@@ -45,13 +45,12 @@
  */
 package com.teragrep.new_rlo_06.clocks;
 
-import com.teragrep.new_rlo_06._Priority;
+import com.teragrep.new_rlo_06.*;
 import com.teragrep.new_rlo_06.inputs.StringInput;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
-import java.util.LinkedList;
 
 public class PriorityClockTest {
 
@@ -59,24 +58,18 @@ public class PriorityClockTest {
     public void testClock() {
         PriorityClock priorityClock = new PriorityClock();
 
-        LinkedList<_Priority> priorities = new LinkedList<>();
         StringInput input = new StringInput("<123>");
 
         ByteBuffer[] buffers = input.asBuffers(2);
-        for (ByteBuffer buffer : buffers) {
-            _Priority priority = priorityClock.submit(buffer);
 
-            if (!priority.isStub()) {
-                priorities.add(priority);
-            }
-        }
-
-        Assertions.assertEquals(1, priorities.size());
-
-        _Priority priority = priorities.get(0);
-
+        ByteBuffer out0 = priorityClock.apply(buffers[0]);
+        Assertions.assertFalse(out0.hasRemaining());
+        
+        ByteBuffer out1 = priorityClock.apply(buffers[1]);
+        Assertions.assertFalse(out1.hasRemaining());
+        
+        Priority priority = priorityClock.get();
         Assertions.assertFalse(priority.isStub());
-
         Assertions.assertEquals(123, priority.toInt());
     }
 
@@ -87,10 +80,10 @@ public class PriorityClockTest {
         ByteBuffer[] buffers = input.asBuffers();
 
         PriorityParseException exception = Assertions.assertThrows(PriorityParseException.class, () -> {
-            priorityClock.submit(buffers[0]);
+            priorityClock.apply(buffers[0]);
         });
 
-        Assertions.assertEquals(exception.getMessage(), "priority too long");
+        Assertions.assertEquals(exception.getMessage(), "too many numbers");
     }
 
     @Test
@@ -101,23 +94,27 @@ public class PriorityClockTest {
 
         Assertions.assertEquals(6, buffers.length);
 
-        _Priority priority0 = priorityClock.submit(buffers[0]);
-        Assertions.assertTrue(priority0.isStub());
+        ByteBuffer out0 = priorityClock.apply(buffers[0]);
+        Assertions.assertTrue(priorityClock.get().isStub());
+        Assertions.assertFalse(out0.hasRemaining());
 
-        _Priority priority1 = priorityClock.submit(buffers[1]);
-        Assertions.assertTrue(priority1.isStub());
+        ByteBuffer out1 = priorityClock.apply(buffers[1]);
+        Assertions.assertTrue(priorityClock.get().isStub());
+        Assertions.assertFalse(out1.hasRemaining());
 
-        _Priority priority2 = priorityClock.submit(buffers[2]);
-        Assertions.assertTrue(priority2.isStub());
+        ByteBuffer out2 = priorityClock.apply(buffers[2]);
+        Assertions.assertTrue(priorityClock.get().isStub());
+        Assertions.assertFalse(out2.hasRemaining());
 
-        _Priority priority3 = priorityClock.submit(buffers[3]);
-        Assertions.assertTrue(priority3.isStub());
+        ByteBuffer out3 = priorityClock.apply(buffers[3]);
+        Assertions.assertTrue(priorityClock.get().isStub());
+        Assertions.assertFalse(out3.hasRemaining());
 
         PriorityParseException exception = Assertions.assertThrows(PriorityParseException.class, () -> {
-            priorityClock.submit(buffers[4]);
+            priorityClock.apply(buffers[4]);
         });
 
-        Assertions.assertEquals(exception.getMessage(), "priority too long");
+        Assertions.assertEquals(exception.getMessage(), "too many numbers");
     }
 
     @Test
@@ -127,10 +124,10 @@ public class PriorityClockTest {
         ByteBuffer[] buffers = input.asBuffers();
 
         PriorityParseException exception = Assertions.assertThrows(PriorityParseException.class, () -> {
-            priorityClock.submit(buffers[0]);
+            priorityClock.apply(buffers[0]);
         });
 
-        Assertions.assertEquals(exception.getMessage(), "priority must have content");
+        Assertions.assertEquals(exception.getMessage(), "too few numbers");
     }
 
     @Test
@@ -139,15 +136,15 @@ public class PriorityClockTest {
         StringInput input = new StringInput("<>");
         ByteBuffer[] buffers = input.asBuffers(2);
 
-        _Priority priority = priorityClock.submit(buffers[0]);
-
-        Assertions.assertTrue(priority.isStub());
+        ByteBuffer out0 = priorityClock.apply(buffers[0]);
+        Assertions.assertTrue(priorityClock.get().isStub());
+        Assertions.assertFalse(out0.hasRemaining());
 
         PriorityParseException exception = Assertions.assertThrows(PriorityParseException.class, () -> {
-            priorityClock.submit(buffers[1]);
+            priorityClock.apply(buffers[1]);
         });
 
-        Assertions.assertEquals(exception.getMessage(), "priority must have content");
+        Assertions.assertEquals(exception.getMessage(), "too few numbers");
     }
 
     @Test
@@ -157,7 +154,7 @@ public class PriorityClockTest {
         ByteBuffer[] buffers = input.asBuffers();
 
         PriorityParseException exception = Assertions.assertThrows(PriorityParseException.class, () -> {
-            priorityClock.submit(buffers[0]);
+            priorityClock.apply(buffers[0]);
         });
 
         Assertions.assertEquals(exception.getMessage(), "priority must start with a '<'");
@@ -170,10 +167,10 @@ public class PriorityClockTest {
         ByteBuffer[] buffers = input.asBuffers();
 
         PriorityParseException exception = Assertions.assertThrows(PriorityParseException.class, () -> {
-            priorityClock.submit(buffers[0]);
+            priorityClock.apply(buffers[0]);
         });
 
-        Assertions.assertEquals(exception.getMessage(), "priority must not contain '<' in the content");
+        Assertions.assertEquals(exception.getMessage(), "too few numbers");
     }
 
     @Test
@@ -182,13 +179,15 @@ public class PriorityClockTest {
         StringInput input = new StringInput("<<3>");
         ByteBuffer[] buffers = input.asBuffers(4);
 
-        Assertions.assertTrue(priorityClock.submit(buffers[0]).isStub());
+        ByteBuffer out0 = priorityClock.apply(buffers[0]);
+        Assertions.assertTrue(priorityClock.get().isStub());
+        Assertions.assertFalse(out0.hasRemaining());
 
         PriorityParseException exception = Assertions.assertThrows(PriorityParseException.class, () -> {
-            priorityClock.submit(buffers[1]);
+            priorityClock.apply(buffers[1]);
         });
 
-        Assertions.assertEquals(exception.getMessage(), "priority must not contain '<' in the content");
+        Assertions.assertEquals(exception.getMessage(), "too few numbers");
     }
 
     @Test
@@ -197,7 +196,10 @@ public class PriorityClockTest {
         StringInput input = new StringInput("<3>X");
         ByteBuffer[] buffers = input.asBuffers(1);
 
-        _Priority priority = priorityClock.submit(buffers[0]);
+        ByteBuffer out0 = priorityClock.apply(buffers[0]);
+        Assertions.assertTrue(out0.hasRemaining());
+
+        Priority priority = priorityClock.get();
         Assertions.assertFalse(priority.isStub());
 
         Assertions.assertEquals(3, priority.toInt());
@@ -209,12 +211,23 @@ public class PriorityClockTest {
         StringInput input = new StringInput("<3>X");
         ByteBuffer[] buffers = input.asBuffers(4);
 
-        Assertions.assertTrue(priorityClock.submit(buffers[0]).isStub());
-        Assertions.assertTrue(priorityClock.submit(buffers[1]).isStub());
+        ByteBuffer out0 = priorityClock.apply(buffers[0]);
+        Assertions.assertTrue(priorityClock.get().isStub());
+        Assertions.assertFalse(out0.hasRemaining());
 
-        _Priority priority = priorityClock.submit(buffers[2]);
+        ByteBuffer out1 = priorityClock.apply(buffers[1]);
+        Assertions.assertTrue(priorityClock.get().isStub());
+        Assertions.assertFalse(out1.hasRemaining());
+
+        ByteBuffer out2 = priorityClock.apply(buffers[2]);
+        Priority priority = priorityClock.get();
         Assertions.assertFalse(priority.isStub());
-
+        Assertions.assertFalse(out2.hasRemaining());
         Assertions.assertEquals(3, priority.toInt());
+
+        ByteBuffer out3 = priorityClock.apply(buffers[3]);
+        Assertions.assertFalse(priorityClock.get().isStub());
+        Assertions.assertTrue(out3.hasRemaining()); // must not consume X
+
     }
 }

@@ -43,12 +43,40 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.new_rlo_06.clocks;
+package com.teragrep.new_rlo_06;
 
-import java.nio.ByteBuffer;
-import java.util.function.Supplier;
+public class RFC5424FrameImpl implements RFC5424Frame {
 
-public interface TerminalClock<T> extends Supplier<T> {
+    private final Priority priority;
+    private final Message message;
 
-    void submit(ByteBuffer input);
+    public RFC5424FrameImpl(Priority priority, Message message) {
+        this.priority = priority;
+        this.message = message;
+    }
+
+    @Override
+    public Priority priority() {
+        return priority;
+    }
+
+    @Override
+    public RFC5424Frame priority(Priority priority) {
+        return new RFC5424FrameImpl(priority, message);
+    }
+
+    @Override
+    public Message message() {
+        return message;
+    }
+
+    @Override
+    public RFC5424Frame message(Message message) {
+        return new RFC5424FrameImpl(priority, message);
+    }
+
+    @Override
+    public boolean isStub() {
+        return false;
+    }
 }

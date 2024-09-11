@@ -45,28 +45,38 @@
  */
 package com.teragrep.new_rlo_06;
 
-public class _RFC5424FrameImpl implements _RFC5424Frame {
+import java.nio.ByteBuffer;
+import java.util.List;
 
-    private final _Priority priority;
-    private final _Message message;
+public class MessageStub implements Message {
 
-    public _RFC5424FrameImpl(_Priority priority, _Message message) {
-        this.priority = priority;
-        this.message = message;
+    @Override
+    public byte[] toBytes() {
+        throw new UnsupportedOperationException("Stub does not allow this.");
     }
 
     @Override
-    public _Priority priority() {
-        return priority;
+    public int toInt() {
+        throw new UnsupportedOperationException("Stub does not allow this.");
     }
 
     @Override
-    public _Message message() {
-        return message;
+    public long size() {
+        throw new UnsupportedOperationException("Stub does not allow this.");
     }
 
     @Override
     public boolean isStub() {
-        return false;
+        throw new UnsupportedOperationException("Stub does not allow this.");
+    }
+
+    @Override
+    public String toString() {
+        throw new UnsupportedOperationException("Stub does not allow this.");
+    }
+
+    @Override
+    public List<ByteBuffer> toEncoded() {
+        throw new UnsupportedOperationException("Stub does not allow this.");
     }
 }

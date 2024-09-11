@@ -45,36 +45,11 @@
  */
 package com.teragrep.new_rlo_06;
 
-public class _PriorityImpl implements _Priority {
+public interface RFC5424Frame extends Stubable {
 
-    private final Element element;
+    Priority priority();
+    RFC5424Frame priority(Priority priority);
 
-    public _PriorityImpl(Element element) {
-        this.element = element;
-    }
-
-    @Override
-    public boolean isStub() {
-        return element.isStub();
-    }
-
-    @Override
-    public byte[] toBytes() {
-        return element.toBytes();
-    }
-
-    @Override
-    public int toInt() {
-        return element.toInt();
-    }
-
-    @Override
-    public long size() {
-        return element.size();
-    }
-
-    @Override
-    public String toString() {
-        return element.toString();
-    }
+    Message message();
+    RFC5424Frame message(Message message);
 }

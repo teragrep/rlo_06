@@ -45,6 +45,69 @@
  */
 package com.teragrep.new_rlo_06;
 
-public interface _Priority extends Element {
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
+public class PriorityBufferedImpl implements Priority {
+
+    private final List<ByteBuffer> openBuffers;
+    private final List<ByteBuffer> numbersBuffers;
+    private final List<ByteBuffer> closeBuffers;
+
+
+    public PriorityBufferedImpl(List<ByteBuffer> openBuffers, List<ByteBuffer> numbersBuffers, List<ByteBuffer> closeBuffers) {
+        this.openBuffers = openBuffers;
+        this.numbersBuffers = numbersBuffers;
+        this.closeBuffers = closeBuffers;
+    }
+
+    @Override
+    public boolean isStub() {
+        return false;
+    }
+
+    @Override
+    public List<ByteBuffer> toEncoded() {
+        List<ByteBuffer> readOnlyBuffers = new ArrayList<>(
+                openBuffers.size()
+                + numbersBuffers.size()
+                + closeBuffers.size()
+        );
+
+        for (ByteBuffer buffer : openBuffers) {
+            readOnlyBuffers.add(buffer.asReadOnlyBuffer());
+        }
+
+        for (ByteBuffer buffer : numbersBuffers) {
+            readOnlyBuffers.add(buffer.asReadOnlyBuffer());
+        }
+
+        for (ByteBuffer buffer : closeBuffers) {
+            readOnlyBuffers.add(buffer.asReadOnlyBuffer());
+        }
+
+
+        return readOnlyBuffers;
+    }
+
+    @Override
+    public byte[] toBytes() {
+        return new ElementImpl(numbersBuffers).toBytes();
+    }
+
+    @Override
+    public int toInt() {
+        return new ElementImpl(numbersBuffers).toInt();
+    }
+
+    @Override
+    public long size() {
+        return new ElementImpl(numbersBuffers).size();
+    }
+
+    @Override
+    public String toString() {
+        return new ElementImpl(numbersBuffers).toString();
+    }
 }

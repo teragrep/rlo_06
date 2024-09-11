@@ -45,37 +45,43 @@
  */
 package com.teragrep.new_rlo_06.clocks;
 
-import com.teragrep.new_rlo_06.Element;
-import com.teragrep.new_rlo_06.ElementImpl;
-import com.teragrep.new_rlo_06._Message;
-import com.teragrep.new_rlo_06._MessageImpl;
+import com.teragrep.new_rlo_06.Message;
+import com.teragrep.new_rlo_06.MessageBufferedImpl;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
-public class MessageClock implements TerminalClock<_Message> {
+public class MessageClock implements Clock<Message> {
 
-    private final LinkedList<ByteBuffer> bufferSliceList;
+    private final LinkedList<ByteBuffer> buffers;
 
     public MessageClock() {
-        bufferSliceList = new LinkedList<>();
+        buffers = new LinkedList<>();
     }
 
     @Override
-    public void submit(ByteBuffer input) {
+    public ByteBuffer apply(ByteBuffer input) {
         ByteBuffer slice = input.slice();
 
+        // consume all, message is just like that
+        input.position(input.limit());
+
         // ignore empty slices
-        if (slice.capacity() != 0) {
-            bufferSliceList.add(slice);
+        if (slice.limit() != 0) {
+            buffers.add(slice);
         }
 
         // TODO new line termination in another type of MessageClock?
+        return input;
     }
 
     @Override
-    public _Message get() {
-        Element element = new ElementImpl(bufferSliceList);
-        return new _MessageImpl(element);
+    public Message get() {
+        return new MessageBufferedImpl(buffers);
+    }
+
+    @Override
+    public boolean isComplete() {
+        return true; // TODO line feed terminating version may not always be complete
     }
 }

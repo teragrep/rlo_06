@@ -45,5 +45,53 @@
  */
 package com.teragrep.new_rlo_06;
 
-public interface _Message extends Element {
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
+import java.util.List;
+
+public class PriorityImpl implements Priority {
+    private static final ByteBuffer open = ByteBuffer.wrap(new byte[]{'<'});
+    private static final ByteBuffer close = ByteBuffer.wrap(new byte[]{'>'});
+
+    private final int priority;
+    public PriorityImpl(int priority) {
+        this.priority = priority;
+    }
+
+    @Override
+    public boolean isStub() {
+        return false;
+    }
+
+    @Override
+    public byte[] toBytes() {
+        return toString().getBytes(StandardCharsets.US_ASCII);
+    }
+
+    @Override
+    public int toInt() {
+        return priority;
+    }
+
+    @Override
+    public long size() {
+        return toBytes().length;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(priority);
+    }
+
+    @Override
+    public List<ByteBuffer> toEncoded() {
+        List<ByteBuffer> encoded = new LinkedList<>();
+        encoded.add(open.asReadOnlyBuffer());
+        encoded.add(ByteBuffer.wrap(toBytes()));
+        encoded.add(close.asReadOnlyBuffer());
+        return encoded;
+    }
+
+    // TODO equals, hashcode
 }

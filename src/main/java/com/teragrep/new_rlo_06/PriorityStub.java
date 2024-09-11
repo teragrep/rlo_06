@@ -45,36 +45,38 @@
  */
 package com.teragrep.new_rlo_06;
 
-public class _MessageImpl implements _Message {
+import java.nio.ByteBuffer;
+import java.util.List;
 
-    private final Element element;
+public class PriorityStub implements Priority {
 
-    public _MessageImpl(Element element) {
-        this.element = element;
+    @Override
+    public boolean isStub() {
+        return true;
     }
 
     @Override
     public byte[] toBytes() {
-        return element.toBytes();
+        throw new UnsupportedOperationException("Stub does not allow this.");
     }
 
     @Override
     public int toInt() {
-        return element.toInt();
+        throw new UnsupportedOperationException("Stub does not allow this.");
     }
 
     @Override
     public long size() {
-        return element.size();
-    }
-
-    @Override
-    public boolean isStub() {
-        return element.isStub();
+        throw new UnsupportedOperationException("Stub does not allow this.");
     }
 
     @Override
     public String toString() {
-        return element.toString();
+        throw new UnsupportedOperationException("Stub does not allow this.");
+    }
+
+    @Override
+    public List<ByteBuffer> toEncoded() {
+        throw new UnsupportedOperationException("Stub does not allow this.");
     }
 }

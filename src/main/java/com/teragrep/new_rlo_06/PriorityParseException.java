@@ -45,30 +45,19 @@
  */
 package com.teragrep.new_rlo_06;
 
-public class _MessageStub implements _Message {
+import com.teragrep.rlo_06.ParseException;
 
-    @Override
-    public byte[] toBytes() {
-        throw new UnsupportedOperationException("Stub does not allow this.");
+public class PriorityParseException extends ParseException {
+
+    public PriorityParseException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    @Override
-    public int toInt() {
-        throw new UnsupportedOperationException("Stub does not allow this.");
+    public PriorityParseException(String message) {
+        super(message);
     }
 
-    @Override
-    public long size() {
-        throw new UnsupportedOperationException("Stub does not allow this.");
-    }
-
-    @Override
-    public boolean isStub() {
-        throw new UnsupportedOperationException("Stub does not allow this.");
-    }
-
-    @Override
-    public String toString() {
-        throw new UnsupportedOperationException("Stub does not allow this.");
+    public PriorityParseException(Throwable cause) {
+        super(cause);
     }
 }

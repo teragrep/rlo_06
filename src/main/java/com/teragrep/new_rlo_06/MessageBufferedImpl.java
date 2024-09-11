@@ -43,21 +43,51 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.new_rlo_06.clocks;
+package com.teragrep.new_rlo_06;
 
-import com.teragrep.rlo_06.ParseException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
-class PriorityParseException extends ParseException {
+public class MessageBufferedImpl implements Message {
 
-    public PriorityParseException(String message, Throwable cause) {
-        super(message, cause);
+    private final List<ByteBuffer> buffers;
+
+    public MessageBufferedImpl(List<ByteBuffer> buffers) {
+        this.buffers = buffers;
     }
 
-    public PriorityParseException(String message) {
-        super(message);
+    @Override
+    public byte[] toBytes() {
+        return new ElementImpl(buffers).toBytes();
     }
 
-    public PriorityParseException(Throwable cause) {
-        super(cause);
+    @Override
+    public int toInt() {
+        return new ElementImpl(buffers).toInt();
+    }
+
+    @Override
+    public long size() {
+        return new ElementImpl(buffers).size();
+    }
+
+    @Override
+    public boolean isStub() {
+        return new ElementImpl(buffers).isStub();
+    }
+
+    @Override
+    public String toString() {
+        return new ElementImpl(buffers).toString();
+    }
+
+    @Override
+    public List<ByteBuffer> toEncoded() {
+        List<ByteBuffer> readOnlyBuffers = new ArrayList<>(buffers.size());
+        for (ByteBuffer slice : buffers) {
+            readOnlyBuffers.add(slice.asReadOnlyBuffer());
+        }
+        return readOnlyBuffers;
     }
 }
