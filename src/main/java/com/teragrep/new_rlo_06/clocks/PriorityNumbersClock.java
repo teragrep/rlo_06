@@ -24,7 +24,7 @@ public class PriorityNumbersClock implements Clock<List<ByteBuffer>> {
             while (input.hasRemaining()) {
                 byte b = input.get();
 
-                if (b > '0' && b < '9') {
+                if (b >= '0' && b <= '9') {
                     numberCount++;
                     if (numberCount > 3) {
                         throw new PriorityParseException("too many numbers");
