@@ -1,6 +1,7 @@
 package com.teragrep.new_rlo_06.clocks;
 
 import com.teragrep.new_rlo_06.ElementImpl;
+import com.teragrep.new_rlo_06.PriorityParseException;
 import com.teragrep.new_rlo_06.inputs.StringInput;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -59,5 +60,29 @@ public class PriorityNumbersClockTest {
         Assertions.assertEquals(59, new ElementImpl(clock.get()).toInt());
 
         Assertions.assertTrue(clock.isComplete());
+    }
+
+    @Test
+    public void testTooManyNumbers() {
+        StringInput input = new StringInput("0590");
+        ByteBuffer[] buffers = input.asBuffers(1);
+        PriorityNumbersClock clock = new PriorityNumbersClock();
+        Assertions.assertFalse(clock.isComplete());
+
+        Exception exception = Assertions.assertThrows(PriorityParseException.class, () -> clock.apply(buffers[0]));
+
+        Assertions.assertEquals("too many numbers", exception.getMessage());
+    }
+
+    @Test
+    public void testTooFewNumbers() {
+        StringInput input = new StringInput(">");
+        ByteBuffer[] buffers = input.asBuffers(1);
+        PriorityNumbersClock clock = new PriorityNumbersClock();
+        Assertions.assertFalse(clock.isComplete());
+
+        Exception exception = Assertions.assertThrows(PriorityParseException.class, () -> clock.apply(buffers[0]));
+
+        Assertions.assertEquals("too few numbers", exception.getMessage());
     }
 }
