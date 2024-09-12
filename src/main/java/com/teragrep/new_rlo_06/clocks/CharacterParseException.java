@@ -45,54 +45,19 @@
  */
 package com.teragrep.new_rlo_06.clocks;
 
-import com.teragrep.new_rlo_06.Priority;
-import com.teragrep.new_rlo_06.PriorityBufferedImpl;
-import com.teragrep.new_rlo_06.PriorityStub;
+import com.teragrep.rlo_06.ParseException;
 
-import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.function.Function;
+public class CharacterParseException extends ParseException {
 
-
-public class PriorityClock implements Clock<Priority> {
-
-    private static final PriorityStub priorityStub = new PriorityStub();
-
-    private final CharClock priorityOpenClock;
-    private final NumberClock numberClock;
-    private final CharClock priorityCloseClock;
-    private final Function<ByteBuffer, ByteBuffer> priorityClocks;
-
-    public PriorityClock() {
-        this.priorityOpenClock = new CharClock('<');
-        this.numberClock = new NumberClock(3);
-        this.priorityCloseClock = new CharClock('>');
-
-        this.priorityClocks = priorityOpenClock.andThen(numberClock.andThen(priorityCloseClock));
-
+    public CharacterParseException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    @Override
-    public ByteBuffer apply(ByteBuffer input) {
-        return priorityClocks.apply(input);
+    public CharacterParseException(String message) {
+        super(message);
     }
 
-    @Override
-    public Priority get() {
-        final Priority priority;
-        if (priorityCloseClock.isComplete()) {
-            List<ByteBuffer> openBuffers = priorityOpenClock.get();
-            List<ByteBuffer> numbersBuffers = numberClock.get();
-            List<ByteBuffer> closeBuffers = priorityCloseClock.get();
-            priority = new PriorityBufferedImpl(openBuffers, numbersBuffers, closeBuffers);
-        } else {
-            priority = priorityStub;
-        }
-        return priority;
-    }
-
-    @Override
-    public boolean isComplete() {
-        return priorityCloseClock.isComplete();
+    public CharacterParseException(Throwable cause) {
+        super(cause);
     }
 }

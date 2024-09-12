@@ -6,31 +6,44 @@ import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
-public class PriorityOpenClock implements Clock<List<ByteBuffer>> {
+public class NumberClock implements Clock<List<ByteBuffer>> {
 
+    private final int maximumLength;
     private boolean isComplete;
     private final List<ByteBuffer> buffers;
+    private int numberCount = 0;
 
-    public PriorityOpenClock() {
+    public NumberClock(int maximumLength) {
+        this.maximumLength = maximumLength;
         this.isComplete = false;
         this.buffers = new LinkedList<>();
     }
-
     @Override
     public ByteBuffer apply(ByteBuffer input) {
         if (!isComplete) {
             ByteBuffer slice = input.slice();
-
-            if (input.hasRemaining()) {
+            int sliceLimit = 0;
+            while (input.hasRemaining()) {
                 byte b = input.get();
-                if (b == '<') {
-                    slice.limit(1);
-                    isComplete = true;
+
+                if (b >= '0' && b <= '9') {
+                    numberCount++;
+                    if (numberCount > maximumLength) {
+                        throw new PriorityParseException("too many numbers");
+                    }
+                    sliceLimit++;
                 }
                 else {
-                    throw new PriorityParseException("priority must start with a '<'");
+                    if (numberCount < 1) {
+                        throw new PriorityParseException("too few numbers");
+                    }
+                    // un-get
+                    input.position(input.position() - 1);
+                    isComplete = true;
+                    break;
                 }
             }
+            slice.limit(sliceLimit);
 
             // ignore empty slices
             if (slice.limit() > 0) {

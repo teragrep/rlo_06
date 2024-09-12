@@ -153,11 +153,11 @@ public class PriorityClockTest {
         StringInput input = new StringInput("123>");
         ByteBuffer[] buffers = input.asBuffers();
 
-        PriorityParseException exception = Assertions.assertThrows(PriorityParseException.class, () -> {
+        CharacterParseException exception = Assertions.assertThrows(CharacterParseException.class, () -> {
             priorityClock.apply(buffers[0]);
         });
 
-        Assertions.assertEquals(exception.getMessage(), "priority must start with a '<'");
+        Assertions.assertEquals(exception.getMessage(), "expected '<'");
     }
 
     @Test

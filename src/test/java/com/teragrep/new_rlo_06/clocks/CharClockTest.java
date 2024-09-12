@@ -10,14 +10,14 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PriorityOpenClockTest {
+public class CharClockTest {
 
     @Test
-    public void testOpenClock() {
+    public void testCharClock() {
         StringInput input = new StringInput("<");
         ByteBuffer[] buffers = input.asBuffers(1);
 
-        PriorityOpenClock clock = new PriorityOpenClock();
+        CharClock clock = new CharClock('<');
 
         Assertions.assertFalse(clock.isComplete());
 
@@ -30,11 +30,11 @@ public class PriorityOpenClockTest {
     }
 
     @Test
-    public void testOpenClockNoConsumeMore() {
+    public void testCharClockNoConsumeMore() {
         StringInput input = new StringInput("<X");
         ByteBuffer[] buffers = input.asBuffers(1);
 
-        PriorityOpenClock clock = new PriorityOpenClock();
+        CharClock clock = new CharClock('<');
         ByteBuffer out0 = clock.apply(buffers[0]);
         Assertions.assertTrue(out0.hasRemaining());
 
@@ -49,11 +49,11 @@ public class PriorityOpenClockTest {
     }
 
     @Test
-    public void testOpenClockNoConsumeMoreTwoBuffers() {
+    public void testCharClockNoConsumeMoreTwoBuffers() {
         StringInput input = new StringInput("<X");
         ByteBuffer[] buffers = input.asBuffers(2);
 
-        PriorityOpenClock clock = new PriorityOpenClock();
+        CharClock clock = new CharClock('<');
 
         ByteBuffer out0 = clock.apply(buffers[0]);
         Assertions.assertFalse(out0.hasRemaining());
@@ -75,12 +75,12 @@ public class PriorityOpenClockTest {
         StringInput input = new StringInput("@");
         ByteBuffer[] buffers = input.asBuffers(1);
 
-        PriorityOpenClock clock = new PriorityOpenClock();
+        CharClock clock = new CharClock('<');
 
-        PriorityParseException exception = Assertions.assertThrows(PriorityParseException.class, () -> {
+        CharacterParseException exception = Assertions.assertThrows(CharacterParseException.class, () -> {
             clock.apply(buffers[0]);
         });
-        Assertions.assertEquals("priority must start with a '<'", exception.getMessage());
+        Assertions.assertEquals("expected '<'", exception.getMessage());
 
     }
 }

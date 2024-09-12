@@ -1,17 +1,17 @@
 package com.teragrep.new_rlo_06.clocks;
 
-import com.teragrep.new_rlo_06.PriorityParseException;
-
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
-public class PriorityCloseClock implements Clock<List<ByteBuffer>> {
+public class CharClock implements Clock<List<ByteBuffer>> {
 
+    private final char character;
     private boolean isComplete;
     private final List<ByteBuffer> buffers;
 
-    public PriorityCloseClock() {
+    public CharClock(char character) {
+        this.character = character;
         this.isComplete = false;
         this.buffers = new LinkedList<>();
     }
@@ -20,13 +20,15 @@ public class PriorityCloseClock implements Clock<List<ByteBuffer>> {
     public ByteBuffer apply(ByteBuffer input) {
         if (!isComplete) {
             ByteBuffer slice = input.slice();
+
             if (input.hasRemaining()) {
                 byte b = input.get();
-                if (b == '>') {
+                if (b == character) {
                     slice.limit(1);
                     isComplete = true;
-                } else {
-                    throw new PriorityParseException("priority must end with a '>'");
+                }
+                else {
+                    throw new CharacterParseException("expected '"+ character +"'");
                 }
             }
 
