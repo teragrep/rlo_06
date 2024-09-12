@@ -1,7 +1,6 @@
 package com.teragrep.new_rlo_06.clocks;
 
 import com.teragrep.new_rlo_06.ElementImpl;
-import com.teragrep.new_rlo_06.PriorityParseException;
 import com.teragrep.new_rlo_06.inputs.StringInput;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

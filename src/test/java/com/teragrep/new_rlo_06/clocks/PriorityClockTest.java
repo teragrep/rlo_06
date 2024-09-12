@@ -79,7 +79,7 @@ public class PriorityClockTest {
         StringInput input = new StringInput("<1234>");
         ByteBuffer[] buffers = input.asBuffers();
 
-        PriorityParseException exception = Assertions.assertThrows(PriorityParseException.class, () -> {
+        NumberSequenceParseException exception = Assertions.assertThrows(NumberSequenceParseException.class, () -> {
             priorityClock.apply(buffers[0]);
         });
 
@@ -110,7 +110,7 @@ public class PriorityClockTest {
         Assertions.assertTrue(priorityClock.get().isStub());
         Assertions.assertFalse(out3.hasRemaining());
 
-        PriorityParseException exception = Assertions.assertThrows(PriorityParseException.class, () -> {
+        NumberSequenceParseException exception = Assertions.assertThrows(NumberSequenceParseException.class, () -> {
             priorityClock.apply(buffers[4]);
         });
 
@@ -123,7 +123,7 @@ public class PriorityClockTest {
         StringInput input = new StringInput("<>");
         ByteBuffer[] buffers = input.asBuffers();
 
-        PriorityParseException exception = Assertions.assertThrows(PriorityParseException.class, () -> {
+        NumberSequenceParseException exception = Assertions.assertThrows(NumberSequenceParseException.class, () -> {
             priorityClock.apply(buffers[0]);
         });
 
@@ -140,7 +140,7 @@ public class PriorityClockTest {
         Assertions.assertTrue(priorityClock.get().isStub());
         Assertions.assertFalse(out0.hasRemaining());
 
-        PriorityParseException exception = Assertions.assertThrows(PriorityParseException.class, () -> {
+        NumberSequenceParseException exception = Assertions.assertThrows(NumberSequenceParseException.class, () -> {
             priorityClock.apply(buffers[1]);
         });
 
@@ -166,7 +166,7 @@ public class PriorityClockTest {
         StringInput input = new StringInput("<<3>");
         ByteBuffer[] buffers = input.asBuffers();
 
-        PriorityParseException exception = Assertions.assertThrows(PriorityParseException.class, () -> {
+        NumberSequenceParseException exception = Assertions.assertThrows(NumberSequenceParseException.class, () -> {
             priorityClock.apply(buffers[0]);
         });
 
@@ -183,7 +183,7 @@ public class PriorityClockTest {
         Assertions.assertTrue(priorityClock.get().isStub());
         Assertions.assertFalse(out0.hasRemaining());
 
-        PriorityParseException exception = Assertions.assertThrows(PriorityParseException.class, () -> {
+        NumberSequenceParseException exception = Assertions.assertThrows(NumberSequenceParseException.class, () -> {
             priorityClock.apply(buffers[1]);
         });
 

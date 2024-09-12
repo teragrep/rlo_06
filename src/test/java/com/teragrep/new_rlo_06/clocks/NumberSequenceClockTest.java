@@ -8,13 +8,13 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 
-public class NumberClockTest {
+public class NumberSequenceClockTest {
     @Test
     public void testNumbersClock() {
         StringInput input = new StringInput("059>");
         ByteBuffer[] buffers = input.asBuffers(1);
 
-        NumberClock clock = new NumberClock(3);
+        NumberSequenceClock clock = new NumberSequenceClock(3);
 
         Assertions.assertFalse(clock.isComplete());
 
@@ -33,7 +33,7 @@ public class NumberClockTest {
         StringInput input = new StringInput("059>");
         ByteBuffer[] buffers = input.asBuffers(4);
 
-        NumberClock clock = new NumberClock(3);
+        NumberSequenceClock clock = new NumberSequenceClock(3);
 
         Assertions.assertFalse(clock.isComplete());
 
@@ -66,7 +66,7 @@ public class NumberClockTest {
     public void testTooManyNumbers() {
         StringInput input = new StringInput("0590");
         ByteBuffer[] buffers = input.asBuffers(1);
-        NumberClock clock = new NumberClock(3);
+        NumberSequenceClock clock = new NumberSequenceClock(3);
         Assertions.assertFalse(clock.isComplete());
 
         Exception exception = Assertions.assertThrows(PriorityParseException.class, () -> clock.apply(buffers[0]));
@@ -78,7 +78,7 @@ public class NumberClockTest {
     public void testTooFewNumbers() {
         StringInput input = new StringInput(">");
         ByteBuffer[] buffers = input.asBuffers(1);
-        NumberClock clock = new NumberClock(3);
+        NumberSequenceClock clock = new NumberSequenceClock(3);
         Assertions.assertFalse(clock.isComplete());
 
         Exception exception = Assertions.assertThrows(PriorityParseException.class, () -> clock.apply(buffers[0]));

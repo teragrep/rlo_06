@@ -1,7 +1,6 @@
 package com.teragrep.new_rlo_06.clocks;
 
 import com.teragrep.new_rlo_06.ElementImpl;
-import com.teragrep.new_rlo_06.PriorityParseException;
 import com.teragrep.new_rlo_06.inputs.StringInput;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -50,7 +49,7 @@ public class VersionClockTest {
         Assertions.assertEquals("1", clock.get().toString());
 
         ByteBuffer out2 = clock.apply(buffers[2]);
-        Assertions.assertFalse(out2.hasRemaining());
+        Assertions.assertTrue(out2.hasRemaining());
 
         ByteBuffer in2 = out2.slice();
         List<ByteBuffer> ins = new ArrayList<>(1);
@@ -65,10 +64,24 @@ public class VersionClockTest {
 
         VersionClock clock = new VersionClock();
 
-        PriorityParseException exception = Assertions.assertThrows(PriorityParseException.class, () -> {
+        NumberSequenceParseException exception = Assertions.assertThrows(NumberSequenceParseException.class, () -> {
             clock.apply(buffers[0]);
         });
-        Assertions.assertEquals("version version version", exception.getMessage());
+        Assertions.assertEquals("too few numbers", exception.getMessage());
+
+    }
+
+    @Test
+    public void testMissingSpaceThrows() {
+        StringInput input = new StringInput("1@");
+        ByteBuffer[] buffers = input.asBuffers(1);
+
+        VersionClock clock = new VersionClock();
+
+        CharacterParseException exception = Assertions.assertThrows(CharacterParseException.class, () -> {
+            clock.apply(buffers[0]);
+        });
+        Assertions.assertEquals("expected ' '", exception.getMessage());
 
     }
 }

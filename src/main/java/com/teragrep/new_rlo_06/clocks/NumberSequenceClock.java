@@ -1,19 +1,17 @@
 package com.teragrep.new_rlo_06.clocks;
 
-import com.teragrep.new_rlo_06.PriorityParseException;
-
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
-public class NumberClock implements Clock<List<ByteBuffer>> {
+public class NumberSequenceClock implements Clock<List<ByteBuffer>> {
 
     private final int maximumLength;
     private boolean isComplete;
     private final List<ByteBuffer> buffers;
     private int numberCount = 0;
 
-    public NumberClock(int maximumLength) {
+    public NumberSequenceClock(int maximumLength) {
         this.maximumLength = maximumLength;
         this.isComplete = false;
         this.buffers = new LinkedList<>();
@@ -29,13 +27,13 @@ public class NumberClock implements Clock<List<ByteBuffer>> {
                 if (b >= '0' && b <= '9') {
                     numberCount++;
                     if (numberCount > maximumLength) {
-                        throw new PriorityParseException("too many numbers");
+                        throw new NumberSequenceParseException("too many numbers");
                     }
                     sliceLimit++;
                 }
                 else {
                     if (numberCount < 1) {
-                        throw new PriorityParseException("too few numbers");
+                        throw new NumberSequenceParseException("too few numbers");
                     }
                     // un-get
                     input.position(input.position() - 1);
