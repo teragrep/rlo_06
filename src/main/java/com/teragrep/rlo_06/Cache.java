@@ -47,7 +47,7 @@ package com.teragrep.rlo_06;
 
 interface Cache<T> {
 
-    T take();
+    public abstract T take();
 
-    void put(T t);
+    public abstract void put(T t);
 }

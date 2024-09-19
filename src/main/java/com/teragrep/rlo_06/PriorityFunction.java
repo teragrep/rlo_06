@@ -97,17 +97,11 @@ public final class PriorityFunction implements BiFunction<Stream, ByteBuffer, By
                     throw new PriorityParseException("PRIORITY > missing");
                 }
             }
-            else if (stream.get() == 62) { // third may be a '>'
-                // omit '>'
-            }
-            else {
+            else if (stream.get() != 62) { // must be a '>'
                 throw new PriorityParseException("PRIORITY number incorrect");
             }
         }
-        else if (stream.get() == 62) { // second may be a '>'
-            // omit '>'
-        }
-        else {
+        else if (stream.get() != 62) { // must be a '>'
             throw new PriorityParseException("PRIORITY number incorrect");
         }
         buffer.flip();

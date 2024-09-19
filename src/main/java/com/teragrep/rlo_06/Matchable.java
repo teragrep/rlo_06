@@ -49,5 +49,5 @@ import java.nio.ByteBuffer;
 
 public interface Matchable {
 
-    boolean matches(ByteBuffer buffer);
+    public abstract boolean matches(ByteBuffer buffer);
 }
