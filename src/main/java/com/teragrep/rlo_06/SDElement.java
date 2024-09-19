@@ -90,11 +90,9 @@ public final class SDElement implements Consumer<Stream>, Clearable {
             b = stream.get();
         }
 
-        if (b == 93) { // ']', sdId only here: Payload:'[ID_A@1]' or Payload:'[ID_A@1][ID_B@1]'
+        if (b != 93) { // not ']', sdId only here: Payload:'[ID_A@1]' or Payload:'[ID_A@1][ID_B@1]'
             // MSG may not exist, no \n either, Parsing may be complete. get sets this.returnAfter to false
             // Total payload: '<14>1 2015-06-20T09:14:07.12345+00:00 host02 serverd DEA MSG-01 [ID_A@1]'
-        }
-        else {
             throw new StructuredDataParseException("SP missing after SD_ID or SD_ID too long");
         }
         fragmentState = FragmentState.WRITTEN;

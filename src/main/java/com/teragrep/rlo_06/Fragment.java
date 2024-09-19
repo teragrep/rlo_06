@@ -62,7 +62,7 @@ public final class Fragment implements Consumer<Stream>, Clearable, Matchable, B
     Fragment() {
         this.isStub = true;
         this.buffer = ByteBuffer.allocateDirect(0);
-        this.parseRule = (stream, buffer) -> ByteBuffer.allocateDirect(0);
+        this.parseRule = (stream, bytebuffer) -> ByteBuffer.allocateDirect(0);
         this.fragmentState = FragmentState.EMPTY;
     }
 

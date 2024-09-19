@@ -91,6 +91,212 @@
     <finalName>rlo_06</finalName>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.5.0</version>
+        <executions>
+          <!-- These are all errors that will fail the build if triggered -->
+          <execution>
+            <id>scan-errors</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>process-classes</phase>
+            <configuration>
+              <violationSeverity>error</violationSeverity>
+              <logViolationsToConsole>true</logViolationsToConsole>
+              <failOnViolation>true</failOnViolation>
+              <failsOnError>false</failsOnError>
+              <checkstyleRules>
+                <module name="Checker">
+                  <module name="TreeWalker">
+                    <module name="ClassMemberImpliedModifier"></module>
+                    <module name="CovariantEquals"></module>
+                    <module name="DefaultComesLast"></module>
+                    <module name="EmptyBlock"></module>
+                    <module name="EmptyCatchBlock"></module>
+                    <module name="EmptyStatement"></module>
+                    <module name="EqualsAvoidNull"></module>
+                    <module name="EqualsHashCode"></module>
+                    <module name="FallThrough"></module>
+                    <module name="FinalClass"></module>
+                    <module name="HiddenField">
+                      <property name="ignoreConstructorParameter" value="true"></property>
+                      <property name="ignoreSetter" value="true"></property>
+                    </module>
+                    <module name="IllegalCatch"></module>
+                    <module name="IllegalImport"></module>
+                    <module name="IllegalThrows"></module>
+                    <module name="IllegalToken"></module>
+                    <module name="IllegalType"></module>
+                    <module name="InnerAssignment"></module>
+                    <module name="InterfaceMemberImpliedModifier"></module>
+                    <module name="MissingOverride"></module>
+                    <module name="MissingSwitchDefault"></module>
+                    <module name="ModifiedControlVariable">
+                      <property name="skipEnhancedForLoopVariable" value="true"></property>
+                    </module>
+                    <module name="ModifierOrder"></module>
+                    <module name="MutableException"></module>
+                    <module name="NeedBraces"></module>
+                    <module name="NestedForDepth">
+                      <property name="max" value="2"></property>
+                    </module>
+                    <module name="NestedTryDepth"></module>
+                    <module name="NoClone"></module>
+                    <module name="NoFinalizer"></module>
+                    <module name="OneTopLevelClass"></module>
+                    <module name="PackageDeclaration"></module>
+                    <module name="PackageName">
+                      <property name="format" value="^com\.teragrep\.[a-z]{3}_\d{2}(?:.[a-zA-Z]\w*)*$"></property>
+                    </module>
+                    <module name="ReturnCount">
+                      <property name="max" value="5"></property>
+                    </module>
+                    <module name="StringLiteralEquality"></module>
+                    <module name="SuperClone"></module>
+                    <module name="SuperFinalize"></module>
+                    <module name="TypeName"></module>
+                    <module name="UpperEll"></module>
+                    <module name="VisibilityModifier">
+                      <property name="allowPublicFinalFields" value="true"></property>
+                    </module>
+                  </module>
+                  <module name="Translation"></module>
+                  <module name="UniqueProperties"></module>
+                </module>
+              </checkstyleRules>
+            </configuration>
+          </execution>
+          <!-- These are warnings but will not fail the build -->
+          <execution>
+            <id>scan-warnings</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>process-classes</phase>
+            <configuration>
+              <violationSeverity>warning</violationSeverity>
+              <logViolationsToConsole>true</logViolationsToConsole>
+              <failOnViolation>false</failOnViolation>
+              <failsOnError>false</failsOnError>
+              <checkstyleRules>
+                <module name="Checker">
+                  <module name="TreeWalker">
+                    <module name="ArrayTypeStyle">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="AvoidNestedBlocks">
+                      <property name="allowInSwitchCase" value="true"></property>
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="AvoidNoArgumentSuperConstructorCall">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="AvoidStarImport">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="AvoidStaticImport">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="DeclarationOrder">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="FinalLocalVariable">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="FinalParameters">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="MagicNumber">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="MissingDeprecated">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="MultipleVariableDeclarations">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="NestedForDepth">
+                      <property name="max" value="1"></property>
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="NestedIfDepth">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="NoArrayTrailingComma">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="NoCodeInFile">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="NoEnumTrailingComma">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="OneStatementPerLine">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="OuterTypeFilename">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="ParameterAssignment">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="RedundantImport">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="RequireThis">
+                      <property name="checkFields" value="false"></property>
+                      <property name="checkMethods" value="false"></property>
+                      <property name="validateOnlyOverlapping" value="true"></property>
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="ReturnCount">
+                      <property name="max" value="1"></property>
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="SimplifyBooleanExpression">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="SimplifyBooleanReturn">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="UnnecessarySemicolonAfterOuterTypeDeclaration">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="UnnecessarySemicolonAfterTypeMemberDeclaration">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="UnnecessarySemicolonInEnumeration">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="UnnecessarySemicolonInTryWithResources">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="UnusedLocalVariable">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="VariableDeclarationUsageDistance">
+                      <property name="severity" value="warning"></property>
+                    </module>
+                    <module name="VisibilityModifier">
+                      <property name="allowPublicFinalFields" value="false"></property>
+                      <property name="severity" value="warning"></property>
+                    </module>
+                  </module>
+                  <module name="NewlineAtEndOfFile">
+                    <property name="severity" value="warning"></property>
+                  </module>
+                  <module name="OrderedProperties">
+                    <property name="severity" value="warning"></property>
+                  </module>
+                </module>
+              </checkstyleRules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
         <version>2.30.0</version>
