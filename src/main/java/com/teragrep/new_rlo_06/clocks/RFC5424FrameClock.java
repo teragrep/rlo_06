@@ -55,15 +55,19 @@ public class RFC5424FrameClock implements Clock<RFC5424Frame> {
     private static final RFC5424FrameStub rfc5424FrameStub = new RFC5424FrameStub();
 
     private final PriorityClock priorityClock;
+    private final VersionClock versionClock;
+    private final TimestampClock timestampClock;
     private final MessageClock messageClock;
     private final Function<ByteBuffer, ByteBuffer> clockChain;
 
     public RFC5424FrameClock() {
 
         this.priorityClock = new PriorityClock();
+        this.versionClock = new VersionClock();
+        this.timestampClock = new TimestampClock();
         this.messageClock = new MessageClock();
 
-        this.clockChain = priorityClock.andThen(messageClock);
+        this.clockChain = priorityClock.andThen(versionClock.andThen(timestampClock.andThen(messageClock)));
     }
 
     public ByteBuffer apply(ByteBuffer input) {
