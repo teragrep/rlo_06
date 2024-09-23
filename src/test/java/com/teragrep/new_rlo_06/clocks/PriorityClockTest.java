@@ -56,18 +56,18 @@ public class PriorityClockTest {
 
     @Test
     public void testClock() {
-        PriorityClock priorityClock = new PriorityClock();
+        PriorityClock priorityClock = new PriorityClock(versionClock);
 
         StringInput input = new StringInput("<123>");
 
         ByteBuffer[] buffers = input.asBuffers(2);
 
-        ByteBuffer out0 = priorityClock.apply(buffers[0]);
+        ByteBuffer out0 = priorityClock.accept(buffers[0]);
         Assertions.assertFalse(out0.hasRemaining());
-        
-        ByteBuffer out1 = priorityClock.apply(buffers[1]);
+
+        ByteBuffer out1 = priorityClock.accept(buffers[1]);
         Assertions.assertFalse(out1.hasRemaining());
-        
+
         Priority priority = priorityClock.get();
         Assertions.assertFalse(priority.isStub());
         Assertions.assertEquals(123, priority.toInt());
@@ -75,12 +75,12 @@ public class PriorityClockTest {
 
     @Test
     void testFailOversizeOneBuffer() {
-        PriorityClock priorityClock = new PriorityClock();
+        PriorityClock priorityClock = new PriorityClock(versionClock);
         StringInput input = new StringInput("<1234>");
         ByteBuffer[] buffers = input.asBuffers();
 
         NumberSequenceParseException exception = Assertions.assertThrows(NumberSequenceParseException.class, () -> {
-            priorityClock.apply(buffers[0]);
+            priorityClock.accept(buffers[0]);
         });
 
         Assertions.assertEquals(exception.getMessage(), "too many numbers");
@@ -88,30 +88,30 @@ public class PriorityClockTest {
 
     @Test
     void testFailOversizeSixBuffers() {
-        PriorityClock priorityClock = new PriorityClock();
+        PriorityClock priorityClock = new PriorityClock(versionClock);
         StringInput input = new StringInput("<1234>");
         ByteBuffer[] buffers = input.asBuffers(6);
 
         Assertions.assertEquals(6, buffers.length);
 
-        ByteBuffer out0 = priorityClock.apply(buffers[0]);
+        ByteBuffer out0 = priorityClock.accept(buffers[0]);
         Assertions.assertTrue(priorityClock.get().isStub());
         Assertions.assertFalse(out0.hasRemaining());
 
-        ByteBuffer out1 = priorityClock.apply(buffers[1]);
+        ByteBuffer out1 = priorityClock.accept(buffers[1]);
         Assertions.assertTrue(priorityClock.get().isStub());
         Assertions.assertFalse(out1.hasRemaining());
 
-        ByteBuffer out2 = priorityClock.apply(buffers[2]);
+        ByteBuffer out2 = priorityClock.accept(buffers[2]);
         Assertions.assertTrue(priorityClock.get().isStub());
         Assertions.assertFalse(out2.hasRemaining());
 
-        ByteBuffer out3 = priorityClock.apply(buffers[3]);
+        ByteBuffer out3 = priorityClock.accept(buffers[3]);
         Assertions.assertTrue(priorityClock.get().isStub());
         Assertions.assertFalse(out3.hasRemaining());
 
         NumberSequenceParseException exception = Assertions.assertThrows(NumberSequenceParseException.class, () -> {
-            priorityClock.apply(buffers[4]);
+            priorityClock.accept(buffers[4]);
         });
 
         Assertions.assertEquals(exception.getMessage(), "too many numbers");
@@ -119,12 +119,12 @@ public class PriorityClockTest {
 
     @Test
     public void testFailNoContentOneBuffer() {
-        PriorityClock priorityClock = new PriorityClock();
+        PriorityClock priorityClock = new PriorityClock(versionClock);
         StringInput input = new StringInput("<>");
         ByteBuffer[] buffers = input.asBuffers();
 
         NumberSequenceParseException exception = Assertions.assertThrows(NumberSequenceParseException.class, () -> {
-            priorityClock.apply(buffers[0]);
+            priorityClock.accept(buffers[0]);
         });
 
         Assertions.assertEquals(exception.getMessage(), "too few numbers");
@@ -132,16 +132,16 @@ public class PriorityClockTest {
 
     @Test
     public void testFailNoContentTwoBuffers() {
-        PriorityClock priorityClock = new PriorityClock();
+        PriorityClock priorityClock = new PriorityClock(versionClock);
         StringInput input = new StringInput("<>");
         ByteBuffer[] buffers = input.asBuffers(2);
 
-        ByteBuffer out0 = priorityClock.apply(buffers[0]);
+        ByteBuffer out0 = priorityClock.accept(buffers[0]);
         Assertions.assertTrue(priorityClock.get().isStub());
         Assertions.assertFalse(out0.hasRemaining());
 
         NumberSequenceParseException exception = Assertions.assertThrows(NumberSequenceParseException.class, () -> {
-            priorityClock.apply(buffers[1]);
+            priorityClock.accept(buffers[1]);
         });
 
         Assertions.assertEquals(exception.getMessage(), "too few numbers");
@@ -149,12 +149,12 @@ public class PriorityClockTest {
 
     @Test
     void testFailStart() {
-        PriorityClock priorityClock = new PriorityClock();
+        PriorityClock priorityClock = new PriorityClock(versionClock);
         StringInput input = new StringInput("123>");
         ByteBuffer[] buffers = input.asBuffers();
 
         CharacterParseException exception = Assertions.assertThrows(CharacterParseException.class, () -> {
-            priorityClock.apply(buffers[0]);
+            priorityClock.accept(buffers[0]);
         });
 
         Assertions.assertEquals(exception.getMessage(), "expected '<'");
@@ -162,12 +162,12 @@ public class PriorityClockTest {
 
     @Test
     void testFailDoubleStart() {
-        PriorityClock priorityClock = new PriorityClock();
+        PriorityClock priorityClock = new PriorityClock(versionClock);
         StringInput input = new StringInput("<<3>");
         ByteBuffer[] buffers = input.asBuffers();
 
         NumberSequenceParseException exception = Assertions.assertThrows(NumberSequenceParseException.class, () -> {
-            priorityClock.apply(buffers[0]);
+            priorityClock.accept(buffers[0]);
         });
 
         Assertions.assertEquals(exception.getMessage(), "too few numbers");
@@ -175,16 +175,16 @@ public class PriorityClockTest {
 
     @Test
     void testFailMultiBuffer() {
-        PriorityClock priorityClock = new PriorityClock();
+        PriorityClock priorityClock = new PriorityClock(versionClock);
         StringInput input = new StringInput("<<3>");
         ByteBuffer[] buffers = input.asBuffers(4);
 
-        ByteBuffer out0 = priorityClock.apply(buffers[0]);
+        ByteBuffer out0 = priorityClock.accept(buffers[0]);
         Assertions.assertTrue(priorityClock.get().isStub());
         Assertions.assertFalse(out0.hasRemaining());
 
         NumberSequenceParseException exception = Assertions.assertThrows(NumberSequenceParseException.class, () -> {
-            priorityClock.apply(buffers[1]);
+            priorityClock.accept(buffers[1]);
         });
 
         Assertions.assertEquals(exception.getMessage(), "too few numbers");
@@ -192,11 +192,11 @@ public class PriorityClockTest {
 
     @Test
     void testTerminationSingleBuffer() {
-        PriorityClock priorityClock = new PriorityClock();
+        PriorityClock priorityClock = new PriorityClock(versionClock);
         StringInput input = new StringInput("<3>X");
         ByteBuffer[] buffers = input.asBuffers(1);
 
-        ByteBuffer out0 = priorityClock.apply(buffers[0]);
+        ByteBuffer out0 = priorityClock.accept(buffers[0]);
         Assertions.assertTrue(out0.hasRemaining());
 
         Priority priority = priorityClock.get();
@@ -207,25 +207,25 @@ public class PriorityClockTest {
 
     @Test
     void testTerminationFourBuffers() {
-        PriorityClock priorityClock = new PriorityClock();
+        PriorityClock priorityClock = new PriorityClock(versionClock);
         StringInput input = new StringInput("<3>X");
         ByteBuffer[] buffers = input.asBuffers(4);
 
-        ByteBuffer out0 = priorityClock.apply(buffers[0]);
+        ByteBuffer out0 = priorityClock.accept(buffers[0]);
         Assertions.assertTrue(priorityClock.get().isStub());
         Assertions.assertFalse(out0.hasRemaining());
 
-        ByteBuffer out1 = priorityClock.apply(buffers[1]);
+        ByteBuffer out1 = priorityClock.accept(buffers[1]);
         Assertions.assertTrue(priorityClock.get().isStub());
         Assertions.assertFalse(out1.hasRemaining());
 
-        ByteBuffer out2 = priorityClock.apply(buffers[2]);
+        ByteBuffer out2 = priorityClock.accept(buffers[2]);
         Priority priority = priorityClock.get();
         Assertions.assertFalse(priority.isStub());
         Assertions.assertFalse(out2.hasRemaining());
         Assertions.assertEquals(3, priority.toInt());
 
-        ByteBuffer out3 = priorityClock.apply(buffers[3]);
+        ByteBuffer out3 = priorityClock.accept(buffers[3]);
         Assertions.assertFalse(priorityClock.get().isStub());
         Assertions.assertTrue(out3.hasRemaining()); // must not consume X
 

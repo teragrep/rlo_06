@@ -55,8 +55,11 @@ public class PriorityBufferedImpl implements Priority {
     private final List<ByteBuffer> numbersBuffers;
     private final List<ByteBuffer> closeBuffers;
 
-
-    public PriorityBufferedImpl(List<ByteBuffer> openBuffers, List<ByteBuffer> numbersBuffers, List<ByteBuffer> closeBuffers) {
+    public PriorityBufferedImpl(
+            List<ByteBuffer> openBuffers,
+            List<ByteBuffer> numbersBuffers,
+            List<ByteBuffer> closeBuffers
+    ) {
         this.openBuffers = openBuffers;
         this.numbersBuffers = numbersBuffers;
         this.closeBuffers = closeBuffers;
@@ -70,9 +73,7 @@ public class PriorityBufferedImpl implements Priority {
     @Override
     public List<ByteBuffer> toEncoded() {
         List<ByteBuffer> readOnlyBuffers = new ArrayList<>(
-                openBuffers.size()
-                + numbersBuffers.size()
-                + closeBuffers.size()
+                openBuffers.size() + numbersBuffers.size() + closeBuffers.size()
         );
 
         for (ByteBuffer buffer : openBuffers) {
@@ -86,7 +87,6 @@ public class PriorityBufferedImpl implements Priority {
         for (ByteBuffer buffer : closeBuffers) {
             readOnlyBuffers.add(buffer.asReadOnlyBuffer());
         }
-
 
         return readOnlyBuffers;
     }

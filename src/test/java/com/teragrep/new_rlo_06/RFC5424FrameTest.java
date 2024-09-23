@@ -74,11 +74,11 @@ public class RFC5424FrameTest {
 
         RFC5424FrameClock frameClock = new RFC5424FrameClock();
 
-        ByteBuffer out0 = frameClock.apply(fragments[0]);
+        ByteBuffer out0 = frameClock.accept(fragments[0]);
         Assertions.assertFalse(out0.hasRemaining());
         Assertions.assertFalse(frameClock.get().isStub()); // message is always complete
 
-        ByteBuffer out1 = frameClock.apply(fragments[1]);
+        ByteBuffer out1 = frameClock.accept(fragments[1]);
         Assertions.assertFalse(out1.hasRemaining());
 
         RFC5424Frame frame = frameClock.get();

@@ -48,8 +48,10 @@ package com.teragrep.new_rlo_06;
 public interface RFC5424Frame extends Stubable {
 
     Priority priority();
+
     RFC5424Frame priority(Priority priority);
 
     Message message();
+
     RFC5424Frame message(Message message);
 }

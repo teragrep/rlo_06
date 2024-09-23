@@ -47,52 +47,34 @@ package com.teragrep.new_rlo_06.clocks;
 
 import com.teragrep.new_rlo_06.Priority;
 import com.teragrep.new_rlo_06.PriorityBufferedImpl;
-import com.teragrep.new_rlo_06.PriorityStub;
 
 import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.function.Function;
-
+import java.util.function.Consumer;
 
 public class PriorityClock implements Clock<Priority> {
-
-    private static final PriorityStub priorityStub = new PriorityStub();
 
     private final CharClock priorityOpenClock;
     private final NumberSequenceClock numberSequenceClock;
     private final CharClock priorityCloseClock;
-    private final Function<ByteBuffer, ByteBuffer> priorityClocks;
 
-    public PriorityClock() {
-        this.priorityOpenClock = new CharClock('<');
-        this.numberSequenceClock = new NumberSequenceClock(3);
-        this.priorityCloseClock = new CharClock('>');
-
-        this.priorityClocks = priorityOpenClock.andThen(numberSequenceClock.andThen(priorityCloseClock));
-
+    public PriorityClock(Consumer<ByteBuffer> nextClock) {
+        this.priorityCloseClock = new CharClock(nextClock, '>');
+        this.numberSequenceClock = new NumberSequenceClock(this.priorityCloseClock, 3);
+        this.priorityOpenClock = new CharClock(this.numberSequenceClock, '<');
     }
 
     @Override
-    public ByteBuffer apply(ByteBuffer input) {
-        return priorityClocks.apply(input);
+    public void accept(ByteBuffer byteBuffer) {
+        priorityOpenClock.accept(byteBuffer);
     }
 
     @Override
     public Priority get() {
-        final Priority priority;
-        if (priorityCloseClock.isComplete()) {
-            List<ByteBuffer> openBuffers = priorityOpenClock.get();
-            List<ByteBuffer> numbersBuffers = numberSequenceClock.get();
-            List<ByteBuffer> closeBuffers = priorityCloseClock.get();
-            priority = new PriorityBufferedImpl(openBuffers, numbersBuffers, closeBuffers);
-        } else {
-            priority = priorityStub;
-        }
-        return priority;
+        List<ByteBuffer> openBuffers = priorityOpenClock.get();
+        List<ByteBuffer> numbersBuffers = numberSequenceClock.get();
+        List<ByteBuffer> closeBuffers = priorityCloseClock.get();
+        return new PriorityBufferedImpl(openBuffers, numbersBuffers, closeBuffers);
     }
 
-    @Override
-    public boolean isComplete() {
-        return priorityCloseClock.isComplete();
-    }
 }

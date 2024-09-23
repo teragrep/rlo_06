@@ -48,47 +48,38 @@ package com.teragrep.new_rlo_06.clocks;
 import com.teragrep.new_rlo_06.*;
 
 import java.nio.ByteBuffer;
-import java.util.function.Function;
 
 public class RFC5424FrameClock implements Clock<RFC5424Frame> {
 
     private static final RFC5424FrameStub rfc5424FrameStub = new RFC5424FrameStub();
 
-    private final PriorityClock priorityClock;
-    private final VersionClock versionClock;
-    private final TimestampClock timestampClock;
     private final MessageClock messageClock;
-    private final Function<ByteBuffer, ByteBuffer> clockChain;
+    private final TimestampClock timestampClock;
+    private final VersionClock versionClock;
+    private final PriorityClock priorityClock;
 
     public RFC5424FrameClock() {
-
-        this.priorityClock = new PriorityClock();
-        this.versionClock = new VersionClock();
-        this.timestampClock = new TimestampClock();
         this.messageClock = new MessageClock();
-
-        this.clockChain = priorityClock.andThen(versionClock.andThen(timestampClock.andThen(messageClock)));
+        this.timestampClock = new TimestampClock(messageClock);
+        this.versionClock = new VersionClock(timestampClock);
+        this.priorityClock = new PriorityClock(versionClock);
     }
 
-    public ByteBuffer apply(ByteBuffer input) {
-        while (input.hasRemaining()) {
-            clockChain.apply(input);
+    @Override
+    public void accept(ByteBuffer byteBuffer) {
+        while (byteBuffer.hasRemaining()) {
+            priorityClock.accept(byteBuffer);
         }
-        return input;
     }
 
     public RFC5424Frame get() {
         final RFC5424Frame rfc5424Frame;
         if (!messageClock.get().isStub()) { // TODO change if (!structuredData.isStub()), message is optional
             rfc5424Frame = new RFC5424FrameImpl(priorityClock.get(), messageClock.get());
-        } else {
+        }
+        else {
             rfc5424Frame = rfc5424FrameStub;
         }
         return rfc5424Frame;
-    }
-
-    @Override
-    public boolean isComplete() {
-        return true; // TODO SD is mandatory, lf version needs \n in message
     }
 }

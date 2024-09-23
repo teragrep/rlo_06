@@ -51,10 +51,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class PriorityImpl implements Priority {
-    private static final ByteBuffer open = ByteBuffer.wrap(new byte[]{'<'});
-    private static final ByteBuffer close = ByteBuffer.wrap(new byte[]{'>'});
+
+    private static final ByteBuffer open = ByteBuffer.wrap(new byte[] {
+            '<'
+    });
+    private static final ByteBuffer close = ByteBuffer.wrap(new byte[] {
+            '>'
+    });
 
     private final int priority;
+
     public PriorityImpl(int priority) {
         this.priority = priority;
     }

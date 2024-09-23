@@ -60,7 +60,7 @@ public class MessageClock implements Clock<Message> {
     }
 
     @Override
-    public ByteBuffer apply(ByteBuffer input) {
+    public void accept(ByteBuffer input) {
         ByteBuffer slice = input.slice();
 
         // consume all, message is just like that
@@ -72,16 +72,10 @@ public class MessageClock implements Clock<Message> {
         }
 
         // TODO new line termination in another type of MessageClock?
-        return input;
     }
 
     @Override
     public Message get() {
         return new MessageBufferedImpl(buffers);
-    }
-
-    @Override
-    public boolean isComplete() {
-        return true; // TODO line feed terminating version may not always be complete
     }
 }

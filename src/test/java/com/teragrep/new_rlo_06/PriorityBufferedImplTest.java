@@ -47,20 +47,17 @@ package com.teragrep.new_rlo_06;
 
 import com.teragrep.new_rlo_06.inputs.StringInput;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.LinkedList;
 
 public class PriorityBufferedImplTest {
+
     @Test
     public void test() {
         StringInput openInput = new StringInput("<");
         StringInput numbersInput = new StringInput("012");
         StringInput closeInput = new StringInput(">");
-
 
         Priority priority = new PriorityBufferedImpl(
                 Arrays.asList(openInput.asBuffers()),
@@ -82,31 +79,31 @@ public class PriorityBufferedImplTest {
         Element element = new ElementImpl(priority.encode().buffers());
         Assertions.assertEquals("<012>", element.toString());
     }
-
+    
     @Test
     public void testDecodeEncodeDecode() {
         StringInput stringInput = new StringInput("012");
         LinkedList<ByteBuffer> buffers = new LinkedList<>(Arrays.asList(stringInput.asBuffers()));
         Priority priority = new PriorityBufferedImpl(new ElementImpl(buffers));
         Priority priority1Decoded = priority.encode().decode();
-
+    
         Assertions.assertEquals("012", priority1Decoded.toString());
         // Assertions.assertEquals(priority, priority1Decoded); // TODO once testEquals passes
-
+    
     }
-
+    
     @Disabled
     @Test
     public void testEquals() {
         StringInput stringInput = new StringInput("012");
         LinkedList<ByteBuffer> buffers = new LinkedList<>(Arrays.asList(stringInput.asBuffers()));
         Priority priority = new PriorityBufferedImpl(new ElementImpl(buffers));
-
+    
         LinkedList<ByteBuffer> buffers1 = new LinkedList<>(Arrays.asList(stringInput.asBuffers()));
         Priority priority1 = new PriorityBufferedImpl(new ElementImpl(buffers1));
-
+    
         Assertions.assertEquals(priority, priority1);
     }
-
+    
      */
 }
