@@ -61,16 +61,12 @@ public class CharClockTest {
         StringInput input = new StringInput("<");
         ByteBuffer[] buffers = input.asBuffers(1);
 
-        CharClock clock = new CharClock('<');
+        CharClock clock = new CharClock(new FakeClock(), '<');
 
-        Assertions.assertFalse(clock.isComplete());
-
-        ByteBuffer out0 = clock.accept(buffers[0]);
-        Assertions.assertFalse(out0.hasRemaining());
+        clock.accept(buffers[0]);
+        Assertions.assertFalse(buffers[0].hasRemaining());
 
         Assertions.assertEquals("<", new ElementImpl(clock.get()).toString());
-
-        Assertions.assertTrue(clock.isComplete());
     }
 
     @Test
@@ -78,15 +74,13 @@ public class CharClockTest {
         StringInput input = new StringInput("<X");
         ByteBuffer[] buffers = input.asBuffers(1);
 
-        CharClock clock = new CharClock('<');
-        ByteBuffer out0 = clock.accept(buffers[0]);
-        Assertions.assertTrue(out0.hasRemaining());
-
-        Assertions.assertTrue(clock.isComplete());
+        CharClock clock = new CharClock(new FakeClock(), '<');
+        clock.accept(buffers[0]);
+        Assertions.assertTrue(buffers[0].hasRemaining());
 
         Assertions.assertEquals("<", new ElementImpl(clock.get()).toString());
 
-        ByteBuffer in1 = out0.slice();
+        ByteBuffer in1 = buffers[0].slice();
         List<ByteBuffer> ins = new ArrayList<>();
         ins.add(in1);
         Assertions.assertEquals("X", new ElementImpl(ins).toString());
@@ -97,18 +91,17 @@ public class CharClockTest {
         StringInput input = new StringInput("<X");
         ByteBuffer[] buffers = input.asBuffers(2);
 
-        CharClock clock = new CharClock('<');
+        CharClock clock = new CharClock(new FakeClock(), '<');
 
-        ByteBuffer out0 = clock.accept(buffers[0]);
-        Assertions.assertFalse(out0.hasRemaining());
-        Assertions.assertTrue(clock.isComplete());
+        clock.accept(buffers[0]);
+        Assertions.assertFalse(buffers[0].hasRemaining());
 
         Assertions.assertEquals("<", new ElementImpl(clock.get()).toString());
 
-        ByteBuffer out1 = clock.accept(buffers[1]);
-        Assertions.assertTrue(out1.hasRemaining());
+        clock.accept(buffers[1]);
+        Assertions.assertTrue(buffers[1].hasRemaining());
 
-        ByteBuffer in1 = out1.slice();
+        ByteBuffer in1 = buffers[1].slice();
         List<ByteBuffer> ins = new ArrayList<>();
         ins.add(in1);
         Assertions.assertEquals("X", new ElementImpl(ins).toString());
@@ -119,7 +112,7 @@ public class CharClockTest {
         StringInput input = new StringInput("@");
         ByteBuffer[] buffers = input.asBuffers(1);
 
-        CharClock clock = new CharClock('<');
+        CharClock clock = new CharClock(new FakeClock(), '<');
 
         CharacterParseException exception = Assertions.assertThrows(CharacterParseException.class, () -> {
             clock.accept(buffers[0]);

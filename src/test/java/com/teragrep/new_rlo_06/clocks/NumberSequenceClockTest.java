@@ -46,7 +46,6 @@
 package com.teragrep.new_rlo_06.clocks;
 
 import com.teragrep.new_rlo_06.ElementImpl;
-import com.teragrep.new_rlo_06.PriorityParseException;
 import com.teragrep.new_rlo_06.inputs.StringInput;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -60,18 +59,15 @@ public class NumberSequenceClockTest {
         StringInput input = new StringInput("059>");
         ByteBuffer[] buffers = input.asBuffers(1);
 
-        NumberSequenceClock clock = new NumberSequenceClock(3);
+        NumberSequenceClock clock = new NumberSequenceClock(new FakeClock(), 3);
 
-        Assertions.assertFalse(clock.isComplete());
-
-        ByteBuffer out0 = clock.accept(buffers[0]);
-        Assertions.assertTrue(out0.hasRemaining());
+        clock.accept(buffers[0]);
+        Assertions.assertTrue(buffers[0].hasRemaining());
 
         Assertions.assertEquals("059", new ElementImpl(clock.get()).toString());
 
         Assertions.assertEquals(59, new ElementImpl(clock.get()).toInt());
 
-        Assertions.assertTrue(clock.isComplete());
     }
 
     @Test
@@ -79,42 +75,35 @@ public class NumberSequenceClockTest {
         StringInput input = new StringInput("059>");
         ByteBuffer[] buffers = input.asBuffers(4);
 
-        NumberSequenceClock clock = new NumberSequenceClock(3);
+        NumberSequenceClock clock = new NumberSequenceClock(new FakeClock(), 3);
 
-        Assertions.assertFalse(clock.isComplete());
+        clock.accept(buffers[0]);
+        Assertions.assertFalse(buffers[0].hasRemaining());
 
-        ByteBuffer out0 = clock.accept(buffers[0]);
-        Assertions.assertFalse(out0.hasRemaining());
-        Assertions.assertFalse(clock.isComplete());
+        clock.accept(buffers[1]);
+        Assertions.assertFalse(buffers[1].hasRemaining());
 
-        ByteBuffer out1 = clock.accept(buffers[1]);
-        Assertions.assertFalse(out1.hasRemaining());
-        Assertions.assertFalse(clock.isComplete());
-
-        ByteBuffer out2 = clock.accept(buffers[2]);
-        Assertions.assertFalse(out2.hasRemaining());
-        Assertions.assertFalse(clock.isComplete());
+        clock.accept(buffers[2]);
+        Assertions.assertFalse(buffers[2].hasRemaining());
 
         // must not consume '>'
-        ByteBuffer out3 = clock.accept(buffers[3]);
-        Assertions.assertTrue(out3.hasRemaining());
-        Assertions.assertTrue(clock.isComplete());
+        clock.accept(buffers[3]);
+        Assertions.assertTrue(buffers[3].hasRemaining());
 
         Assertions.assertEquals("059", new ElementImpl(clock.get()).toString());
 
         Assertions.assertEquals(59, new ElementImpl(clock.get()).toInt());
 
-        Assertions.assertTrue(clock.isComplete());
     }
 
     @Test
     public void testTooManyNumbers() {
         StringInput input = new StringInput("0590");
         ByteBuffer[] buffers = input.asBuffers(1);
-        NumberSequenceClock clock = new NumberSequenceClock(3);
-        Assertions.assertFalse(clock.isComplete());
+        NumberSequenceClock clock = new NumberSequenceClock(new FakeClock(), 3);
 
-        Exception exception = Assertions.assertThrows(PriorityParseException.class, () -> clock.accept(buffers[0]));
+        Exception exception = Assertions
+                .assertThrows(NumberSequenceParseException.class, () -> clock.accept(buffers[0]));
 
         Assertions.assertEquals("too many numbers", exception.getMessage());
     }
@@ -123,10 +112,10 @@ public class NumberSequenceClockTest {
     public void testTooFewNumbers() {
         StringInput input = new StringInput(">");
         ByteBuffer[] buffers = input.asBuffers(1);
-        NumberSequenceClock clock = new NumberSequenceClock(3);
-        Assertions.assertFalse(clock.isComplete());
+        NumberSequenceClock clock = new NumberSequenceClock(new FakeClock(), 3);
 
-        Exception exception = Assertions.assertThrows(PriorityParseException.class, () -> clock.accept(buffers[0]));
+        Exception exception = Assertions
+                .assertThrows(NumberSequenceParseException.class, () -> clock.accept(buffers[0]));
 
         Assertions.assertEquals("too few numbers", exception.getMessage());
     }

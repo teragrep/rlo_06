@@ -61,19 +61,15 @@ public class VersionClockTest {
         StringInput input = new StringInput("1 X");
         ByteBuffer[] buffers = input.asBuffers(1);
 
-        VersionClock clock = new VersionClock(timestampClock);
+        VersionClock clock = new VersionClock(new FakeClock());
 
-        Assertions.assertFalse(clock.isComplete());
-
-        ByteBuffer out0 = clock.accept(buffers[0]);
-        Assertions.assertTrue(out0.hasRemaining());
+        clock.accept(buffers[0]);
+        Assertions.assertTrue(buffers[0].hasRemaining());
 
         Assertions.assertEquals("1", clock.get().toString());
 
-        Assertions.assertTrue(clock.isComplete());
-
         List<ByteBuffer> bufferList = new ArrayList<>(1);
-        bufferList.add(out0.slice());
+        bufferList.add(buffers[0].slice());
         Assertions.assertEquals("X", new ElementImpl(bufferList).toString());
     }
 
@@ -82,22 +78,20 @@ public class VersionClockTest {
         StringInput input = new StringInput("1 X");
         ByteBuffer[] buffers = input.asBuffers(3);
 
-        VersionClock clock = new VersionClock(timestampClock);
+        VersionClock clock = new VersionClock(new FakeClock());
 
-        ByteBuffer out0 = clock.accept(buffers[0]);
-        Assertions.assertFalse(out0.hasRemaining());
-        Assertions.assertFalse(clock.isComplete());
+        clock.accept(buffers[0]);
+        Assertions.assertFalse(buffers[0].hasRemaining());
 
-        ByteBuffer out1 = clock.accept(buffers[1]);
-        Assertions.assertFalse(out1.hasRemaining());
-        Assertions.assertTrue(clock.isComplete());
+        clock.accept(buffers[1]);
+        Assertions.assertFalse(buffers[1].hasRemaining());
 
         Assertions.assertEquals("1", clock.get().toString());
 
-        ByteBuffer out2 = clock.accept(buffers[2]);
-        Assertions.assertTrue(out2.hasRemaining());
+        clock.accept(buffers[2]);
+        Assertions.assertTrue(buffers[2].hasRemaining());
 
-        ByteBuffer in2 = out2.slice();
+        ByteBuffer in2 = buffers[2].slice();
         List<ByteBuffer> ins = new ArrayList<>(1);
         ins.add(in2);
         Assertions.assertEquals("X", new ElementImpl(ins).toString());
@@ -108,7 +102,7 @@ public class VersionClockTest {
         StringInput input = new StringInput("@");
         ByteBuffer[] buffers = input.asBuffers(1);
 
-        VersionClock clock = new VersionClock(timestampClock);
+        VersionClock clock = new VersionClock(new FakeClock());
 
         NumberSequenceParseException exception = Assertions.assertThrows(NumberSequenceParseException.class, () -> {
             clock.accept(buffers[0]);
@@ -122,7 +116,7 @@ public class VersionClockTest {
         StringInput input = new StringInput("1@");
         ByteBuffer[] buffers = input.asBuffers(1);
 
-        VersionClock clock = new VersionClock(timestampClock);
+        VersionClock clock = new VersionClock(new FakeClock());
 
         CharacterParseException exception = Assertions.assertThrows(CharacterParseException.class, () -> {
             clock.accept(buffers[0]);

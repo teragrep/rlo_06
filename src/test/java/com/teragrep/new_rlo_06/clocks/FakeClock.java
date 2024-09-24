@@ -43,49 +43,19 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-package com.teragrep.new_rlo_06;
-
-import com.teragrep.new_rlo_06.clocks.RFC5424FrameClock;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+package com.teragrep.new_rlo_06.clocks;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
-public class RFC5424FrameTest {
+public class FakeClock implements Clock<Void> {
 
-    @Test
-    public void testInterpretation() {
-        String payloadFirstFragment = "<14>1 2014-06-20T09:14:07.123456";
-        byte[] firstFragmentBytes = payloadFirstFragment.getBytes(StandardCharsets.UTF_8);
-        ByteBuffer firstFragment = ByteBuffer.allocateDirect(firstFragmentBytes.length);
-        firstFragment.put(firstFragmentBytes);
-        firstFragment.flip();
+    @Override
+    public void accept(ByteBuffer byteBuffer) {
 
-        String payloadSecondFragment = "+00:00 host01 systemd DEA MSG-01 [ID_A@1 u=\"\\\"3\" e=\"t\"][ID_B@2 n=\"9\"] sigsegv\n";
-        byte[] secondFragmentBytes = payloadSecondFragment.getBytes(StandardCharsets.UTF_8);
-        ByteBuffer secondFragment = ByteBuffer.allocateDirect(secondFragmentBytes.length);
-        secondFragment.put(secondFragmentBytes);
-        secondFragment.flip();
+    }
 
-        ByteBuffer[] fragments = new ByteBuffer[2];
-        fragments[0] = firstFragment;
-        fragments[1] = secondFragment;
-
-        RFC5424FrameClock frameClock = new RFC5424FrameClock();
-
-        frameClock.accept(fragments[0]);
-        Assertions.assertFalse(fragments[0].hasRemaining());
-
-        frameClock.accept(fragments[1]);
-        Assertions.assertFalse(fragments[1].hasRemaining());
-
-        RFC5424Frame frame = frameClock.get();
-
-        Assertions.assertEquals(14, frame.priority().toInt());
-
-        // TODO remove and assert once complete
-        System.out.println("message <[" + frame.message() + "]>");
-
+    @Override
+    public Void get() {
+        throw new UnsupportedOperationException();
     }
 }
