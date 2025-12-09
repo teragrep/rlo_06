@@ -49,7 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Consumer;
 
-public final class RFC5424Frame {
+public final class RFC5424Frame implements Frame {
 
     private final Stream stream;
     private final Consumer<Stream> streamConsumer;
@@ -107,6 +107,7 @@ public final class RFC5424Frame {
                 );
     }
 
+    @Override
     public boolean next() throws IOException {
         /*
         Following abbreviations are used to indicate parsing in the comments.
@@ -144,7 +145,53 @@ public final class RFC5424Frame {
         msg.clear();
     }
 
+    @Override
     public void load(InputStream inputStream) {
         stream.setInputStream(inputStream);
+    }
+
+    @Override
+    public Fragment priority() {
+        return priority;
+    }
+
+    @Override
+    public Fragment version() {
+        return version;
+    }
+
+    @Override
+    public Fragment timestamp() {
+        return timestamp;
+    }
+
+    @Override
+    public Fragment hostname() {
+        return hostname;
+    }
+
+    @Override
+    public Fragment appName() {
+        return appName;
+    }
+
+    @Override
+    public Fragment procId() {
+        return procId;
+    }
+
+    @Override
+    public Fragment msgId() {
+        return msgId;
+    }
+
+    @Override
+    public StructuredData structuredData() {
+        return structuredData;
+    }
+
+    @Override
+    public Fragment msg() {
+        return msg;
     }
 }

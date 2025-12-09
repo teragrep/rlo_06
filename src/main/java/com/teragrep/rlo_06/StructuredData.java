@@ -76,8 +76,15 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
 
     private final Fragment stubFragment;
 
+    private final boolean noOp;
+
     StructuredData() {
+        this(false);
+    }
+
+    StructuredData(boolean noOp) {
         int numElements = 16;
+        this.noOp = noOp;
         this.sdElementCache = new SDElementCache(numElements);
         this.sdElements = new ArrayList<>(numElements);
         this.fragmentState = FragmentState.EMPTY;
@@ -86,6 +93,10 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
 
     @Override
     public void accept(Stream stream) {
+        if (noOp) {
+            fragmentState = FragmentState.WRITTEN;
+            return;
+        }
         if (fragmentState != FragmentState.EMPTY) {
             throw new IllegalStateException("fragmentState != FragmentState.EMPTY");
         }
@@ -144,6 +155,9 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
     }
 
     public Fragment getValue(SDVector sdVector) {
+        if (noOp) {
+            return new Fragment(true);
+        }
         if (fragmentState != FragmentState.WRITTEN) {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
@@ -163,6 +177,9 @@ public final class StructuredData implements Consumer<Stream>, Clearable {
 
     @Override
     public String toString() {
+        if (noOp) {
+            return "";
+        }
         if (fragmentState != FragmentState.WRITTEN) {
             throw new IllegalStateException("fragmentState != FragmentState.WRITTEN");
         }
